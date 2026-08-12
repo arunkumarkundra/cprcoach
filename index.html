@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#FAFAF7">
+
+<!-- ── SEO ─────────────────────────────────────────── -->
+<title>CPR Coach — Free Step-by-Step CPR Instructions with Live Metronome</title>
+<meta name="description" content="Free hands-only CPR guidance that works offline. Voice instructions, a 110 bpm compression metronome, AED steps and rescue breath timing in 6 languages. No app, no account.">
+<meta name="keywords" content="CPR, CPR instructions, how to do CPR, hands only CPR, chest compressions, CPR metronome, 110 bpm, cardiac arrest, AED, defibrillator, rescue breaths, first aid, emergency, CPR steps, CPR Hindi, CPR Kannada, CPR Tamil, offline CPR guide">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="CPR Coach">
+<link rel="canonical" href="https://example.org/">
+<link rel="alternate" hreflang="en" href="https://example.org/?lang=en">
+<link rel="alternate" hreflang="hi" href="https://example.org/?lang=hi">
+<link rel="alternate" hreflang="kn" href="https://example.org/?lang=kn">
+<link rel="alternate" hreflang="ta" href="https://example.org/?lang=ta">
+<link rel="alternate" hreflang="es" href="https://example.org/?lang=es">
+<link rel="alternate" hreflang="ar" href="https://example.org/?lang=ar">
+<link rel="alternate" hreflang="x-default" href="https://example.org/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CPR Coach">
+<meta property="og:title" content="CPR Coach — free CPR instructions that work offline">
+<meta property="og:description" content="One button. Voice guidance, a live compression beat, AED steps and rescue breath timing. Six languages. No app to install.">
+<meta property="og:url" content="https://example.org/">
+<meta property="og:image" content="https://example.org/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="An ECG trace on a pale background">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CPR Coach — free CPR instructions that work offline">
+<meta name="twitter:description" content="One button. Voice guidance, a live compression beat and AED steps in six languages.">
+<meta name="twitter:image" content="https://example.org/og-image.png">
+
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23FAFAF7"/><path d="M6 36h10l6-20 8 32 6-16h22" fill="none" stroke="%23E8412C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>'>
+<link rel="apple-touch-icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23FAFAF7"/><path d="M6 36h10l6-20 8 32 6-16h22" fill="none" stroke="%23E8412C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>'>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"WebApplication","name":"CPR Coach","url":"https://example.org/",
+"applicationCategory":"HealthApplication","operatingSystem":"Any web browser",
+"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+"description":"Free offline CPR guidance with voice instructions, a 110 bpm compression metronome, AED steps and rescue breath timing in six languages.",
+"inLanguage":["en","hi","kn","ta","es","ar"],"isAccessibleForFree":true},
+{"@type":"HowTo","name":"How to perform hands-only CPR on an adult",
+"description":"Steps to give chest compressions to an adult who has collapsed and is not breathing normally.",
+"totalTime":"PT2M","step":[
+{"@type":"HowToStep","name":"Check for a response","text":"Shout at them and squeeze their shoulder. If there is no response, they need help."},
+{"@type":"HowToStep","name":"Check the breathing","text":"Watch the chest for 10 seconds. Gasping, snoring or irregular gulps are not normal breathing."},
+{"@type":"HowToStep","name":"Call for an ambulance","text":"Call your local emergency number and put the phone on speaker. Send someone for a defibrillator."},
+{"@type":"HowToStep","name":"Position the person","text":"Lay them flat on their back on a firm surface. Kneel beside their chest. Tilt the head back and lift the chin."},
+{"@type":"HowToStep","name":"Give chest compressions","text":"Heel of one hand in the centre of the chest, other hand on top, elbows locked. Push down about 5 cm, 100 to 120 times a minute, letting the chest come fully back up each time."},
+{"@type":"HowToStep","name":"Use a defibrillator as soon as one arrives","text":"Turn it on and follow its spoken prompts. Resume compressions immediately after any shock."}]}
+]}
+</script>
+
+<style>
+:root{
+  --paper:#FAFAF7; --ink:#0F1113; --slate:#5A646E; --hair:#D9DCD8;
+  --pulse:#E8412C; --jade:#0E7C5E; --amber:#C97A0B;
+  --pad: clamp(20px, 5vw, 40px); --wash: 0;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI Variable Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-feature-settings:"tnum" 1;-webkit-font-smoothing:antialiased;line-height:1.25;
+  display:flex;flex-direction:column;min-height:100dvh}
+body[dir="rtl"]{direction:rtl}
+#wash{position:fixed;inset:0;pointer-events:none;z-index:0;background:var(--pulse);
+  opacity:calc(var(--wash) * 0.16);transition:opacity 90ms linear}
+@media (prefers-reduced-motion: reduce){#wash{opacity:0}
+  body.beating{box-shadow:inset 0 0 0 calc(var(--wash) * 14px) var(--pulse)}}
+
+.screen{position:relative;z-index:1;flex:1;display:none;flex-direction:column;padding:var(--pad)}
+.screen.on{display:flex}
+.eyebrow{font-size:clamp(11px,2.8vw,13px);font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--slate)}
+h1{font-size:clamp(30px,8.5vw,54px);font-weight:800;letter-spacing:-.03em;line-height:1.02}
+h2{font-size:clamp(23px,6.4vw,38px);font-weight:800;letter-spacing:-.025em;line-height:1.08}
+h3{font-size:19px;font-weight:800;letter-spacing:-.01em}
+.lede{font-size:clamp(17px,4.4vw,22px);font-weight:500;color:var(--slate);line-height:1.4}
+.stack{display:flex;flex-direction:column;gap:14px}
+.grow{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;padding:22px 0}
+.foot{display:flex;flex-direction:column;gap:12px;padding-bottom:env(safe-area-inset-bottom)}
+
+button{font:inherit;border:none;border-radius:18px;cursor:pointer;min-height:74px;padding:19px 22px;width:100%;
+  font-size:clamp(18px,4.8vw,23px);font-weight:700;letter-spacing:-.01em;background:var(--ink);color:var(--paper);
+  transition:transform 90ms ease,filter 120ms ease;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center}
+button:active{transform:scale(.975);filter:brightness(1.15)}
+button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
+.b-red{background:var(--pulse);color:#fff}
+.b-jade{background:var(--jade);color:#fff}
+.b-amber{background:var(--amber);color:#fff}
+.b-quiet{background:transparent;color:var(--slate);border:2px solid var(--hair);min-height:56px;font-size:16px;font-weight:600}
+.b-huge{min-height:clamp(150px,32vh,250px);font-size:clamp(29px,7.6vw,44px);font-weight:800;border-radius:26px;flex-direction:column;gap:8px}
+.b-huge small{font-size:15px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.82}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+#counter{font-size:min(44vw,290px);font-weight:800;letter-spacing:-.05em;line-height:.86;text-align:center;
+  font-variant-numeric:tabular-nums}
+#counter.small{font-size:min(20vw,120px)}
+#cue{font-size:clamp(20px,5.2vw,29px);font-weight:700;text-align:center;letter-spacing:-.02em;min-height:2.8em}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
+.bar b{font-size:19px;font-weight:800;letter-spacing:-.01em;color:var(--ink);font-variant-numeric:tabular-nums}
+.tick{height:6px;background:var(--hair);border-radius:3px;overflow:hidden;margin:10px 0 0}
+.tick i{display:block;height:100%;background:var(--pulse);width:0%;transition:width 120ms linear}
+.tick.breath i{background:var(--jade)}
+
+.note{font-size:15px;line-height:1.45;color:var(--slate);font-weight:500}
+.warn{border-inline-start:5px solid var(--pulse);padding-inline-start:14px}
+.steps{list-style:none;display:flex;flex-direction:column;gap:16px}
+.steps li{display:flex;gap:14px;align-items:flex-start;font-size:clamp(17px,4.4vw,21px);font-weight:600;line-height:1.3}
+.steps b{flex:none;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--paper);
+  display:grid;place-items:center;font-size:16px;font-weight:800}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:0;width:auto;padding:11px 16px;border-radius:999px;font-size:16px;font-weight:600;
+  background:transparent;color:var(--ink);border:2px solid var(--hair)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.mini{padding:8px 13px;font-size:14px}
+#langstrip{display:none;padding:10px 0 2px}
+#langstrip.on{display:block}
+.globe{min-height:0;width:auto;padding:8px 13px;border-radius:999px;background:transparent;
+  border:2px solid var(--hair);color:var(--ink);font-size:14px;font-weight:700}
+
+.log{list-style:none}
+.log li{display:flex;gap:16px;padding:13px 0;border-bottom:1px solid var(--hair);font-size:16px;font-weight:600}
+.log time{font-variant-numeric:tabular-nums;color:var(--slate);font-weight:700;min-width:74px}
+
+.dash{display:grid;gap:14px}
+.card{border:2px solid var(--hair);border-radius:16px;padding:18px}
+.card h3{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);margin-bottom:10px}
+.metric{font-size:clamp(28px,6.5vw,40px);font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.metric.pending{color:var(--hair)}
+.metric.big{font-size:clamp(38px,10vw,60px);letter-spacing:.06em}
+.script{font-size:clamp(18px,4.4vw,23px);font-weight:700;line-height:1.3;letter-spacing:-.015em}
+.script em{display:block;font-style:normal;font-size:15px;font-weight:600;color:var(--slate);margin-top:8px}
+@media(min-width:760px){.dash{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}
+.link{background:none;border:none;color:var(--slate);font-size:15px;font-weight:700;min-height:0;width:auto;
+  padding:8px 0;text-decoration:underline;text-underline-offset:4px}
+.badge{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;
+  border-radius:999px;background:var(--ink);color:var(--paper)}
+.badge.beta{background:var(--amber);color:#fff}
+.badge.off{background:var(--hair);color:var(--slate)}
+.brandmark{display:flex;align-items:center;gap:9px}
+.brandmark svg{width:26px;height:26px;flex:none}
+
+#codeinput{width:100%;font:inherit;font-size:38px;font-weight:800;letter-spacing:.22em;text-align:center;
+  padding:20px;border:2px solid var(--hair);border-radius:16px;background:transparent;color:var(--ink);
+  font-variant-numeric:tabular-nums}
+#preview{width:100%;max-height:34vh;border-radius:16px;background:#000;object-fit:cover;display:block}
+
+.disclaimer{font-size:13px;line-height:1.45;color:var(--slate);font-weight:500;
+  border-top:1px solid var(--hair);padding-top:12px}
+.disclaimer b{color:var(--ink)}
+.article{border-top:1px solid var(--hair);margin-top:26px;padding-top:22px;display:flex;flex-direction:column;gap:14px}
+.article p{font-size:16px;line-height:1.55;color:var(--slate)}
+.article h2{font-size:22px}
+.article h3{font-size:17px;margin-top:6px}
+</style>
+</head>
+<body>
+<div id="wash"></div>
+
+<!-- ═══ HOME ═══ -->
+<section class="screen on" id="s-home">
+  <div class="topbar">
+    <span class="brandmark">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 36h10l6-20 8 32 6-16h26" fill="none" stroke="#E8412C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="eyebrow">CPR Coach</span>
+      <span class="badge beta">Beta</span>
+    </span>
+    <button class="link" id="btn-console">Dispatcher</button>
+  </div>
+  <div class="grow">
+    <h1 id="t-home-h">If someone has collapsed,<br>start here.</h1>
+    <p class="lede" id="t-home-p">Works with no signal. No account. Nothing to install.</p>
+  </div>
+  <div class="foot stack">
+    <button class="b-red b-huge" id="btn-start"><span id="t-start">SOMEONE COLLAPSED</span><small id="t-start-sub">Tap to begin</small></button>
+    <div class="chips" id="langchips"></div>
+    <p class="disclaimer" id="t-disclaimer"><b>Beta — not clinically approved.</b> This is an early prototype under review and may contain errors. It does not replace training or professional medical care. Call your local emergency number first. Use at your own risk.</p>
+
+    <!-- crawlable content: real guidance, also useful before an emergency -->
+    <div class="article">
+      <h2>How to do CPR on an adult</h2>
+      <p>Cardiac arrest kills within minutes. Chest compressions started by whoever is standing there — before an ambulance arrives — are the single biggest factor in whether someone survives. You do not need training and you cannot make a person in cardiac arrest worse by trying.</p>
+      <h3>1. Check for a response</h3>
+      <p>Shout at them and squeeze their shoulder. If there is no response at all, they need help immediately.</p>
+      <h3>2. Check the breathing</h3>
+      <p>Watch the chest for ten seconds. Gasping, snoring or irregular gulping is <em>not</em> normal breathing — it is the sound of a heart that has stopped. This is the mistake that costs the most lives. If you are unsure, treat it as cardiac arrest.</p>
+      <h3>3. Call for help</h3>
+      <p>Call your local emergency number and put the phone on speaker. If anyone else is nearby, point at one specific person and give them one specific job: call, or fetch a defibrillator.</p>
+      <h3>4. Get them into position</h3>
+      <p>Lay them flat on their back on a firm surface — the floor, not a bed or sofa. Kneel beside their chest. Tilt the head back and lift the chin to open the airway. Expose the chest.</p>
+      <h3>5. Push hard and fast</h3>
+      <p>Put the heel of one hand in the centre of the chest, the other hand on top, and lock your elbows. Push down about 5 cm, between 100 and 120 times a minute, letting the chest come all the way back up between compressions. Keep going until help arrives or the person starts breathing normally.</p>
+      <h3>6. Use a defibrillator the moment one appears</h3>
+      <p>Turn it on and do exactly what it says. Keep compressing while the pads are being attached. Resume compressions immediately after any shock.</p>
+      <h3>Should I give rescue breaths?</h3>
+      <p>If you are untrained or unwilling, compression-only CPR on an adult is effective and is what most guidance recommends. For children and babies, breaths matter more, because their hearts usually stop as a result of a breathing problem. This tool switches automatically once you say who you are helping.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RESPONSIVE ═══ -->
+<section class="screen" id="s-resp">
+  <div class="grow">
+    <span class="eyebrow" id="t-q1-eye">Question 1 of 3</span>
+    <h2 id="t-q1"></h2>
+  </div>
+  <div class="foot stack">
+    <button class="b-jade" data-go="resp-yes" id="t-q1-yes"></button>
+    <button class="b-red" data-go="resp-no" id="t-q1-no"></button>
+  </div>
+</section>
+
+<!-- ═══ BREATHING ═══ -->
+<section class="screen" id="s-breath">
+  <div class="grow">
+    <span class="eyebrow" id="t-q2-eye">Question 2 of 3</span>
+    <h2 id="t-q2"></h2>
+    <p class="note warn" id="t-q2-warn"></p>
+  </div>
+  <div class="foot stack">
+    <button class="b-jade" data-go="breath-yes" id="t-q2-yes"></button>
+    <button class="b-red" data-go="breath-no" id="t-q2-no"></button>
+  </div>
+</section>
+
+<!-- ═══ WHO ═══ -->
+<section class="screen" id="s-who">
+  <div class="grow">
+    <span class="eyebrow" id="t-q3-eye">Question 3 of 3 — last one</span>
+    <h2 id="t-q3"></h2>
+    <p class="note" id="t-q3-note"></p>
+  </div>
+  <div class="foot stack">
+    <button data-who="adult" id="t-adult"></button>
+    <button data-who="child" id="t-child"></button>
+    <button data-who="infant" id="t-infant"></button>
+  </div>
+</section>
+
+<!-- ═══ CALL ═══ -->
+<section class="screen" id="s-call">
+  <div class="grow">
+    <span class="eyebrow" id="t-call-eye">Do this now</span>
+    <h2 id="t-call-h"></h2>
+    <p class="lede" id="t-call-p"></p>
+  </div>
+  <div class="foot stack">
+    <button class="b-red" id="btn-called"></button>
+    <button class="b-quiet" id="btn-alone"></button>
+  </div>
+</section>
+
+<!-- ═══ POSITION ═══ -->
+<section class="screen" id="s-prep">
+  <div class="grow">
+    <span class="eyebrow" id="t-prep-eye">Ten seconds — then we push</span>
+    <h2 id="t-prep-h"></h2>
+    <ul class="steps" id="prep-steps"></ul>
+  </div>
+  <div class="foot stack">
+    <button class="b-red" id="btn-prep-done"></button>
+  </div>
+</section>
+
+<!-- ═══ COMPRESSIONS ═══ -->
+<section class="screen" id="s-cpr">
+  <div class="bar">
+    <span><b id="clock">0:00</b> <span id="t-elapsed">elapsed</span></span>
+    <span style="display:flex;gap:8px;align-items:center">
+      <span><span id="t-total">total</span> <b id="total">0</b></span>
+      <button class="globe" id="btn-lang-cpr" aria-label="Change language">🌐</button>
+    </span>
+  </div>
+  <div id="langstrip"><div class="chips" id="langchips-cpr"></div></div>
+  <div class="tick" id="tickwrap"><i id="ticker"></i></div>
+  <div class="grow">
+    <div id="counter">0</div>
+    <div id="cue"></div>
+    <video id="preview" playsinline muted autoplay style="display:none"></video>
+  </div>
+  <div class="foot stack">
+    <div class="row">
+      <button class="b-amber" id="btn-aed"></button>
+      <button class="b-jade" id="btn-alive"></button>
+    </div>
+    <div class="row">
+      <button class="b-quiet" id="btn-swap"></button>
+      <button class="b-quiet" id="btn-breaths"></button>
+    </div>
+    <button class="b-quiet" id="btn-video"></button>
+  </div>
+</section>
+
+<!-- ═══ VIDEO CODE ═══ -->
+<section class="screen" id="s-code">
+  <div class="grow">
+    <span class="eyebrow" id="t-code-eye">The dispatcher will read this out</span>
+    <h2 id="t-code-h"></h2>
+    <input id="codeinput" inputmode="numeric" maxlength="6" placeholder="000000" aria-label="Dispatcher code">
+    <p class="note" id="t-code-note"></p>
+  </div>
+  <div class="foot stack">
+    <button class="b-amber" id="btn-code-go"></button>
+    <button class="b-quiet" id="btn-code-back"></button>
+  </div>
+</section>
+
+<!-- ═══ AED ═══ -->
+<section class="screen" id="s-aed">
+  <div class="bar"><span><b id="clock2">0:00</b></span><span class="badge">AED</span></div>
+  <div class="grow">
+    <span class="eyebrow" id="t-aed-eye">Keep pushing until the pads are on</span>
+    <h2 id="aed-step"></h2>
+    <p class="note" id="aed-note"></p>
+  </div>
+  <div class="foot stack">
+    <button class="b-amber" id="btn-aed-next">Next</button>
+    <button class="b-quiet" id="btn-aed-back"></button>
+  </div>
+</section>
+
+<!-- ═══ RECOVERY ═══ -->
+<section class="screen" id="s-alive">
+  <div class="grow">
+    <span class="eyebrow" id="t-alive-eye">Keep watching them</span>
+    <h2 id="t-alive-h"></h2>
+    <p class="lede" id="t-alive-p"></p>
+  </div>
+  <div class="foot stack">
+    <button class="b-red" id="btn-restart"></button>
+    <button class="b-quiet" id="btn-handover2">Handover summary</button>
+  </div>
+</section>
+
+<!-- ═══ HANDOVER ═══ -->
+<section class="screen" id="s-hand">
+  <div class="topbar"><span class="eyebrow" id="t-hand-eye">Show this to the crew</span><span class="badge off">Handover</span></div>
+  <div class="grow" style="justify-content:flex-start">
+    <h2 id="t-hand-h"></h2>
+    <ul class="log" id="loglist"></ul>
+  </div>
+  <div class="foot stack">
+    <button class="b-quiet" id="btn-copy">Copy as text</button>
+    <button class="b-quiet" id="btn-home">Back to start</button>
+  </div>
+</section>
+
+<!-- ═══ DISPATCHER ═══ -->
+<section class="screen" id="s-console">
+  <div class="topbar"><span class="eyebrow">Dispatcher console <span class="badge beta">Beta</span></span><button class="link" id="btn-exit-console">Exit</button></div>
+  <div class="grow" style="justify-content:flex-start;gap:14px">
+    <div class="dash">
+      <div class="card"><h3>Call clock</h3><div class="metric" id="d-clock">0:00</div></div>
+      <div class="card"><h3>Video link code — read this to the caller</h3><div class="metric big" id="d-code">——————</div></div>
+      <div class="card"><h3>Compression rate seen on video</h3><div class="metric pending" id="d-rate">—</div></div>
+      <div class="card"><h3>Arrest recognised at</h3><div class="metric pending" id="d-recog">—</div></div>
+      <div class="card"><h3>First compression at</h3><div class="metric pending" id="d-first">—</div></div>
+      <div class="card wide"><h3>Say this <span id="d-step">1 / 5</span></h3><div class="script" id="d-script"></div></div>
+      <div class="card wide"><h3>Caller's language — one tap speaks it to them</h3><div class="chips" id="d-langs"></div></div>
+    </div>
+  </div>
+  <div class="foot stack">
+    <div class="row"><button id="d-mark-recog">Mark recognised</button><button id="d-mark-first">Mark first compression</button></div>
+    <div class="row"><button class="b-amber" id="d-speak">Speak to caller</button><button class="b-red" id="d-metro">Start beat</button></div>
+    <button class="b-quiet" id="d-next">Next instruction</button>
+  </div>
+</section>
+
+<script>
+"use strict";
+/* ══ 1. LANGUAGE PACK — every string needs native + clinical review ══ */
+const L = {
+en:{name:"English",code:"en-US",dir:"ltr",
+ homeH:"If someone has collapsed,<br>start here.",
+ homeP:"Works with no signal. No account. Nothing to install.",
+ start:"SOMEONE COLLAPSED",startSub:"Tap to begin",
+ q1:"Shout at them and squeeze their shoulder. Any response?",q1y:"Yes — they moved or spoke",q1n:"No — nothing at all",
+ q2:"Watch their chest for 10 seconds. Are they breathing normally?",
+ q2w:"<b>Gasping, snoring or irregular gulps are not normal breathing.</b> That is the sound of a heart that has stopped. If you are unsure, choose No.",
+ q2y:"Yes — steady and regular",q2n:"No, or I'm not sure",
+ q3:"Who are you helping?",q3n:"This changes how hard you push and whether breaths are needed.",
+ adult:"An adult or teenager",child:"A child (1 year to puberty)",infant:"A baby under 1 year",
+ callH:"Call for an ambulance. Put the phone on speaker.",
+ callP:"If anyone else is there, point at one person and say: <b>you call, you find a defibrillator.</b> Then come straight back.",
+ called:"Done — next step",alone:"I'm alone and can't call yet",
+ prepH:"Get them ready. Do this fast.",
+ prep:["Lay them flat on their back on the floor. Not a bed, not a sofa — it must be hard.",
+       "Kneel beside their chest. Tilt the head back, lift the chin.",
+       "Open or cut away clothing so you can see the bare chest."],
+ prepDone:"Ready — start pushing",
+ elapsed:"elapsed",total:"total",
+ aedBtn:"Defibrillator here",aliveBtn:"They're breathing",swap:"Handing over",breathsOn:"Add rescue breaths",breathsOff:"Compressions only",
+ videoBtn:"Dispatcher asked for video",
+ codeH:"Enter the 6-digit code the dispatcher gave you.",
+ codeNote:"Your camera turns on so the dispatcher can see the chest and check your rhythm. They cannot hear you through this — keep talking on the phone call.",
+ codeGo:"Connect video",codeBack:"Not now — keep pushing",
+ aliveH:"Roll them onto their side, head tilted back, mouth pointing down.",
+ aliveP:"Stay there. If the breathing stops or turns to gasping, start compressions again immediately.",
+ restart:"They stopped breathing — restart",handH:"What happened",aedBack:"Back to compressions",
+ newRescuer:"You are the responder now. Keep the same beat.",
+ say:{place:{adult:"Heel of one hand in the centre of the chest. Other hand on top. Lock your elbows.",
+   child:"Heel of one hand in the centre of the chest. Use two hands if you need to.",
+   infant:"Two fingers in the centre of the chest, just below the nipple line."},
+  depth:{adult:"Push down about 5 centimetres. Let the chest come all the way back up each time.",
+   child:"Push down about a third of the depth of the chest.",infant:"Push down about 4 centimetres."},
+  go:"Push hard and fast. Follow the beat.",
+  keep:["Keep going. You are doing the right thing.","Don't stop. Every push counts.","Stay with the beat.","You're doing well. Keep pushing."],
+  b1:"Stop. Tilt the head back and lift the chin.",
+  b2:"Pinch the nose. Seal your mouth over theirs. Blow for one second — watch the chest rise.",
+  b3:"Let the chest fall. Blow once more.",
+  resume:"Straight back to compressions now.",
+  aed:"Turn the defibrillator on and do exactly what it tells you.",
+  clear:"Nobody touch them. Stand clear.",shock:"Shock delivered. Straight back to compressions now.",
+  prep:"Lay them flat on their back on a hard surface. Tilt the head back and lift the chin."},
+ aedSteps:[{h:"Turn it on. Then do exactly what it says.",n:"Keep pushing while someone else opens it."},
+  {h:"Bare the chest. Wipe it dry if it's wet.",n:"Cut or tear clothing. Remove metal jewellery from the chest."},
+  {h:"Stick the pads on exactly as pictured on the pads.",n:"One upper right chest, one lower left side. The picture on the pad is the instruction."},
+  {h:"Nobody touch them. Let it analyse.",n:"Say it out loud: stand clear."},
+  {h:"If it says shock, press the button. Then push again immediately.",n:"Do not wait to see what happens."}],
+ dScript:[{s:"Is he awake? Shout his name and squeeze his shoulder.",e:"Wait for a clear yes or no. Nothing else yet."},
+  {s:"Look at his chest. Is he breathing normally? Gasping does not count.",e:"This is the question that most often goes wrong. Push back once on a vague answer."},
+  {s:"Help is on the way. I need you to start pushing on his chest right now.",e:"Do not ask for age, history or address again."},
+  {s:"Put him flat on his back on the floor. Kneel beside him, heel of your hand in the centre of his chest.",e:"Position and hand placement in one sentence."},
+  {s:"Push down hard, twice a second, and don't stop until I tell you.",e:"Start the beat. Count out loud with them for the first ten."}]},
+
+hi:{name:"हिन्दी",code:"hi-IN",dir:"ltr",
+ homeH:"अगर कोई गिर पड़ा है,<br>यहाँ से शुरू करें।",homeP:"बिना नेटवर्क के भी चलता है। कोई खाता नहीं।",
+ start:"कोई गिर पड़ा है",startSub:"शुरू करने के लिए दबाएँ",
+ q1:"ज़ोर से आवाज़ दें और कंधा दबाएँ। कोई प्रतिक्रिया?",q1y:"हाँ — हिले या बोले",q1n:"नहीं — कुछ भी नहीं",
+ q2:"10 सेकंड तक छाती देखें। क्या साँस सामान्य चल रही है?",
+ q2w:"<b>हाँफना, खर्राटे जैसी या रुक-रुक कर आती साँस सामान्य नहीं है।</b> यह रुके हुए दिल की आवाज़ है। संदेह हो तो 'नहीं' चुनें।",
+ q2y:"हाँ — नियमित है",q2n:"नहीं, या मुझे पक्का नहीं",
+ q3:"आप किसकी मदद कर रहे हैं?",q3n:"इससे तय होगा कि कितना ज़ोर लगाना है और साँस देनी है या नहीं।",
+ adult:"वयस्क या किशोर",child:"बच्चा (1 साल से किशोरावस्था तक)",infant:"1 साल से छोटा शिशु",
+ callH:"एम्बुलेंस बुलाएँ। फ़ोन स्पीकर पर रखें।",
+ callP:"अगर कोई और है, एक व्यक्ति की ओर इशारा करके कहें: <b>आप फ़ोन करें, आप डिफ़िब्रिलेटर लाएँ।</b>",
+ called:"हो गया — अगला कदम",alone:"मैं अकेला हूँ, अभी कॉल नहीं कर सकता",
+ prepH:"उन्हें तैयार करें। जल्दी करें।",
+ prep:["उन्हें पीठ के बल ज़मीन पर सीधा लिटाएँ। बिस्तर या सोफ़े पर नहीं — सतह सख़्त होनी चाहिए।",
+   "उनकी छाती के पास घुटनों पर बैठें। सिर पीछे करें, ठुड्डी ऊपर उठाएँ।",
+   "कपड़े खोलें या काटें ताकि छाती दिखे।"],
+ prepDone:"तैयार — दबाना शुरू करें",
+ elapsed:"बीता समय",total:"कुल",
+ aedBtn:"डिफ़िब्रिलेटर आ गया",aliveBtn:"साँस चल रही है",swap:"दूसरा संभाल रहा है",breathsOn:"साँस भी दें",breathsOff:"सिर्फ़ दबाव",
+ videoBtn:"डिस्पैचर ने वीडियो माँगा",
+ codeH:"डिस्पैचर द्वारा दिया गया 6 अंकों का कोड डालें।",
+ codeNote:"आपका कैमरा चालू होगा ताकि डिस्पैचर छाती देख सके। वे इससे सुन नहीं सकते — फ़ोन कॉल पर बात करते रहें।",
+ codeGo:"वीडियो जोड़ें",codeBack:"अभी नहीं — दबाते रहें",
+ aliveH:"उन्हें करवट पर लिटाएँ, सिर पीछे, मुँह नीचे की ओर।",
+ aliveP:"वहीं रुकें। साँस रुके या हाँफने लगे तो तुरंत फिर से दबाना शुरू करें।",
+ restart:"साँस रुक गई — फिर शुरू करें",handH:"क्या हुआ",aedBack:"वापस दबाने पर",
+ newRescuer:"अब आप ज़िम्मेदार हैं। वही ताल बनाए रखें।",
+ say:{place:{adult:"एक हाथ की हथेली छाती के बीच में। दूसरा हाथ ऊपर। कोहनियाँ सीधी।",
+   child:"एक हाथ की हथेली छाती के बीच में रखें।",infant:"दो उंगलियाँ छाती के बीच में रखें।"},
+  depth:{adult:"लगभग 5 सेंटीमीटर दबाएँ। हर बार छाती पूरी तरह ऊपर आने दें।",
+   child:"छाती की गहराई का एक तिहाई दबाएँ।",infant:"लगभग 4 सेंटीमीटर दबाएँ।"},
+  go:"ज़ोर से और तेज़ दबाएँ। ताल के साथ चलें।",
+  keep:["चलते रहें। आप सही कर रहे हैं।","रुकें नहीं। हर दबाव मायने रखता है।","ताल के साथ रहें।","अच्छा कर रहे हैं। दबाते रहें।"],
+  b1:"रुकें। सिर पीछे करें और ठुड्डी ऊपर उठाएँ।",
+  b2:"नाक दबाएँ। मुँह से मुँह जोड़ें। एक सेकंड तक फूँकें — छाती उठती देखें।",
+  b3:"छाती को नीचे आने दें। एक बार और फूँकें।",
+  resume:"तुरंत फिर से दबाना शुरू करें।",
+  aed:"डिफ़िब्रिलेटर चालू करें और जैसा वह कहे वैसा करें।",
+  clear:"कोई छुए नहीं। दूर हट जाएँ।",shock:"झटका दे दिया गया। तुरंत फिर से दबाएँ।",
+  prep:"उन्हें सख़्त सतह पर पीठ के बल लिटाएँ। सिर पीछे करें, ठुड्डी ऊपर उठाएँ।"},
+ aedSteps:[{h:"चालू करें। फिर वही करें जो वह कहे।",n:"कोई और इसे खोले, आप दबाते रहें।"},
+  {h:"छाती खोलें। गीली हो तो पोंछ लें।",n:"कपड़ा काटें या फाड़ें।"},
+  {h:"पैड ठीक वैसे चिपकाएँ जैसा पैड पर चित्र है।",n:"एक ऊपर दाईं ओर, एक नीचे बाईं ओर।"},
+  {h:"कोई न छुए। इसे जाँचने दें।",n:"ज़ोर से कहें: सब दूर हटें।"},
+  {h:"अगर झटका कहे, बटन दबाएँ। फिर तुरंत दबाना शुरू करें।",n:"रुककर देखें नहीं।"}],
+ dScript:[{s:"क्या वे होश में हैं? नाम पुकारें और कंधा दबाएँ।",e:"साफ़ हाँ या ना का इंतज़ार करें।"},
+  {s:"छाती देखिए। साँस सामान्य है? हाँफना नहीं गिना जाता।",e:"यहीं सबसे ज़्यादा गलती होती है।"},
+  {s:"मदद आ रही है। अभी उनकी छाती दबाना शुरू कीजिए।",e:"उम्र या पता दोबारा न पूछें।"},
+  {s:"उन्हें ज़मीन पर पीठ के बल लिटाइए। पास घुटनों पर बैठिए, हथेली छाती के बीच।",e:"एक वाक्य में।"},
+  {s:"ज़ोर से दबाएँ, एक सेकंड में दो बार, जब तक मैं न कहूँ रुकें नहीं।",e:"ताल शुरू करें।"}]},
+
+kn:{name:"ಕನ್ನಡ",code:"kn-IN",dir:"ltr",
+ homeH:"ಯಾರಾದರೂ ಕುಸಿದು ಬಿದ್ದರೆ,<br>ಇಲ್ಲಿಂದ ಪ್ರಾರಂಭಿಸಿ.",homeP:"ನೆಟ್‌ವರ್ಕ್ ಇಲ್ಲದೆಯೂ ಕೆಲಸ ಮಾಡುತ್ತದೆ.",
+ start:"ಯಾರೋ ಕುಸಿದು ಬಿದ್ದಿದ್ದಾರೆ",startSub:"ಪ್ರಾರಂಭಿಸಲು ಒತ್ತಿ",
+ q1:"ಜೋರಾಗಿ ಕರೆಯಿರಿ ಮತ್ತು ಭುಜ ಅಲ್ಲಾಡಿಸಿ. ಪ್ರತಿಕ್ರಿಯೆ ಇದೆಯೇ?",q1y:"ಹೌದು — ಅಲುಗಾಡಿದರು",q1n:"ಇಲ್ಲ — ಏನೂ ಇಲ್ಲ",
+ q2:"10 ಸೆಕೆಂಡು ಎದೆಯನ್ನು ನೋಡಿ. ಉಸಿರಾಟ ಸಾಮಾನ್ಯವಾಗಿದೆಯೇ?",
+ q2w:"<b>ಏದುಸಿರು, ಗೊರಕೆಯಂತಹ ಅಥವಾ ಅನಿಯಮಿತ ಉಸಿರು ಸಾಮಾನ್ಯವಲ್ಲ.</b> ಅದು ನಿಂತ ಹೃದಯದ ಸದ್ದು. ಅನುಮಾನವಿದ್ದರೆ 'ಇಲ್ಲ' ಆಯ್ಕೆ ಮಾಡಿ.",
+ q2y:"ಹೌದು — ಸ್ಥಿರವಾಗಿದೆ",q2n:"ಇಲ್ಲ, ಅಥವಾ ಖಚಿತವಿಲ್ಲ",
+ q3:"ನೀವು ಯಾರಿಗೆ ಸಹಾಯ ಮಾಡುತ್ತಿದ್ದೀರಿ?",q3n:"ಇದು ಎಷ್ಟು ಒತ್ತಬೇಕು ಎಂದು ನಿರ್ಧರಿಸುತ್ತದೆ.",
+ adult:"ವಯಸ್ಕ ಅಥವಾ ಹದಿಹರೆಯದವರು",child:"ಮಗು (1 ವರ್ಷದಿಂದ)",infant:"1 ವರ್ಷದೊಳಗಿನ ಶಿಶು",
+ callH:"ಆಂಬ್ಯುಲೆನ್ಸ್ ಕರೆಯಿರಿ. ಫೋನ್ ಸ್ಪೀಕರ್‌ನಲ್ಲಿ ಇಡಿ.",
+ callP:"ಬೇರೆ ಯಾರಾದರೂ ಇದ್ದರೆ ಒಬ್ಬರನ್ನು ತೋರಿಸಿ ಹೇಳಿ: <b>ನೀವು ಕರೆ ಮಾಡಿ, ನೀವು ಡಿಫಿಬ್ರಿಲೇಟರ್ ತನ್ನಿ.</b>",
+ called:"ಆಯಿತು — ಮುಂದಿನ ಹಂತ",alone:"ನಾನು ಒಬ್ಬನೇ ಇದ್ದೇನೆ",
+ prepH:"ಅವರನ್ನು ಸಿದ್ಧಪಡಿಸಿ. ಬೇಗ ಮಾಡಿ.",
+ prep:["ಅವರನ್ನು ನೆಲದ ಮೇಲೆ ಬೆನ್ನಿನ ಮೇಲೆ ಮಲಗಿಸಿ. ಹಾಸಿಗೆ ಅಥವಾ ಸೋಫಾ ಅಲ್ಲ — ಗಟ್ಟಿ ನೆಲ ಬೇಕು.",
+   "ಅವರ ಎದೆಯ ಪಕ್ಕ ಮಂಡಿಯೂರಿ. ತಲೆ ಹಿಂದಕ್ಕೆ ಬಗ್ಗಿಸಿ, ಗಲ್ಲ ಮೇಲೆತ್ತಿ.",
+   "ಬಟ್ಟೆ ತೆಗೆಯಿರಿ ಅಥವಾ ಕತ್ತರಿಸಿ, ಎದೆ ಕಾಣುವಂತೆ ಮಾಡಿ."],
+ prepDone:"ಸಿದ್ಧ — ಒತ್ತಲು ಪ್ರಾರಂಭಿಸಿ",
+ elapsed:"ಕಳೆದ ಸಮಯ",total:"ಒಟ್ಟು",
+ aedBtn:"ಡಿಫಿಬ್ರಿಲೇಟರ್ ಬಂದಿದೆ",aliveBtn:"ಉಸಿರಾಡುತ್ತಿದ್ದಾರೆ",swap:"ಬೇರೆಯವರು ವಹಿಸಿಕೊಳ್ಳುತ್ತಿದ್ದಾರೆ",breathsOn:"ಉಸಿರೂ ಕೊಡಿ",breathsOff:"ಒತ್ತುವುದು ಮಾತ್ರ",
+ videoBtn:"ಡಿಸ್ಪ್ಯಾಚರ್ ವೀಡಿಯೊ ಕೇಳಿದರು",
+ codeH:"ಡಿಸ್ಪ್ಯಾಚರ್ ಕೊಟ್ಟ 6 ಅಂಕಿಯ ಕೋಡ್ ಹಾಕಿ.",
+ codeNote:"ನಿಮ್ಮ ಕ್ಯಾಮೆರಾ ಆನ್ ಆಗುತ್ತದೆ, ಡಿಸ್ಪ್ಯಾಚರ್ ಎದೆಯನ್ನು ನೋಡಬಹುದು. ಫೋನ್ ಕರೆಯಲ್ಲಿ ಮಾತನಾಡುತ್ತಿರಿ.",
+ codeGo:"ವೀಡಿಯೊ ಸಂಪರ್ಕಿಸಿ",codeBack:"ಈಗ ಬೇಡ — ಒತ್ತುತ್ತಿರಿ",
+ aliveH:"ಅವರನ್ನು ಪಕ್ಕಕ್ಕೆ ತಿರುಗಿಸಿ, ತಲೆ ಹಿಂದಕ್ಕೆ, ಬಾಯಿ ಕೆಳಮುಖವಾಗಿ.",
+ aliveP:"ಅಲ್ಲಿಯೇ ಇರಿ. ಉಸಿರಾಟ ನಿಂತರೆ ತಕ್ಷಣ ಮತ್ತೆ ಒತ್ತಿ.",
+ restart:"ಉಸಿರಾಟ ನಿಂತಿತು — ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ",handH:"ಏನಾಯಿತು",aedBack:"ಮತ್ತೆ ಒತ್ತುವುದಕ್ಕೆ",
+ newRescuer:"ಈಗ ನೀವು ಜವಾಬ್ದಾರರು. ಅದೇ ತಾಳ ಇಟ್ಟುಕೊಳ್ಳಿ.",
+ say:{place:{adult:"ಒಂದು ಕೈಯ ಹಿಮ್ಮಡಿ ಎದೆಯ ಮಧ್ಯದಲ್ಲಿ. ಇನ್ನೊಂದು ಕೈ ಮೇಲೆ. ಮೊಣಕೈ ನೇರವಾಗಿರಲಿ.",
+   child:"ಒಂದು ಕೈಯ ಹಿಮ್ಮಡಿ ಎದೆಯ ಮಧ್ಯದಲ್ಲಿ ಇಡಿ.",infant:"ಎರಡು ಬೆರಳು ಎದೆಯ ಮಧ್ಯದಲ್ಲಿ ಇಡಿ."},
+  depth:{adult:"ಸುಮಾರು 5 ಸೆಂಟಿಮೀಟರ್ ಒತ್ತಿ. ಪ್ರತಿ ಬಾರಿ ಎದೆ ಪೂರ್ತಿ ಮೇಲಕ್ಕೆ ಬರಲಿ.",
+   child:"ಎದೆಯ ಆಳದ ಮೂರನೇ ಒಂದು ಭಾಗ ಒತ್ತಿ.",infant:"ಸುಮಾರು 4 ಸೆಂಟಿಮೀಟರ್ ಒತ್ತಿ."},
+  go:"ಜೋರಾಗಿ ಮತ್ತು ವೇಗವಾಗಿ ಒತ್ತಿ. ತಾಳಕ್ಕೆ ಅನುಗುಣವಾಗಿ.",
+  keep:["ಮುಂದುವರಿಸಿ. ಸರಿಯಾದದ್ದನ್ನೇ ಮಾಡುತ್ತಿದ್ದೀರಿ.","ನಿಲ್ಲಿಸಬೇಡಿ. ಪ್ರತಿ ಒತ್ತುವಿಕೆಯೂ ಮುಖ್ಯ.","ತಾಳದೊಂದಿಗೆ ಇರಿ.","ಚೆನ್ನಾಗಿ ಮಾಡುತ್ತಿದ್ದೀರಿ."],
+  b1:"ನಿಲ್ಲಿಸಿ. ತಲೆ ಹಿಂದಕ್ಕೆ ಬಗ್ಗಿಸಿ, ಗಲ್ಲ ಮೇಲೆತ್ತಿ.",
+  b2:"ಮೂಗು ಮುಚ್ಚಿ. ಬಾಯಿಗೆ ಬಾಯಿ ಜೋಡಿಸಿ. ಒಂದು ಸೆಕೆಂಡು ಊದಿ — ಎದೆ ಏಳುವುದನ್ನು ನೋಡಿ.",
+  b3:"ಎದೆ ಇಳಿಯಲಿ. ಮತ್ತೊಮ್ಮೆ ಊದಿ.",
+  resume:"ತಕ್ಷಣ ಮತ್ತೆ ಒತ್ತಲು ಪ್ರಾರಂಭಿಸಿ.",
+  aed:"ಡಿಫಿಬ್ರಿಲೇಟರ್ ಆನ್ ಮಾಡಿ ಮತ್ತು ಅದು ಹೇಳಿದಂತೆ ಮಾಡಿ.",
+  clear:"ಯಾರೂ ಮುಟ್ಟಬೇಡಿ. ದೂರ ಸರಿಯಿರಿ.",shock:"ಶಾಕ್ ಕೊಡಲಾಗಿದೆ. ತಕ್ಷಣ ಮತ್ತೆ ಒತ್ತಿ.",
+  prep:"ಗಟ್ಟಿ ನೆಲದ ಮೇಲೆ ಬೆನ್ನಿನ ಮೇಲೆ ಮಲಗಿಸಿ. ತಲೆ ಹಿಂದಕ್ಕೆ, ಗಲ್ಲ ಮೇಲೆತ್ತಿ."},
+ aedSteps:[{h:"ಆನ್ ಮಾಡಿ. ನಂತರ ಅದು ಹೇಳಿದಂತೆಯೇ ಮಾಡಿ.",n:"ಬೇರೆಯವರು ತೆರೆಯಲಿ, ನೀವು ಒತ್ತುತ್ತಿರಿ."},
+  {h:"ಎದೆಯನ್ನು ತೆರೆಯಿರಿ. ಒದ್ದೆಯಿದ್ದರೆ ಒರೆಸಿ.",n:"ಬಟ್ಟೆ ಕತ್ತರಿಸಿ ಅಥವಾ ಹರಿಯಿರಿ."},
+  {h:"ಪ್ಯಾಡ್‌ಗಳ ಮೇಲಿನ ಚಿತ್ರದಂತೆಯೇ ಅಂಟಿಸಿ.",n:"ಒಂದು ಮೇಲೆ ಬಲಕ್ಕೆ, ಒಂದು ಕೆಳಗೆ ಎಡಕ್ಕೆ."},
+  {h:"ಯಾರೂ ಮುಟ್ಟಬೇಡಿ. ಅದು ಪರೀಕ್ಷಿಸಲಿ.",n:"ಜೋರಾಗಿ ಹೇಳಿ: ಎಲ್ಲರೂ ದೂರ ಸರಿಯಿರಿ."},
+  {h:"ಶಾಕ್ ಎಂದರೆ ಬಟನ್ ಒತ್ತಿ. ನಂತರ ತಕ್ಷಣ ಒತ್ತಿ.",n:"ಕಾಯಬೇಡಿ."}],
+ dScript:[{s:"ಅವರಿಗೆ ಪ್ರಜ್ಞೆ ಇದೆಯೇ? ಹೆಸರು ಕರೆದು ಭುಜ ಅಲ್ಲಾಡಿಸಿ.",e:"ಸ್ಪಷ್ಟ ಉತ್ತರಕ್ಕಾಗಿ ಕಾಯಿರಿ."},
+  {s:"ಎದೆ ನೋಡಿ. ಉಸಿರಾಟ ಸಾಮಾನ್ಯವೇ? ಏದುಸಿರು ಎಣಿಕೆಗೆ ಬರುವುದಿಲ್ಲ.",e:"ಇಲ್ಲಿಯೇ ಹೆಚ್ಚು ತಪ್ಪಾಗುತ್ತದೆ."},
+  {s:"ಸಹಾಯ ಬರುತ್ತಿದೆ. ಈಗಲೇ ಎದೆ ಒತ್ತಲು ಪ್ರಾರಂಭಿಸಿ.",e:"ವಯಸ್ಸು ಅಥವಾ ವಿಳಾಸ ಮತ್ತೆ ಕೇಳಬೇಡಿ."},
+  {s:"ಅವರನ್ನು ನೆಲದ ಮೇಲೆ ಮಲಗಿಸಿ. ಪಕ್ಕ ಮಂಡಿಯೂರಿ, ಹಸ್ತ ಎದೆಯ ಮಧ್ಯದಲ್ಲಿ.",e:"ಒಂದೇ ವಾಕ್ಯದಲ್ಲಿ."},
+  {s:"ಜೋರಾಗಿ ಒತ್ತಿ, ಸೆಕೆಂಡಿಗೆ ಎರಡು ಬಾರಿ, ನಾನು ಹೇಳುವವರೆಗೆ ನಿಲ್ಲಿಸಬೇಡಿ.",e:"ತಾಳ ಪ್ರಾರಂಭಿಸಿ."}]},
+
+ta:{name:"தமிழ்",code:"ta-IN",dir:"ltr",
+ homeH:"யாராவது சரிந்து விழுந்தால்,<br>இங்கே தொடங்குங்கள்.",homeP:"நெட்வொர்க் இல்லாமலும் வேலை செய்யும்.",
+ start:"யாரோ சரிந்து விழுந்துவிட்டார்",startSub:"தொடங்க அழுத்தவும்",
+ q1:"சத்தமாக அழையுங்கள், தோளை அழுத்துங்கள். பதில் உள்ளதா?",q1y:"ஆம் — அசைந்தார்",q1n:"இல்லை — எதுவும் இல்லை",
+ q2:"10 வினாடிகள் மார்பைப் பாருங்கள். சுவாசம் இயல்பாக உள்ளதா?",
+ q2w:"<b>மூச்சிரைப்பு அல்லது ஒழுங்கற்ற மூச்சு இயல்பானது அல்ல.</b> அது நின்றுபோன இதயத்தின் ஒலி. சந்தேகம் இருந்தால் 'இல்லை' தேர்வு செய்யுங்கள்.",
+ q2y:"ஆம் — சீராக உள்ளது",q2n:"இல்லை, அல்லது உறுதியில்லை",
+ q3:"நீங்கள் யாருக்கு உதவுகிறீர்கள்?",q3n:"இது எவ்வளவு அழுத்த வேண்டும் என்பதை மாற்றும்.",
+ adult:"பெரியவர் அல்லது இளைஞர்",child:"குழந்தை (1 வயது முதல்)",infant:"1 வயதுக்குக் குறைவான குழந்தை",
+ callH:"ஆம்புலன்ஸ் அழையுங்கள். ஃபோனை ஸ்பீக்கரில் வையுங்கள்.",
+ callP:"வேறு யாராவது இருந்தால் ஒருவரைச் சுட்டிக்காட்டி சொல்லுங்கள்: <b>நீங்கள் அழையுங்கள், நீங்கள் டிஃபிபிரிலேட்டர் கொண்டு வாருங்கள்.</b>",
+ called:"முடிந்தது — அடுத்த படி",alone:"நான் தனியாக இருக்கிறேன்",
+ prepH:"அவரைத் தயார் செய்யுங்கள். விரைவாக.",
+ prep:["அவரைத் தரையில் முதுகில் நேராகப் படுக்க வையுங்கள். படுக்கை அல்லது சோஃபா அல்ல — கடினமான தரை வேண்டும்.",
+   "அவர் மார்புக்கு அருகில் மண்டியிடுங்கள். தலையைப் பின்னால் சாய்த்து, தாடையை உயர்த்துங்கள்.",
+   "ஆடையை விலக்கி மார்பு தெரியும்படி செய்யுங்கள்."],
+ prepDone:"தயார் — அழுத்தத் தொடங்குங்கள்",
+ elapsed:"கடந்த நேரம்",total:"மொத்தம்",
+ aedBtn:"டிஃபிபிரிலேட்டர் வந்தது",aliveBtn:"சுவாசிக்கிறார்",swap:"வேறொருவர் ஏற்கிறார்",breathsOn:"மூச்சும் கொடுங்கள்",breathsOff:"அழுத்தம் மட்டும்",
+ videoBtn:"டிஸ்பாட்சர் வீடியோ கேட்டார்",
+ codeH:"டிஸ்பாட்சர் கொடுத்த 6 இலக்கக் குறியீட்டை உள்ளிடவும்.",
+ codeNote:"உங்கள் கேமரா இயங்கும், டிஸ்பாட்சர் மார்பைப் பார்க்க முடியும். ஃபோன் அழைப்பில் பேசிக்கொண்டே இருங்கள்.",
+ codeGo:"வீடியோ இணைக்கவும்",codeBack:"இப்போது வேண்டாம்",
+ aliveH:"பக்கவாட்டில் திருப்புங்கள், தலை பின்னால், வாய் கீழ்நோக்கி.",
+ aliveP:"அங்கேயே இருங்கள். சுவாசம் நின்றால் உடனே மீண்டும் அழுத்துங்கள்.",
+ restart:"சுவாசம் நின்றது — மீண்டும்",handH:"என்ன நடந்தது",aedBack:"மீண்டும் அழுத்துவதற்கு",
+ newRescuer:"இப்போது நீங்கள் பொறுப்பு. அதே தாளத்தில் தொடருங்கள்.",
+ say:{place:{adult:"ஒரு கையின் அடிப்பகுதி மார்பின் நடுவில். மற்றொரு கை மேலே. முழங்கைகள் நேராக.",
+   child:"ஒரு கையின் அடிப்பகுதியை மார்பின் நடுவில் வையுங்கள்.",infant:"இரண்டு விரல்களை மார்பின் நடுவில் வையுங்கள்."},
+  depth:{adult:"சுமார் 5 சென்டிமீட்டர் அழுத்துங்கள். ஒவ்வொரு முறையும் மார்பு முழுமையாக மேலே வரட்டும்.",
+   child:"மார்பின் ஆழத்தில் மூன்றில் ஒரு பங்கு.",infant:"சுமார் 4 சென்டிமீட்டர்."},
+  go:"பலமாகவும் வேகமாகவும் அழுத்துங்கள். தாளத்தைப் பின்பற்றுங்கள்.",
+  keep:["தொடருங்கள். சரியானதைச் செய்கிறீர்கள்.","நிறுத்தாதீர்கள். ஒவ்வொரு அழுத்தமும் முக்கியம்.","தாளத்துடன் இருங்கள்.","நன்றாகச் செய்கிறீர்கள்."],
+  b1:"நிறுத்துங்கள். தலையைப் பின்னால் சாய்த்து தாடையை உயர்த்துங்கள்.",
+  b2:"மூக்கை மூடுங்கள். வாயை வாயுடன் பொருத்துங்கள். ஒரு வினாடி ஊதுங்கள் — மார்பு உயர்வதைப் பாருங்கள்.",
+  b3:"மார்பு இறங்கட்டும். மீண்டும் ஒருமுறை ஊதுங்கள்.",
+  resume:"உடனே மீண்டும் அழுத்தத் தொடங்குங்கள்.",
+  aed:"டிஃபிபிரிலேட்டரை ஆன் செய்து அது சொல்வதைச் செய்யுங்கள்.",
+  clear:"யாரும் தொடாதீர்கள். விலகி நில்லுங்கள்.",shock:"ஷாக் கொடுக்கப்பட்டது. உடனே அழுத்துங்கள்.",
+  prep:"கடினமான தரையில் முதுகில் படுக்க வையுங்கள். தலை பின்னால், தாடை உயர்த்தி."},
+ aedSteps:[{h:"ஆன் செய்யுங்கள். பிறகு அது சொல்வதைச் செய்யுங்கள்.",n:"வேறொருவர் திறக்கட்டும், நீங்கள் அழுத்துங்கள்."},
+  {h:"மார்பைத் திறக்கவும். ஈரமாக இருந்தால் துடைக்கவும்.",n:"ஆடையை வெட்டவும் அல்லது கிழிக்கவும்."},
+  {h:"பேடுகளில் உள்ள படத்தின்படியே ஒட்டவும்.",n:"ஒன்று மேல் வலது, ஒன்று கீழ் இடது."},
+  {h:"யாரும் தொடாதீர்கள். அது பரிசோதிக்கட்டும்.",n:"சத்தமாகச் சொல்லுங்கள்: விலகி நில்லுங்கள்."},
+  {h:"ஷாக் என்றால் பொத்தானை அழுத்துங்கள். பிறகு உடனே அழுத்துங்கள்.",n:"காத்திருக்காதீர்கள்."}],
+ dScript:[{s:"அவருக்கு நினைவு உள்ளதா? பெயரைக் கூப்பிட்டு தோளை அழுத்துங்கள்.",e:"தெளிவான பதிலுக்குக் காத்திருங்கள்."},
+  {s:"மார்பைப் பாருங்கள். சுவாசம் இயல்பாக உள்ளதா? மூச்சிரைப்பு கணக்கில்லை.",e:"இங்குதான் அதிகம் தவறு நடக்கிறது."},
+  {s:"உதவி வந்துகொண்டிருக்கிறது. இப்போதே மார்பை அழுத்தத் தொடங்குங்கள்.",e:"வயது அல்லது முகவரி மீண்டும் கேட்காதீர்கள்."},
+  {s:"அவரைத் தரையில் படுக்க வையுங்கள். அருகில் மண்டியிட்டு கை மார்பின் நடுவில்.",e:"ஒரே வாக்கியத்தில்."},
+  {s:"பலமாக அழுத்துங்கள், வினாடிக்கு இரண்டு முறை, நான் சொல்லும்வரை நிறுத்தாதீர்கள்.",e:"தாளத்தைத் தொடங்குங்கள்."}]},
+
+es:{name:"Español",code:"es-ES",dir:"ltr",
+ homeH:"Si alguien se ha desplomado,<br>empieza aquí.",homeP:"Funciona sin señal. Sin cuenta. Nada que instalar.",
+ start:"ALGUIEN SE HA DESPLOMADO",startSub:"Toca para empezar",
+ q1:"Grítale y apriétale el hombro. ¿Responde?",q1y:"Sí — se movió o habló",q1n:"No — nada en absoluto",
+ q2:"Mírale el pecho durante 10 segundos. ¿Respira con normalidad?",
+ q2w:"<b>Jadeos, ronquidos o bocanadas irregulares no son respiración normal.</b> Es el sonido de un corazón parado. Si dudas, elige No.",
+ q2y:"Sí — constante y regular",q2n:"No, o no estoy seguro",
+ q3:"¿A quién estás ayudando?",q3n:"Esto cambia la fuerza y si hacen falta ventilaciones.",
+ adult:"Un adulto o adolescente",child:"Un niño (de 1 año a la pubertad)",infant:"Un bebé menor de 1 año",
+ callH:"Llama a una ambulancia. Pon el teléfono en altavoz.",
+ callP:"Si hay alguien más, señala a una persona y di: <b>tú llama, tú busca un desfibrilador.</b>",
+ called:"Hecho — siguiente paso",alone:"Estoy solo y no puedo llamar",
+ prepH:"Prepáralo. Rápido.",
+ prep:["Túmbalo boca arriba en el suelo. Ni cama ni sofá — tiene que ser duro.",
+   "Arrodíllate junto a su pecho. Inclina la cabeza hacia atrás y levanta el mentón.",
+   "Aparta o corta la ropa para dejar el pecho al descubierto."],
+ prepDone:"Listo — empezar a comprimir",
+ elapsed:"transcurrido",total:"total",
+ aedBtn:"Desfibrilador aquí",aliveBtn:"Está respirando",swap:"Relevo",breathsOn:"Añadir ventilaciones",breathsOff:"Solo compresiones",
+ videoBtn:"El operador pidió vídeo",
+ codeH:"Introduce el código de 6 dígitos que te ha dado el operador.",
+ codeNote:"Se activa tu cámara para que el operador vea el pecho. No te oye por aquí — sigue hablando por teléfono.",
+ codeGo:"Conectar vídeo",codeBack:"Ahora no — sigue comprimiendo",
+ aliveH:"Gíralo de lado, con la cabeza hacia atrás y la boca hacia abajo.",
+ aliveP:"Quédate ahí. Si deja de respirar o empieza a jadear, reanuda las compresiones de inmediato.",
+ restart:"Dejó de respirar — reanudar",handH:"Qué ha pasado",aedBack:"Volver a comprimir",
+ newRescuer:"Ahora el responsable eres tú. Mantén el mismo ritmo.",
+ say:{place:{adult:"Talón de una mano en el centro del pecho. La otra encima. Bloquea los codos.",
+   child:"Talón de una mano en el centro del pecho.",infant:"Dos dedos en el centro del pecho."},
+  depth:{adult:"Comprime unos 5 centímetros. Deja que el pecho suba del todo cada vez.",
+   child:"Comprime un tercio de la profundidad del pecho.",infant:"Comprime unos 4 centímetros."},
+  go:"Comprime fuerte y rápido. Sigue el ritmo.",
+  keep:["Sigue. Estás haciendo lo correcto.","No pares. Cada compresión cuenta.","Mantén el ritmo.","Lo estás haciendo bien."],
+  b1:"Para. Inclina la cabeza hacia atrás y levanta el mentón.",
+  b2:"Tápale la nariz. Sella tu boca sobre la suya. Sopla un segundo — mira subir el pecho.",
+  b3:"Deja bajar el pecho. Sopla otra vez.",
+  resume:"Vuelve inmediatamente a las compresiones.",
+  aed:"Enciende el desfibrilador y haz exactamente lo que diga.",
+  clear:"Que nadie lo toque. Apartaos.",shock:"Descarga administrada. Vuelve a comprimir ya.",
+  prep:"Túmbalo boca arriba sobre una superficie dura. Inclina la cabeza y levanta el mentón."},
+ aedSteps:[{h:"Enciéndelo. Luego haz exactamente lo que diga.",n:"Que otra persona lo abra mientras tú comprimes."},
+  {h:"Descubre el pecho. Sécalo si está mojado.",n:"Corta o rasga la ropa."},
+  {h:"Pega los parches exactamente como muestra el dibujo.",n:"Uno arriba a la derecha, otro abajo a la izquierda."},
+  {h:"Que nadie lo toque. Deja que analice.",n:"Dilo en voz alta: apartaos."},
+  {h:"Si dice descarga, pulsa el botón. Después comprime de inmediato.",n:"No esperes a ver qué pasa."}],
+ dScript:[{s:"¿Está consciente? Grítale su nombre y apriétale el hombro.",e:"Espera un sí o un no claro."},
+  {s:"Mírale el pecho. ¿Respira con normalidad? Jadear no cuenta.",e:"Aquí es donde más se falla."},
+  {s:"La ayuda está en camino. Empiece a comprimir el pecho ahora.",e:"No vuelvas a pedir edad ni dirección."},
+  {s:"Póngalo boca arriba en el suelo. Arrodíllese al lado, la mano en el centro del pecho.",e:"Una sola frase."},
+  {s:"Comprima fuerte, dos veces por segundo, y no pare hasta que yo lo diga.",e:"Inicia el ritmo."}]},
+
+ar:{name:"العربية",code:"ar-SA",dir:"rtl",
+ homeH:"إذا سقط شخص فجأة،<br>ابدأ من هنا.",homeP:"يعمل بدون إنترنت. بدون حساب.",
+ start:"شخص ما سقط",startSub:"اضغط للبدء",
+ q1:"نادِ عليه بصوت عالٍ واضغط على كتفه. هل يستجيب؟",q1y:"نعم — تحرك أو تكلم",q1n:"لا — لا شيء إطلاقاً",
+ q2:"راقب صدره لمدة ١٠ ثوانٍ. هل يتنفس بشكل طبيعي؟",
+ q2w:"<b>اللهاث أو الشخير أو الشهقات غير المنتظمة ليست تنفساً طبيعياً.</b> هذا صوت قلب توقف. إذا لم تكن متأكداً اختر لا.",
+ q2y:"نعم — منتظم وثابت",q2n:"لا، أو لست متأكداً",
+ q3:"من الذي تساعده؟",q3n:"هذا يحدد قوة الضغط وهل تلزم أنفاس.",
+ adult:"بالغ أو مراهق",child:"طفل (من سنة حتى البلوغ)",infant:"رضيع أقل من سنة",
+ callH:"اتصل بالإسعاف. ضع الهاتف على مكبر الصوت.",
+ callP:"إذا كان هناك أحد آخر، أشر إلى شخص واحد وقل: <b>أنت اتصل، أنت أحضر جهاز الصدمات.</b>",
+ called:"تم — الخطوة التالية",alone:"أنا وحدي ولا أستطيع الاتصال",
+ prepH:"جهّزه. بسرعة.",
+ prep:["مدّده على ظهره على الأرض. ليس على سرير أو أريكة — يجب أن يكون السطح صلباً.",
+   "اركع بجانب صدره. أمِل رأسه للخلف وارفع ذقنه.",
+   "أزل أو اقطع الملابس حتى يظهر الصدر."],
+ prepDone:"جاهز — ابدأ الضغط",
+ elapsed:"الوقت المنقضي",total:"المجموع",
+ aedBtn:"جهاز الصدمات هنا",aliveBtn:"إنه يتنفس",swap:"تسليم لشخص آخر",breathsOn:"أضف الأنفاس",breathsOff:"ضغط فقط",
+ videoBtn:"طلب المرسل فيديو",
+ codeH:"أدخل الرمز المكون من ٦ أرقام الذي أعطاك إياه المرسل.",
+ codeNote:"ستُفتح الكاميرا ليرى المرسل الصدر. لا يسمعك من هنا — استمر في الحديث عبر المكالمة.",
+ codeGo:"وصل الفيديو",codeBack:"ليس الآن — واصل الضغط",
+ aliveH:"أدره على جانبه، الرأس للخلف والفم للأسفل.",
+ aliveP:"ابقَ معه. إذا توقف التنفس أو تحول إلى لهاث، ابدأ الضغط فوراً.",
+ restart:"توقف التنفس — ابدأ من جديد",handH:"ما الذي حدث",aedBack:"العودة إلى الضغط",
+ newRescuer:"أنت المسؤول الآن. حافظ على نفس الإيقاع.",
+ say:{place:{adult:"كعب يدك في منتصف الصدر. اليد الأخرى فوقها. ثبّت مرفقيك.",
+   child:"كعب يد واحدة في منتصف الصدر.",infant:"إصبعان في منتصف الصدر."},
+  depth:{adult:"اضغط حوالي ٥ سنتيمترات. دع الصدر يعود بالكامل في كل مرة.",
+   child:"اضغط ثلث عمق الصدر.",infant:"اضغط حوالي ٤ سنتيمترات."},
+  go:"اضغط بقوة وسرعة. اتبع الإيقاع.",
+  keep:["استمر. أنت تفعل الصواب.","لا تتوقف. كل ضغطة مهمة.","ابقَ مع الإيقاع.","أنت تبلي حسناً."],
+  b1:"توقف. أمِل الرأس للخلف وارفع الذقن.",
+  b2:"اقفل الأنف. أطبق فمك على فمه. انفخ لثانية واحدة — راقب ارتفاع الصدر.",
+  b3:"دع الصدر ينخفض. انفخ مرة أخرى.",
+  resume:"عد فوراً إلى الضغط.",
+  aed:"شغّل الجهاز ونفّذ ما يقوله بالضبط.",
+  clear:"لا أحد يلمسه. ابتعدوا.",shock:"تم إعطاء الصدمة. عد للضغط فوراً.",
+  prep:"مدّده على ظهره على سطح صلب. أمِل الرأس للخلف وارفع الذقن."},
+ aedSteps:[{h:"شغّله. ثم نفّذ ما يقوله بالضبط.",n:"دع شخصاً آخر يفتحه بينما تواصل الضغط."},
+  {h:"اكشف الصدر. جففه إذا كان مبللاً.",n:"اقطع أو مزّق الملابس."},
+  {h:"ألصق اللاصقات تماماً كما في الصورة عليها.",n:"واحدة أعلى اليمين، وأخرى أسفل اليسار."},
+  {h:"لا أحد يلمسه. دعه يحلل.",n:"قلها بصوت عالٍ: ابتعدوا."},
+  {h:"إذا قال صدمة، اضغط الزر. ثم اضغط الصدر فوراً.",n:"لا تنتظر."}],
+ dScript:[{s:"هل هو واعٍ؟ نادِ باسمه واضغط كتفه.",e:"انتظر نعم أو لا واضحة."},
+  {s:"انظر إلى صدره. هل يتنفس طبيعياً؟ اللهاث لا يُحتسب.",e:"هنا يقع الخطأ الأكبر."},
+  {s:"المساعدة في الطريق. ابدأ الضغط على صدره الآن.",e:"لا تسأل عن العمر أو العنوان مرة أخرى."},
+  {s:"مدّده على ظهره على الأرض. اركع بجانبه ويدك في منتصف الصدر.",e:"جملة واحدة."},
+  {s:"اضغط بقوة، مرتين في الثانية، ولا تتوقف حتى أخبرك.",e:"ابدأ الإيقاع."}]}
+};
+
+/* ══ 2. STATE ══ */
+const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
+ aedStep:0,log:[],dStep:0,dLang:"en",dT0:null,dCode:null,vision:false,seenRate:null,stream:null};
+const BPM=110,PERIOD=60/BPM;
+const $=id=>document.getElementById(id);
+const t=()=>L[S.lang];
+let phase="compress";
+
+/* ══ 3. AUDIO ══ */
+let ac=null,nextBeat=0,timer=null,beatNo=0;
+function audio(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac;}
+function click(at,accent){const c=audio();const o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();
+ f.type="bandpass";f.frequency.value=accent?1180:820;f.Q.value=1.6;o.type="square";o.frequency.value=accent?1180:820;
+ g.gain.setValueAtTime(0.0001,at);g.gain.exponentialRampToValueAtTime(accent?0.5:0.32,at+0.004);
+ g.gain.exponentialRampToValueAtTime(0.0001,at+0.075);o.connect(f);f.connect(g);g.connect(c.destination);o.start(at);o.stop(at+0.09);}
+function scheduler(){const c=audio();
+ while(nextBeat<c.currentTime+0.12){beatNo++;const n=beatNo;click(nextBeat,n%10===0);
+  setTimeout(()=>onBeat(n),Math.max(0,(nextBeat-c.currentTime))*1000);nextBeat+=PERIOD;}
+ timer=setTimeout(scheduler,25);}
+function startBeat(){if(S.running)return;S.running=true;beatNo=0;nextBeat=audio().currentTime+0.08;scheduler();}
+function stopBeat(){S.running=false;clearTimeout(timer);document.documentElement.style.setProperty("--wash",0);}
+
+/* ══ 4. VOICE ══ */
+let voices=[];
+function loadVoices(){voices=window.speechSynthesis?speechSynthesis.getVoices():[];}
+if(window.speechSynthesis){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;}
+function say(text,key){if(!window.speechSynthesis||!text)return;
+ const code=L[key||S.lang].code;const u=new SpeechSynthesisUtterance(text);
+ const v=voices.find(x=>x.lang===code)||voices.find(x=>x.lang.startsWith(code.split("-")[0]));
+ if(v){u.voice=v;u.lang=v.lang;}else{u.lang=code;}
+ u.rate=0.98;speechSynthesis.cancel();speechSynthesis.speak(u);}
+
+/* ══ 5. HELPERS ══ */
+let wakeLock=null;
+async function keepAwake(){try{if("wakeLock"in navigator)wakeLock=await navigator.wakeLock.request("screen");}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&S.t0)keepAwake();});
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));$(id).classList.add("on");window.scrollTo(0,0);}
+function mark(l){S.log.push({at:S.t0?Math.round((Date.now()-S.t0)/1000):0,label:l});}
+function mmss(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
+
+/* ══ 6. TRANSLATION ══ */
+function applyLang(){const d=t();
+ document.body.setAttribute("dir",d.dir);document.documentElement.lang=S.lang;
+ $("t-home-h").innerHTML=d.homeH;$("t-home-p").textContent=d.homeP;
+ $("t-start").textContent=d.start;$("t-start-sub").textContent=d.startSub;
+ $("t-q1").textContent=d.q1;$("t-q1-yes").textContent=d.q1y;$("t-q1-no").textContent=d.q1n;
+ $("t-q2").textContent=d.q2;$("t-q2-warn").innerHTML=d.q2w;$("t-q2-yes").textContent=d.q2y;$("t-q2-no").textContent=d.q2n;
+ $("t-q3").textContent=d.q3;$("t-q3-note").textContent=d.q3n;
+ $("t-adult").textContent=d.adult;$("t-child").textContent=d.child;$("t-infant").textContent=d.infant;
+ $("t-call-h").textContent=d.callH;$("t-call-p").innerHTML=d.callP;
+ $("btn-called").textContent=d.called;$("btn-alone").textContent=d.alone;
+ $("t-prep-h").textContent=d.prepH;$("btn-prep-done").textContent=d.prepDone;
+ const ul=$("prep-steps");ul.innerHTML="";
+ d.prep.forEach((s,i)=>{const li=document.createElement("li");li.innerHTML="<b>"+(i+1)+"</b><span>"+s+"</span>";ul.appendChild(li);});
+ $("t-elapsed").textContent=d.elapsed;$("t-total").textContent=d.total;
+ $("btn-aed").textContent=d.aedBtn;$("btn-alive").textContent=d.aliveBtn;$("btn-swap").textContent=d.swap;
+ $("btn-breaths").textContent=S.breaths?d.breathsOff:d.breathsOn;
+ $("btn-video").textContent=d.videoBtn;
+ $("t-code-h").textContent=d.codeH;$("t-code-note").textContent=d.codeNote;
+ $("btn-code-go").textContent=d.codeGo;$("btn-code-back").textContent=d.codeBack;
+ $("t-alive-h").textContent=d.aliveH;$("t-alive-p").textContent=d.aliveP;
+ $("btn-restart").textContent=d.restart;$("t-hand-h").textContent=d.handH;$("btn-aed-back").textContent=d.aedBack;
+ if(phase==="aed")renderAED();
+}
+function buildChips(boxId,onPick){const box=$(boxId);box.innerHTML="";
+ Object.keys(L).forEach(k=>{const b=document.createElement("button");
+  b.className=boxId==="langchips-cpr"?"chip mini":"chip";b.textContent=L[k].name;
+  b.setAttribute("aria-pressed",k===S.lang);b.onclick=()=>onPick(k);box.appendChild(b);});}
+function pickLang(k){S.lang=k;applyLang();
+ buildChips("langchips",pickLang);buildChips("langchips-cpr",pickLangLive);}
+function pickLangLive(k){S.lang=k;applyLang();
+ buildChips("langchips",pickLang);buildChips("langchips-cpr",pickLangLive);
+ if(phase==="compress")say(t().say.go);}
+
+/* ══ 7. FLOW ══ */
+$("btn-start").onclick=()=>{audio();S.t0=Date.now();S.log=[];S.total=0;mark("Collapse reported");keepAwake();show("s-resp");say(t().q1);};
+document.querySelectorAll("[data-go]").forEach(b=>{b.onclick=()=>{const g=b.dataset.go;
+ if(g==="resp-yes"){mark("Responded to voice");show("s-alive");say(t().aliveH);}
+ if(g==="resp-no"){mark("Unresponsive");show("s-breath");say(t().q2);}
+ if(g==="breath-yes"){mark("Breathing normally");show("s-alive");say(t().aliveH);}
+ if(g==="breath-no"){mark("Not breathing normally — arrest assumed");show("s-who");say(t().q3);}};});
+document.querySelectorAll("[data-who]").forEach(b=>{b.onclick=()=>{
+ S.who=b.dataset.who;S.breaths=(S.who!=="adult");mark("Patient: "+S.who);applyLang();show("s-call");say(t().callH);};});
+$("btn-called").onclick=()=>{mark("Ambulance called");goPrep();};
+$("btn-alone").onclick=()=>{mark("Rescuer alone, call pending");goPrep();};
+function goPrep(){show("s-prep");say(t().say.prep);}
+$("btn-prep-done").onclick=()=>{mark("Positioned flat, airway opened");beginCPR();};
+
+function beginCPR(){show("s-cpr");S.count=0;S.cycles=0;phase="compress";
+ $("counter").classList.remove("small");$("tickwrap").classList.remove("breath");
+ mark("Compressions started");const d=t();
+ $("cue").textContent=d.say.place[S.who];
+ say(d.say.place[S.who]+" "+d.say.depth[S.who]+" "+d.say.go);
+ setTimeout(()=>{if(phase==="compress")startBeat();},3600);tickClock();}
+
+function onBeat(n){const root=document.documentElement;
+ root.style.setProperty("--wash",1);setTimeout(()=>root.style.setProperty("--wash",0),150);
+ document.body.classList.add("beating");
+ if(phase!=="compress")return;
+ S.count++;S.total++;
+ $("counter").textContent=S.count;$("total").textContent=S.total;
+ $("ticker").style.width=((S.count%30)/30*100)+"%";
+ const d=t();
+ if(S.count===6)$("cue").textContent=d.say.go;
+ if(S.count>0&&S.count%30===0){S.cycles++;
+  if(S.breaths){doBreaths();}
+  else{const line=d.say.keep[S.cycles%d.say.keep.length];$("cue").textContent=line;say(line);}}}
+
+/* rescue breaths — target under 10 seconds off the chest */
+let breathTimers=[];
+function clearBreaths(){breathTimers.forEach(clearTimeout);breathTimers=[];}
+function doBreaths(){const d=t();phase="breaths";stopBeat();clearBreaths();
+ $("counter").classList.add("small");$("tickwrap").classList.add("breath");
+ const seq=[[0,d.say.b1,"1"],[2200,d.say.b2,"1 / 2"],[5600,d.say.b3,"2 / 2"]];
+ seq.forEach(([ms,line,lbl])=>breathTimers.push(setTimeout(()=>{
+   if(phase!=="breaths")return;$("counter").textContent=lbl;$("cue").textContent=line;say(line);},ms)));
+ let left=9;const cd=setInterval(()=>{left--;$("ticker").style.width=(left/9*100)+"%";if(left<=0)clearInterval(cd);},1000);
+ breathTimers.push(setTimeout(()=>{if(phase!=="breaths")return;
+   clearInterval(cd);$("counter").classList.remove("small");$("tickwrap").classList.remove("breath");
+   phase="compress";S.count=0;say(d.say.resume);startBeat();},9000));}
+
+function tickClock(){if(!S.t0)return;const s=Math.round((Date.now()-S.t0)/1000);
+ $("clock").textContent=mmss(s);$("clock2").textContent=mmss(s);setTimeout(tickClock,500);}
+
+/* live language switch during CPR */
+$("btn-lang-cpr").onclick=()=>$("langstrip").classList.toggle("on");
+
+/* breaths toggle */
+$("btn-breaths").onclick=()=>{S.breaths=!S.breaths;applyLang();
+ mark(S.breaths?"Switched to 30:2 with breaths":"Switched to compression-only");
+ $("cue").textContent=S.breaths?t().say.b1:t().say.go;};
+
+/* handover to another rescuer — resets count, keeps beat and clock */
+$("btn-swap").onclick=()=>{const d=t();mark("Rescuer changed");
+ clearBreaths();phase="compress";S.count=0;
+ $("counter").classList.remove("small");$("tickwrap").classList.remove("breath");
+ $("counter").textContent="0";$("ticker").style.width="0%";
+ $("cue").textContent=d.newRescuer;say(d.newRescuer+" "+d.say.go);
+ if(!S.running)startBeat();};
+
+/* AED */
+$("btn-aed").onclick=()=>{mark("Defibrillator on scene");stopBeat();clearBreaths();phase="aed";S.aedStep=0;
+ show("s-aed");renderAED();say(t().say.aed);};
+function renderAED(){const st=t().aedSteps[S.aedStep];$("aed-step").textContent=st.h;$("aed-note").textContent=st.n;}
+$("btn-aed-next").onclick=()=>{const d=t();
+ if(S.aedStep===3)say(d.say.clear);
+ if(S.aedStep===4){mark("Shock delivered or advised");say(d.say.shock);backToCPR();return;}
+ S.aedStep++;renderAED();say(t().aedSteps[S.aedStep].h);};
+$("btn-aed-back").onclick=backToCPR;
+function backToCPR(){phase="compress";S.count=0;$("counter").textContent="0";show("s-cpr");startBeat();}
+
+/* outcomes */
+$("btn-alive").onclick=()=>{mark("Breathing returned");stopBeat();clearBreaths();phase="idle";show("s-alive");say(t().aliveH);};
+$("btn-restart").onclick=()=>{mark("Re-arrest — compressions resumed");if(!S.t0){S.t0=Date.now();}beginCPR();};
+$("btn-handover2").onclick=()=>{renderLog();show("s-hand");};
+$("btn-home").onclick=()=>{stopBeat();clearBreaths();stopVision();phase="compress";S.t0=null;show("s-home");};
+function renderLog(){const ul=$("loglist");ul.innerHTML="";
+ S.log.forEach(e=>{const li=document.createElement("li");
+  li.innerHTML="<time>"+mmss(e.at)+"</time><span>"+e.label+"</span>";ul.appendChild(li);});
+ const li=document.createElement("li");
+ li.innerHTML="<time>—</time><span>"+S.total+" compressions guided at "+BPM+"/min</span>";ul.appendChild(li);}
+$("btn-copy").onclick=async()=>{const txt=S.log.map(e=>mmss(e.at)+"  "+e.label).join("\n")+"\ntotal compressions guided: "+S.total;
+ try{await navigator.clipboard.writeText(txt);$("btn-copy").textContent="Copied";}catch(e){$("btn-copy").textContent="Select and copy manually";}};
+
+/* ══ 8. VIDEO LINK + RATE DETECTION ══ */
+$("btn-video").onclick=()=>{show("s-code");$("codeinput").focus();};
+$("btn-code-back").onclick=()=>show("s-cpr");
+$("btn-code-go").onclick=async()=>{
+ const code=$("codeinput").value.trim();
+ if(code.length!==6){$("t-code-note").textContent="Enter all six digits.";return;}
+ mark("Video link opened, code "+code);
+ try{
+  S.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
+  const v=$("preview");v.srcObject=S.stream;v.style.display="block";
+  $("counter").classList.add("small");
+  show("s-cpr");startVision(v);
+ }catch(e){$("t-code-note").textContent="Camera unavailable. Keep pushing — this is optional.";}
+};
+function stopVision(){S.vision=false;if(S.stream){S.stream.getTracks().forEach(t=>t.stop());S.stream=null;}
+ const v=$("preview");v.style.display="none";$("counter").classList.remove("small");}
+function startVision(video){
+ S.vision=true;
+ const cv=document.createElement("canvas");cv.width=48;cv.height=36;
+ const ctx=cv.getContext("2d",{willReadFrequently:true});
+ let prev=null,buf=[],last=0,ivals=[];
+ function loop(){
+  if(!S.vision)return;
+  try{ctx.drawImage(video,0,0,48,36);}catch(e){requestAnimationFrame(loop);return;}
+  const d=ctx.getImageData(0,0,48,36).data;let sum=0;
+  if(prev){for(let i=0;i<d.length;i+=4)sum+=Math.abs(d[i]-prev[i]);}
+  prev=new Uint8ClampedArray(d);
+  const m=sum/(48*36);
+  buf.push(m);if(buf.length>90)buf.shift();
+  const mean=buf.reduce((a,b)=>a+b,0)/buf.length,thr=mean*1.55+1.5,now=performance.now();
+  if(m>thr&&now-last>330){
+   if(last)  {ivals.push(now-last);if(ivals.length>8)ivals.shift();}
+   last=now;
+   if(ivals.length>=4){const s=[...ivals].sort((a,b)=>a-b);
+    S.seenRate=Math.round(60000/s[Math.floor(s.length/2)]);
+    const el=$("d-rate");if(el){el.textContent=S.seenRate+"/min";el.classList.remove("pending");}}
+  }
+  if(now-last>3500){S.seenRate=null;ivals=[];const el=$("d-rate");if(el){el.textContent="—";el.classList.add("pending");}}
+  requestAnimationFrame(loop);
+ }
+ requestAnimationFrame(loop);
+}
+
+/* ══ 9. DISPATCHER ══ */
+$("btn-console").onclick=()=>{S.dT0=Date.now();S.dStep=0;
+ S.dCode=String(Math.floor(100000+Math.random()*900000));
+ $("d-code").textContent=S.dCode;dRender();dClock();show("s-console");};
+$("btn-exit-console").onclick=()=>{S.dT0=null;stopBeat();phase="compress";show("s-home");};
+function dClock(){if(!S.dT0)return;$("d-clock").textContent=mmss(Math.round((Date.now()-S.dT0)/1000));setTimeout(dClock,500);}
+function dRender(){const p=L[S.dLang].dScript[S.dStep];
+ $("d-step").textContent=(S.dStep+1)+" / "+L[S.dLang].dScript.length;
+ $("d-script").innerHTML=p.s+"<em>"+p.e+"</em>";
+ const box=$("d-langs");box.innerHTML="";
+ Object.keys(L).forEach(k=>{const b=document.createElement("button");b.className="chip";b.textContent=L[k].name;
+  b.setAttribute("aria-pressed",k===S.dLang);b.onclick=()=>{S.dLang=k;dRender();};box.appendChild(b);});}
+$("d-next").onclick=()=>{S.dStep=(S.dStep+1)%L[S.dLang].dScript.length;dRender();};
+$("d-speak").onclick=()=>say(L[S.dLang].dScript[S.dStep].s,S.dLang);
+$("d-mark-recog").onclick=()=>{const e=$("d-recog");e.textContent=mmss(Math.round((Date.now()-S.dT0)/1000));e.classList.remove("pending");};
+$("d-mark-first").onclick=()=>{const e=$("d-first");e.textContent=mmss(Math.round((Date.now()-S.dT0)/1000));e.classList.remove("pending");};
+$("d-metro").onclick=e=>{if(S.running){stopBeat();e.target.textContent="Start beat";}
+ else{phase="idle";startBeat();e.target.textContent="Stop beat";}};
+
+/* boot */
+const urlLang=new URLSearchParams(location.search).get("lang");
+if(urlLang&&L[urlLang])S.lang=urlLang;
+buildChips("langchips",pickLang);buildChips("langchips-cpr",pickLangLive);applyLang();
+</script>
+</body>
+</html>

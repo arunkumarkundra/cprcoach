@@ -155,6 +155,26 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
   font-variant-numeric:tabular-nums}
 #preview{width:100%;max-height:34vh;border-radius:16px;background:#000;object-fit:cover;display:block}
 
+/* responsive: centre on tablet/desktop, shrink for landscape phones */
+@media(min-width:700px){
+  .screen{max-width:760px;margin-inline:auto;width:100%}
+  #s-console{max-width:1100px}
+  .b-huge{min-height:230px}
+}
+@media(min-width:1100px){ #s-console .dash{grid-template-columns:repeat(3,1fr)} }
+@media(max-height:520px) and (orientation:landscape){
+  :root{--pad:14px}
+  #counter{font-size:min(20vh,120px)}
+  #cue{font-size:17px;min-height:2.2em}
+  h1{font-size:26px} h2{font-size:22px}
+  .b-huge{min-height:120px;font-size:26px}
+  button{min-height:56px;padding:14px 18px;font-size:17px}
+  .grow{padding:10px 0;gap:10px}
+  .article{display:none}
+}
+#d-preview{width:100%;max-height:280px;border-radius:12px;background:#000;object-fit:cover;display:none;margin-top:12px}
+#d-preview.on{display:block}
+
 .disclaimer{font-size:13px;line-height:1.45;color:var(--slate);font-weight:500;
   border-top:1px solid var(--hair);padding-top:12px}
 .disclaimer b{color:var(--ink)}
@@ -187,24 +207,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <p class="disclaimer" id="t-disclaimer"><b>Beta — not clinically approved.</b> This is an early prototype under review and may contain errors. It does not replace training or professional medical care. Call your local emergency number first. Use at your own risk.</p>
 
     <!-- crawlable content: real guidance, also useful before an emergency -->
-    <div class="article">
-      <h2>How to do CPR on an adult</h2>
-      <p>Cardiac arrest kills within minutes. Chest compressions started by whoever is standing there — before an ambulance arrives — are the single biggest factor in whether someone survives. You do not need training and you cannot make a person in cardiac arrest worse by trying.</p>
-      <h3>1. Check for a response</h3>
-      <p>Shout at them and squeeze their shoulder. If there is no response at all, they need help immediately.</p>
-      <h3>2. Check the breathing</h3>
-      <p>Watch the chest for ten seconds. Gasping, snoring or irregular gulping is <em>not</em> normal breathing — it is the sound of a heart that has stopped. This is the mistake that costs the most lives. If you are unsure, treat it as cardiac arrest.</p>
-      <h3>3. Call for help</h3>
-      <p>Call your local emergency number and put the phone on speaker. If anyone else is nearby, point at one specific person and give them one specific job: call, or fetch a defibrillator.</p>
-      <h3>4. Get them into position</h3>
-      <p>Lay them flat on their back on a firm surface — the floor, not a bed or sofa. Kneel beside their chest. Tilt the head back and lift the chin to open the airway. Expose the chest.</p>
-      <h3>5. Push hard and fast</h3>
-      <p>Put the heel of one hand in the centre of the chest, the other hand on top, and lock your elbows. Push down about 5 cm, between 100 and 120 times a minute, letting the chest come all the way back up between compressions. Keep going until help arrives or the person starts breathing normally.</p>
-      <h3>6. Use a defibrillator the moment one appears</h3>
-      <p>Turn it on and do exactly what it says. Keep compressing while the pads are being attached. Resume compressions immediately after any shock.</p>
-      <h3>Should I give rescue breaths?</h3>
-      <p>If you are untrained or unwilling, compression-only CPR on an adult is effective and is what most guidance recommends. For children and babies, breaths matter more, because their hearts usually stop as a result of a breathing problem. This tool switches automatically once you say who you are helping.</p>
-    </div>
+    <div class="article" id="article"></div>
   </div>
 </section>
 
@@ -278,7 +281,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <span><b id="clock">0:00</b> <span id="t-elapsed">elapsed</span></span>
     <span style="display:flex;gap:8px;align-items:center">
       <span><span id="t-total">total</span> <b id="total">0</b></span>
-      <button class="globe" id="btn-lang-cpr" aria-label="Change language">🌐</button>
+      <button class="globe" id="btn-lang-cpr" aria-label="Change language"><span aria-hidden="true">🌐</span> <span id="lang-label">English</span> ▾</button>
     </span>
   </div>
   <div id="langstrip"><div class="chips" id="langchips-cpr"></div></div>
@@ -361,7 +364,16 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
   <div class="grow" style="justify-content:flex-start;gap:14px">
     <div class="dash">
       <div class="card"><h3>Call clock</h3><div class="metric" id="d-clock">0:00</div></div>
-      <div class="card"><h3>Video link code — read this to the caller</h3><div class="metric big" id="d-code">——————</div></div>
+      <div class="card wide"><h3>Video session</h3>
+        <div class="metric big" id="d-code">——————</div>
+        <p class="note" id="d-linktext" style="margin:10px 0 12px;word-break:break-all"></p>
+        <div class="row">
+          <button class="b-quiet" id="d-copylink">Copy link to send</button>
+          <button class="b-amber" id="d-startvid">Start video session</button>
+        </div>
+        <video id="d-preview" playsinline muted autoplay></video>
+        <p class="note" id="d-vidnote" style="margin-top:10px"></p>
+      </div>
       <div class="card"><h3>Compression rate seen on video</h3><div class="metric pending" id="d-rate">—</div></div>
       <div class="card"><h3>Arrest recognised at</h3><div class="metric pending" id="d-recog">—</div></div>
       <div class="card"><h3>First compression at</h3><div class="metric pending" id="d-first">—</div></div>
@@ -689,9 +701,67 @@ ar:{name:"العربية",code:"ar-SA",dir:"rtl",
   {s:"اضغط بقوة، مرتين في الثانية، ولا تتوقف حتى أخبرك.",e:"ابدأ الإيقاع."}]}
 };
 
+/* ══ 1b. CRAWLABLE ARTICLE, PER LANGUAGE ══ */
+const ART={
+en:{h:"How to do CPR on an adult",
+ p:"Cardiac arrest kills within minutes. Chest compressions started by whoever is standing there — before an ambulance arrives — are the single biggest factor in whether someone survives. You do not need training, and you cannot make a person in cardiac arrest worse by trying.",
+ s:[["1. Check for a response","Shout at them and squeeze their shoulder. If there is no response at all, they need help immediately."],
+  ["2. Check the breathing","Watch the chest for ten seconds. Gasping, snoring or irregular gulping is not normal breathing — it is the sound of a heart that has stopped. This is the mistake that costs the most lives. If you are unsure, treat it as cardiac arrest."],
+  ["3. Call for help","Call your local emergency number and put the phone on speaker. If anyone else is nearby, point at one specific person and give them one specific job: you call, you fetch a defibrillator."],
+  ["4. Get them into position","Lay them flat on their back on a firm surface — the floor, not a bed or sofa. Kneel beside their chest. Tilt the head back and lift the chin to open the airway. Expose the chest."],
+  ["5. Push hard and fast","Heel of one hand in the centre of the chest, other hand on top, elbows locked. Push down about 5 cm, 100 to 120 times a minute, letting the chest come all the way back up between compressions. Keep going until help arrives or the person starts breathing normally."],
+  ["6. Use a defibrillator the moment one appears","Turn it on and do exactly what it says. Keep compressing while the pads are attached. Resume compressions immediately after any shock."],
+  ["Should I give rescue breaths?","If you are untrained or unwilling, compression-only CPR on an adult is effective and is what most guidance recommends. For children and babies, breaths matter more, because their hearts usually stop as a result of a breathing problem. This tool switches automatically once you say who you are helping."]]},
+hi:{h:"वयस्क को सीपीआर कैसे दें",
+ p:"हृदय गति रुकने पर कुछ ही मिनटों में मृत्यु हो सकती है। एम्बुलेंस आने से पहले वहाँ मौजूद व्यक्ति द्वारा शुरू किया गया छाती का दबाव ही जीवित बचने का सबसे बड़ा कारण होता है। इसके लिए प्रशिक्षण ज़रूरी नहीं है, और कोशिश करने से स्थिति बिगड़ती नहीं है।",
+ s:[["1. प्रतिक्रिया जाँचें","ज़ोर से आवाज़ दें और कंधा दबाएँ। अगर कोई प्रतिक्रिया नहीं है, तो उन्हें तुरंत मदद चाहिए।"],
+  ["2. साँस जाँचें","दस सेकंड तक छाती देखें। हाँफना, खर्राटे जैसी या रुक-रुक कर आती साँस सामान्य नहीं है — यह रुके हुए दिल की आवाज़ है। यहीं सबसे ज़्यादा जानें जाती हैं। संदेह हो तो इसे हृदयाघात मानें।"],
+  ["3. मदद बुलाएँ","अपने स्थानीय आपातकालीन नंबर पर कॉल करें और फ़ोन स्पीकर पर रखें। कोई और पास हो तो एक व्यक्ति की ओर इशारा करके एक ही काम दें: आप फ़ोन करें, आप डिफ़िब्रिलेटर लाएँ।"],
+  ["4. सही स्थिति में लिटाएँ","उन्हें सख़्त सतह पर पीठ के बल सीधा लिटाएँ — ज़मीन पर, बिस्तर या सोफ़े पर नहीं। छाती के पास घुटनों पर बैठें। सिर पीछे करें और ठुड्डी ऊपर उठाएँ। छाती खोलें।"],
+  ["5. ज़ोर से और तेज़ दबाएँ","एक हाथ की हथेली छाती के बीच में, दूसरा हाथ ऊपर, कोहनियाँ सीधी। लगभग 5 सेंटीमीटर दबाएँ, प्रति मिनट 100 से 120 बार, और हर बार छाती को पूरी तरह ऊपर आने दें। मदद आने तक या साँस सामान्य होने तक जारी रखें।"],
+  ["6. डिफ़िब्रिलेटर मिलते ही उपयोग करें","इसे चालू करें और जैसा यह कहे वैसा ही करें। पैड लगाते समय भी दबाते रहें। झटके के तुरंत बाद फिर से दबाना शुरू करें।"],
+  ["क्या मुझे साँस देनी चाहिए?","यदि आप प्रशिक्षित नहीं हैं या असहज हैं, तो वयस्कों के लिए केवल छाती दबाना भी प्रभावी है और अधिकांश दिशानिर्देश यही सुझाते हैं। बच्चों और शिशुओं के लिए साँस अधिक महत्वपूर्ण है, क्योंकि उनका दिल आमतौर पर साँस की समस्या के कारण रुकता है। आप जैसे ही बताते हैं कि किसकी मदद कर रहे हैं, यह ऐप अपने आप बदल जाता है।"]]},
+kn:{h:"ವಯಸ್ಕರಿಗೆ ಸಿಪಿಆರ್ ಹೇಗೆ ಮಾಡುವುದು",
+ p:"ಹೃದಯ ಸ್ತಂಭನದಿಂದ ಕೆಲವೇ ನಿಮಿಷಗಳಲ್ಲಿ ಸಾವು ಸಂಭವಿಸಬಹುದು. ಆಂಬ್ಯುಲೆನ್ಸ್ ಬರುವ ಮೊದಲು ಅಲ್ಲಿದ್ದವರು ಪ್ರಾರಂಭಿಸುವ ಎದೆ ಒತ್ತುವಿಕೆಯೇ ಬದುಕುಳಿಯುವಿಕೆಗೆ ದೊಡ್ಡ ಕಾರಣ. ಇದಕ್ಕೆ ತರಬೇತಿ ಬೇಕಿಲ್ಲ, ಮತ್ತು ಪ್ರಯತ್ನಿಸುವುದರಿಂದ ಹಾನಿಯಾಗುವುದಿಲ್ಲ.",
+ s:[["1. ಪ್ರತಿಕ್ರಿಯೆ ಪರೀಕ್ಷಿಸಿ","ಜೋರಾಗಿ ಕರೆಯಿರಿ ಮತ್ತು ಭುಜ ಅಲ್ಲಾಡಿಸಿ. ಯಾವುದೇ ಪ್ರತಿಕ್ರಿಯೆ ಇಲ್ಲದಿದ್ದರೆ ತಕ್ಷಣ ಸಹಾಯ ಬೇಕು."],
+  ["2. ಉಸಿರಾಟ ಪರೀಕ್ಷಿಸಿ","ಹತ್ತು ಸೆಕೆಂಡು ಎದೆಯನ್ನು ನೋಡಿ. ಏದುಸಿರು, ಗೊರಕೆಯಂತಹ ಅಥವಾ ಅನಿಯಮಿತ ಉಸಿರು ಸಾಮಾನ್ಯವಲ್ಲ — ಅದು ನಿಂತ ಹೃದಯದ ಸದ್ದು. ಇಲ್ಲಿಯೇ ಹೆಚ್ಚು ಜೀವ ಹೋಗುತ್ತದೆ. ಅನುಮಾನವಿದ್ದರೆ ಹೃದಯ ಸ್ತಂಭನ ಎಂದೇ ಪರಿಗಣಿಸಿ."],
+  ["3. ಸಹಾಯ ಕರೆಯಿರಿ","ಸ್ಥಳೀಯ ತುರ್ತು ಸಂಖ್ಯೆಗೆ ಕರೆ ಮಾಡಿ ಮತ್ತು ಫೋನ್ ಸ್ಪೀಕರ್‌ನಲ್ಲಿ ಇಡಿ. ಬೇರೆ ಯಾರಾದರೂ ಇದ್ದರೆ ಒಬ್ಬರನ್ನು ತೋರಿಸಿ ಒಂದೇ ಕೆಲಸ ಕೊಡಿ: ನೀವು ಕರೆ ಮಾಡಿ, ನೀವು ಡಿಫಿಬ್ರಿಲೇಟರ್ ತನ್ನಿ."],
+  ["4. ಸರಿಯಾಗಿ ಮಲಗಿಸಿ","ಗಟ್ಟಿ ನೆಲದ ಮೇಲೆ ಬೆನ್ನಿನ ಮೇಲೆ ಮಲಗಿಸಿ — ಹಾಸಿಗೆ ಅಥವಾ ಸೋಫಾ ಅಲ್ಲ. ಎದೆಯ ಪಕ್ಕ ಮಂಡಿಯೂರಿ. ತಲೆ ಹಿಂದಕ್ಕೆ ಬಗ್ಗಿಸಿ, ಗಲ್ಲ ಮೇಲೆತ್ತಿ. ಎದೆಯನ್ನು ತೆರೆಯಿರಿ."],
+  ["5. ಜೋರಾಗಿ ಮತ್ತು ವೇಗವಾಗಿ ಒತ್ತಿ","ಒಂದು ಕೈಯ ಹಿಮ್ಮಡಿ ಎದೆಯ ಮಧ್ಯದಲ್ಲಿ, ಇನ್ನೊಂದು ಕೈ ಮೇಲೆ, ಮೊಣಕೈ ನೇರವಾಗಿ. ಸುಮಾರು 5 ಸೆಂಟಿಮೀಟರ್, ನಿಮಿಷಕ್ಕೆ 100 ರಿಂದ 120 ಬಾರಿ ಒತ್ತಿ, ಪ್ರತಿ ಬಾರಿ ಎದೆ ಪೂರ್ತಿ ಮೇಲಕ್ಕೆ ಬರಲಿ. ಸಹಾಯ ಬರುವವರೆಗೆ ಮುಂದುವರಿಸಿ."],
+  ["6. ಡಿಫಿಬ್ರಿಲೇಟರ್ ಸಿಕ್ಕ ತಕ್ಷಣ ಬಳಸಿ","ಆನ್ ಮಾಡಿ ಮತ್ತು ಅದು ಹೇಳಿದಂತೆಯೇ ಮಾಡಿ. ಪ್ಯಾಡ್ ಅಂಟಿಸುವಾಗಲೂ ಒತ್ತುತ್ತಿರಿ. ಶಾಕ್ ನಂತರ ತಕ್ಷಣ ಮತ್ತೆ ಒತ್ತಿ."],
+  ["ಉಸಿರು ಕೊಡಬೇಕೆ?","ತರಬೇತಿ ಇಲ್ಲದಿದ್ದರೆ ಅಥವಾ ಇಷ್ಟವಿಲ್ಲದಿದ್ದರೆ, ವಯಸ್ಕರಿಗೆ ಒತ್ತುವಿಕೆ ಮಾತ್ರವೂ ಪರಿಣಾಮಕಾರಿ. ಮಕ್ಕಳಿಗೆ ಮತ್ತು ಶಿಶುಗಳಿಗೆ ಉಸಿರು ಮುಖ್ಯ, ಏಕೆಂದರೆ ಅವರ ಹೃದಯ ಸಾಮಾನ್ಯವಾಗಿ ಉಸಿರಾಟದ ಸಮಸ್ಯೆಯಿಂದ ನಿಲ್ಲುತ್ತದೆ. ನೀವು ಯಾರಿಗೆ ಸಹಾಯ ಮಾಡುತ್ತಿದ್ದೀರಿ ಎಂದು ಹೇಳಿದ ತಕ್ಷಣ ಇದು ತಾನಾಗಿಯೇ ಬದಲಾಗುತ್ತದೆ."]]},
+ta:{h:"பெரியவருக்கு சிபிஆர் எப்படி செய்வது",
+ p:"இதயத் தடை சில நிமிடங்களில் உயிரைப் பறிக்கும். ஆம்புலன்ஸ் வருவதற்கு முன் அங்கிருப்பவர் தொடங்கும் மார்பு அழுத்தமே உயிர் பிழைப்பதற்கான மிகப் பெரிய காரணி. இதற்குப் பயிற்சி தேவையில்லை, முயற்சிப்பதால் நிலைமை மோசமாகாது.",
+ s:[["1. பதிலைச் சரிபாருங்கள்","சத்தமாக அழையுங்கள், தோளை அழுத்துங்கள். எந்தப் பதிலும் இல்லையென்றால் உடனே உதவி தேவை."],
+  ["2. சுவாசத்தைச் சரிபாருங்கள்","பத்து வினாடிகள் மார்பைப் பாருங்கள். மூச்சிரைப்பு அல்லது ஒழுங்கற்ற மூச்சு இயல்பானது அல்ல — அது நின்றுபோன இதயத்தின் ஒலி. இங்குதான் அதிக உயிர்கள் பறிபோகின்றன. சந்தேகமிருந்தால் இதயத் தடையாகவே கருதுங்கள்."],
+  ["3. உதவிக்கு அழையுங்கள்","உள்ளூர் அவசர எண்ணை அழைத்து ஃபோனை ஸ்பீக்கரில் வையுங்கள். வேறு யாராவது இருந்தால் ஒருவரைச் சுட்டிக்காட்டி ஒரே வேலையைக் கொடுங்கள்: நீங்கள் அழையுங்கள், நீங்கள் டிஃபிபிரிலேட்டர் கொண்டு வாருங்கள்."],
+  ["4. சரியான நிலையில் படுக்க வையுங்கள்","கடினமான தரையில் முதுகில் நேராகப் படுக்க வையுங்கள் — படுக்கை அல்லது சோஃபா அல்ல. மார்புக்கு அருகில் மண்டியிடுங்கள். தலையைப் பின்னால் சாய்த்து தாடையை உயர்த்துங்கள். மார்பைத் திறக்கவும்."],
+  ["5. பலமாகவும் வேகமாகவும் அழுத்துங்கள்","ஒரு கையின் அடிப்பகுதி மார்பின் நடுவில், மற்றொரு கை மேலே, முழங்கைகள் நேராக. சுமார் 5 சென்டிமீட்டர், நிமிடத்திற்கு 100 முதல் 120 முறை அழுத்துங்கள், ஒவ்வொரு முறையும் மார்பு முழுமையாக மேலே வரட்டும். உதவி வரும் வரை தொடருங்கள்."],
+  ["6. டிஃபிபிரிலேட்டர் கிடைத்ததும் பயன்படுத்துங்கள்","ஆன் செய்து அது சொல்வதைச் சரியாகச் செய்யுங்கள். பேடுகள் ஒட்டும்போதும் அழுத்திக்கொண்டே இருங்கள். ஷாக்குக்குப் பிறகு உடனே மீண்டும் அழுத்துங்கள்."],
+  ["மூச்சு கொடுக்க வேண்டுமா?","பயிற்சி இல்லாவிட்டால் அல்லது விருப்பமில்லாவிட்டால், பெரியவர்களுக்கு அழுத்தம் மட்டுமே போதுமானது. குழந்தைகளுக்கும் பச்சிளம் குழந்தைகளுக்கும் மூச்சு முக்கியம், ஏனெனில் அவர்களின் இதயம் பொதுவாக சுவாசப் பிரச்சினையால் நிற்கிறது. நீங்கள் யாருக்கு உதவுகிறீர்கள் என்று சொன்னதும் இது தானாகவே மாறும்."]]},
+es:{h:"Cómo hacer RCP a un adulto",
+ p:"La parada cardiaca mata en minutos. Las compresiones torácicas que inicia quien está allí — antes de que llegue la ambulancia — son el factor más determinante para sobrevivir. No hace falta formación, y no puedes empeorar a una persona en parada intentándolo.",
+ s:[["1. Comprueba si responde","Grítale y apriétale el hombro. Si no hay ninguna respuesta, necesita ayuda inmediata."],
+  ["2. Comprueba la respiración","Mira el pecho durante diez segundos. Jadear, roncar o dar bocanadas irregulares no es respiración normal — es el sonido de un corazón parado. Este es el error que más vidas cuesta. Si dudas, trátalo como una parada cardiaca."],
+  ["3. Pide ayuda","Llama a tu número de emergencias y pon el teléfono en altavoz. Si hay alguien más, señala a una persona concreta y dale una tarea concreta: tú llama, tú trae un desfibrilador."],
+  ["4. Colócalo bien","Túmbalo boca arriba sobre una superficie firme — el suelo, no una cama ni un sofá. Arrodíllate junto a su pecho. Inclina la cabeza hacia atrás y levanta el mentón para abrir la vía aérea. Deja el pecho al descubierto."],
+  ["5. Comprime fuerte y rápido","Talón de una mano en el centro del pecho, la otra encima, codos bloqueados. Comprime unos 5 cm, entre 100 y 120 veces por minuto, dejando que el pecho suba del todo entre compresiones. Sigue hasta que llegue la ayuda o respire con normalidad."],
+  ["6. Usa un desfibrilador en cuanto aparezca","Enciéndelo y haz exactamente lo que diga. Sigue comprimiendo mientras se colocan los parches. Reanuda las compresiones inmediatamente después de cualquier descarga."],
+  ["¿Debo dar ventilaciones?","Si no tienes formación o no te sientes cómodo, la RCP solo con compresiones en adultos es eficaz y es lo que recomienda la mayoría de las guías. En niños y bebés las ventilaciones importan más, porque su corazón suele pararse por un problema respiratorio. Esta herramienta cambia sola en cuanto indicas a quién estás ayudando."]]},
+ar:{h:"كيف تُجري الإنعاش القلبي الرئوي لبالغ",
+ p:"توقف القلب يقتل خلال دقائق. الضغطات الصدرية التي يبدأها من كان حاضراً — قبل وصول الإسعاف — هي أكبر عامل منفرد في نجاة الشخص. لا تحتاج إلى تدريب، ولا يمكنك أن تزيد حالة شخص متوقف القلب سوءاً بمحاولتك.",
+ s:[["١. تحقق من الاستجابة","نادِ عليه بصوت عالٍ واضغط كتفه. إذا لم تكن هناك أي استجابة فهو يحتاج مساعدة فورية."],
+  ["٢. تحقق من التنفس","راقب الصدر لعشر ثوانٍ. اللهاث أو الشخير أو الشهقات غير المنتظمة ليست تنفساً طبيعياً — إنه صوت قلب توقف. هذا هو الخطأ الذي يكلف أكبر عدد من الأرواح. إذا لم تكن متأكداً فتعامل معه كتوقف قلبي."],
+  ["٣. اطلب المساعدة","اتصل برقم الطوارئ المحلي وضع الهاتف على مكبر الصوت. إذا كان هناك أحد آخر، أشر إلى شخص محدد وأعطه مهمة واحدة محددة: أنت اتصل، أنت أحضر جهاز الصدمات."],
+  ["٤. ضعه في الوضع الصحيح","مدّده على ظهره على سطح صلب — الأرض، وليس سريراً أو أريكة. اركع بجانب صدره. أمِل الرأس للخلف وارفع الذقن لفتح المجرى الهوائي. اكشف الصدر."],
+  ["٥. اضغط بقوة وسرعة","كعب يدك في منتصف الصدر، اليد الأخرى فوقها، والمرفقان مثبتان. اضغط حوالي ٥ سنتيمترات، من ١٠٠ إلى ١٢٠ مرة في الدقيقة، مع ترك الصدر يعود بالكامل بين الضغطات. واصل حتى تصل المساعدة أو يتنفس بشكل طبيعي."],
+  ["٦. استخدم جهاز الصدمات فور توفره","شغّله ونفّذ ما يقوله بالضبط. واصل الضغط أثناء تركيب اللاصقات. عد للضغط فوراً بعد أي صدمة."],
+  ["هل أعطي أنفاساً؟","إذا لم تكن مدرباً أو لم ترغب، فالإنعاش بالضغطات فقط للبالغين فعّال وهو ما توصي به معظم الإرشادات. أما الأطفال والرضّع فالأنفاس أهم لهم، لأن قلوبهم تتوقف عادةً بسبب مشكلة في التنفس. تتبدل هذه الأداة تلقائياً بمجرد أن تحدد من تساعده."]]}
+};
+
 /* ══ 2. STATE ══ */
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
- aedStep:0,log:[],dStep:0,dLang:"en",dT0:null,dCode:null,vision:false,seenRate:null,stream:null};
+ aedStep:0,log:[],dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",vision:false,seenRate:null,stream:null};
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>L[S.lang];
@@ -751,6 +821,13 @@ function applyLang(){const d=t();
  $("btn-code-go").textContent=d.codeGo;$("btn-code-back").textContent=d.codeBack;
  $("t-alive-h").textContent=d.aliveH;$("t-alive-p").textContent=d.aliveP;
  $("btn-restart").textContent=d.restart;$("t-hand-h").textContent=d.handH;$("btn-aed-back").textContent=d.aedBack;
+ $("lang-label").textContent=d.name;
+ // translated, crawlable article
+ const a=ART[S.lang],box=$("article");box.innerHTML="";
+ const h2=document.createElement("h2");h2.textContent=a.h;box.appendChild(h2);
+ const p0=document.createElement("p");p0.textContent=a.p;box.appendChild(p0);
+ a.s.forEach(([hd,bd])=>{const h3=document.createElement("h3");h3.textContent=hd;box.appendChild(h3);
+   const p=document.createElement("p");p.textContent=bd;box.appendChild(p);});
  if(phase==="aed")renderAED();
 }
 function buildChips(boxId,onPick){const box=$(boxId);box.innerHTML="";
@@ -899,7 +976,21 @@ function startVision(video){
 /* ══ 9. DISPATCHER ══ */
 $("btn-console").onclick=()=>{S.dT0=Date.now();S.dStep=0;
  S.dCode=String(Math.floor(100000+Math.random()*900000));
- $("d-code").textContent=S.dCode;dRender();dClock();show("s-console");};
+ $("d-code").textContent=S.dCode;
+ const base=location.origin+location.pathname;
+ S.dLink=base+"?code="+S.dCode+"&lang="+S.dLang;
+ $("d-linktext").textContent=S.dLink;
+ $("d-vidnote").textContent="Send the link, or read the six digits aloud. Prototype: pressing Start opens this device's camera to show what the dispatcher would see. Production routes the caller's uplink over WebRTC.";
+ dRender();dClock();show("s-console");};
+$("d-copylink").onclick=async()=>{try{await navigator.clipboard.writeText(S.dLink);
+ $("d-copylink").textContent="Link copied";setTimeout(()=>$("d-copylink").textContent="Copy link to send",2000);}
+ catch(e){$("d-copylink").textContent="Select the link above";}};
+$("d-startvid").onclick=async()=>{
+ const v=$("d-preview");
+ if(S.stream){stopVision();v.classList.remove("on");$("d-startvid").textContent="Start video session";return;}
+ try{S.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
+  v.srcObject=S.stream;v.classList.add("on");$("d-startvid").textContent="End video session";startVision(v);}
+ catch(e){$("d-vidnote").textContent="Camera blocked. This page must be served over HTTPS and the browser must be granted camera permission.";}};
 $("btn-exit-console").onclick=()=>{S.dT0=null;stopBeat();phase="compress";show("s-home");};
 function dClock(){if(!S.dT0)return;$("d-clock").textContent=mmss(Math.round((Date.now()-S.dT0)/1000));setTimeout(dClock,500);}
 function dRender(){const p=L[S.dLang].dScript[S.dStep];
@@ -916,8 +1007,11 @@ $("d-metro").onclick=e=>{if(S.running){stopBeat();e.target.textContent="Start be
  else{phase="idle";startBeat();e.target.textContent="Stop beat";}};
 
 /* boot */
-const urlLang=new URLSearchParams(location.search).get("lang");
+const q=new URLSearchParams(location.search);
+const urlLang=q.get("lang");
 if(urlLang&&L[urlLang])S.lang=urlLang;
+const urlCode=q.get("code");
+if(urlCode&&/^\d{6}$/.test(urlCode))$("codeinput").value=urlCode;
 buildChips("langchips",pickLang);buildChips("langchips-cpr",pickLangLive);applyLang();
 </script>
 </body>

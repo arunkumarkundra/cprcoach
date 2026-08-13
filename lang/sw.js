@@ -2,7 +2,7 @@
    Network-first for the HTML document — a cache-first document meant users kept
    getting a stale app shell paired with fresh language files, which looked like
    random missing steps. Cache-first only for static assets that are versioned. */
-const V="cprcoach-v6";
+const V="cprcoach-v7";
 const CORE=["./","./index.html","./manifest.webmanifest",
  "./assets/icon-192.png","./assets/icon-512.png",
  "./lang/hi.js","./lang/kn.js","./lang/ta.js","./lang/es.js","./lang/ar.js"];

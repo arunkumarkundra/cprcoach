@@ -450,6 +450,16 @@ the caller's language, which left an English-speaking call-taker with a Hindi ca
 staring at Devanagari, able only to press Play. The Play button is always shown; English
 is not a special case.
 
+**Language names follow the same rule.** `langName(code, inLocale)` uses
+`Intl.DisplayNames` so the caller's language is named *in the dispatcher's language* —
+an English call-taker sees "Play in Tamil", a Hindi one sees "तमिल". The native name is
+appended in the dropdown for recognition. The rescuer's own picker shows native names
+first, because someone looking for their own language recognises it in its own script.
+
+**Both pickers are native `<select>` elements.** The custom sheet with search rows was
+replaced: one tap, scrolls to any length, uses the platform picker on mobile, and there
+is far less of it to break.
+
 ### 5.3 Milestones
 
 Two large buttons that display their own captured value and turn green when pressed:

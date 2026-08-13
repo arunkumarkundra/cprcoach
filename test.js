@@ -156,11 +156,13 @@ const chrome=["hdr-elapsed","hdr-exit","btn-console","btn-copy","btn-home","d-sa
  "d-codelbl","d-linklbl","d-nextlbl","d-recoglbl","d-firstlbl","d-vidlbl"];
 ok(chrome.every(id=>$(id).textContent.trim().length>0),"all console chrome labels populated");
 ok($("d-metro").textContent.includes("110/min"),"metronome label shows rate");
-CLOCK+=600;$("btn-lang").click();
-ok($("langsheet").className.includes("on"),"language sheet opens");
-ok($("langlist").children.length===6,"six languages listed");
-ok($("langlist").children[0].innerHTML.includes("<em>")||$("langlist").children[0].textContent==="English","rows show Latin name");
-ok($("langsearch").style.display==="none","search hidden while list is short");
+ok($("langsel").options.length===6,"header language select lists six languages");
+ok([...$("langsel").options].some(o=>o.textContent.includes("Hindi")),"options show native and Latin names");
+ok($("d-langsel").options.length===6,"caller language select lists six languages");
+ok(/function langName\(code,inLocale\)/.test(html),"language names resolve into the reader's own language");
+ok(!/langsheet|langlist|langsearch/.test(html),"the old custom language sheet is gone");
+ok(/id="d-prevlbl"/.test(html),"back button is labelled, not a bare arrow");
+ok(/u.copyLink/.test(html),"video link button reads 'Copy link'");
 
 console.log("\n"+(fails?("FAILED "+fails+"/"+checks):("PASSED all "+checks+" checks")));
 process.exit(fails?1:0);

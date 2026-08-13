@@ -1,5 +1,7 @@
 # CPR Coach
 
+**Hosting on GitHub Pages without a terminal: see [HOSTING.md](HOSTING.md).**
+
 **See [SPEC.md](SPEC.md) for the complete functional specification** — every screen, control, timing constant and design decision, plus what is deliberately absent and what must happen before public release.
 
 Zero-install CPR guidance that works offline. Open a link, tap one button, follow a voice and a beat.

@@ -1,7 +1,7 @@
 /* CPR Coach service worker — the emergency path must survive with no network. */
-const V="cprcoach-v3";
+const V="cprcoach-v4";
 const CORE=["./","./index.html","./manifest.webmanifest",
- "./lang/hi.js","./lang/kn.js","./lang/ta.js","./lang/es.js","./lang/ar.js","./lang/manifest.json"];
+ "./assets/icon-192.png","./assets/icon-512.png","./lang/hi.js","./lang/kn.js","./lang/ta.js","./lang/es.js","./lang/ar.js","./lang/manifest.json"];
 self.addEventListener("install",e=>{
  self.skipWaiting();
  e.waitUntil(caches.open(V).then(c=>Promise.allSettled(CORE.map(u=>c.add(u)))));

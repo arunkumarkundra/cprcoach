@@ -1,5 +1,5 @@
 /* CPR Coach service worker — the emergency path must survive with no network. */
-const V="cprcoach-v4";
+const V="cprcoach-v5";
 const CORE=["./","./index.html","./manifest.webmanifest",
  "./assets/icon-192.png","./assets/icon-512.png","./lang/hi.js","./lang/kn.js","./lang/ta.js","./lang/es.js","./lang/ar.js","./lang/manifest.json"];
 self.addEventListener("install",e=>{

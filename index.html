@@ -128,8 +128,11 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
  background:transparent;color:var(--ink);border:2px solid var(--hair)}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .log{list-style:none}
-.log li{display:flex;gap:16px;padding:13px 0;border-bottom:1px solid var(--hair);font-size:16px;font-weight:600}
-.log time{font-variant-numeric:tabular-nums;color:var(--slate);font-weight:700;min-width:74px}
+.log li{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--hair);font-size:16px;font-weight:600}
+.log time{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:800;min-width:88px;flex:none}
+.log em{font-style:normal;font-size:13px;font-weight:700;color:var(--slate);margin-inline-start:8px;font-variant-numeric:tabular-nums}
+.log li.day{border-bottom:2px solid var(--ink);padding-top:18px}
+.log li.day b{font-size:14px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--slate)}
 #codeinput{width:100%;font:inherit;font-size:38px;font-weight:800;letter-spacing:.22em;text-align:center;
  padding:20px;border:2px solid var(--hair);border-radius:16px;background:transparent;color:var(--ink);font-variant-numeric:tabular-nums}
 .disclaimer{font-size:13px;line-height:1.45;color:var(--slate);font-weight:500;border-top:1px solid var(--hair);padding-top:12px}
@@ -272,7 +275,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
   <div class="foot stack">
     <div class="row"><button class="b-amber" id="btn-aed"></button><button class="b-jade" id="btn-alive"></button></div>
     <div class="row"><button class="b-quiet" id="btn-swap"></button><button class="b-quiet" id="btn-breaths"></button></div>
-    <button class="b-quiet" id="btn-video"></button>
+    <div class="row"><button class="b-quiet" id="btn-medics"></button><button class="b-quiet" id="btn-video"></button></div>
   </div>
 </section>
 
@@ -302,7 +305,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 <section class="screen" id="s-hand">
   <div class="grow" style="justify-content:flex-start"><h2 id="t-hand-h"></h2><ul class="log" id="loglist"></ul></div>
   <div class="foot stack">
-    <button class="b-quiet" id="btn-copy"></button>
+    <div class="row"><button class="b-quiet" id="btn-share"></button><button class="b-quiet" id="btn-copy"></button></div>
     <button class="b-quiet" id="btn-home"></button></div>
 </section>
 
@@ -417,7 +420,7 @@ registerLang("en",{
   {s:"Put him flat on his back on the floor. Kneel beside him, heel of your hand in the centre of his chest.",e:"Position and hand placement in one sentence."},
   {s:"Push down hard, twice a second, and do not stop until I tell you.",e:"Start the beat. Count aloud with them for the first ten."},
   {s:"Two minutes. If someone else is there, swap over now.",e:"Prompt a compressor change every two minutes."}],
- ui:{step:"Step",of:"of",lastOne:"last one",elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable"},
+ ui:{medics:"🚑 Paramedics here",share:"Share",copied:"Copied",step:"Step",of:"of",lastOne:"last one",elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable"},
  article:{h:"How to do CPR on an adult",
   p:"Cardiac arrest kills within minutes. Chest compressions started by whoever is standing there — before an ambulance arrives — are the single biggest factor in whether someone survives. You do not need training, and you cannot make a person in cardiac arrest worse by trying.",
   s:[["1. Check for a response","Shout at them and squeeze their shoulder. If there is no response at all, they need help immediately."],
@@ -448,9 +451,9 @@ function langOrder(){
 }
 
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
- aedStep:0,log:[],dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
+ aedStep:0,log:[],cprStarted:false,dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
  vision:false,seenRate:null,stream:null,peer:null,feeds:{},sel:null,lastSwapPrompt:0};
-const BUILD="2026-08-14b";
+const BUILD="2026-08-14c";
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>LANG_REGISTRY[S.lang]||LANG_REGISTRY.en;
@@ -493,7 +496,7 @@ function show(id){
  armScreen(sc);
  const n=FLOW.indexOf(id);
  trace("SHOW "+id+(n>=0?"  (step "+(n+1)+" of "+FLOW.length+")":""));
- if(n>=0&&S.t0)S.log.push({at:Math.round((Date.now()-S.t0)/1000),
+ if(n>=0&&S.t0)S.log.push({at:Math.round((Date.now()-S.t0)/1000),ts:Date.now(),
   label:"→ step "+(n+1)+"/"+FLOW.length+" "+id.replace("s-","")});
 }
 /* The single source of truth for the emergency sequence. Screens are numbered from
@@ -631,13 +634,18 @@ function say(text,opts){
 
 let wakeLock=null;
 async function keepAwake(){try{if("wakeLock"in navigator)wakeLock=await navigator.wakeLock.request("screen");}catch(e){}}
-function mark(l){S.log.push({at:S.t0?Math.round((Date.now()-S.t0)/1000):0,label:l});}
+function mark(l){S.log.push({at:S.t0?Math.round((Date.now()-S.t0)/1000):0,ts:Date.now(),label:l});}
+function hhmmss(ms){const d=new Date(ms);
+ return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");}
+function dayOf(ms){const l=(LANG_REGISTRY[S.lang]||LANG_REGISTRY.en).code;
+ try{return new Date(ms).toLocaleDateString(l,{weekday:"long",day:"numeric",month:"long",year:"numeric"});}
+ catch(e){return new Date(ms).toDateString();}}
 function mmss(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
 /* Real media (Wikimedia GIFs/photos) overrides a drawing when the file exists in
    assets/img/. The SVG is always rendered first, so the screen is never empty and
    never waits on a file. If the image loads, it replaces the drawing in place.
    Attribution lives in README.md and CREDITS.md, never on an emergency screen. */
-const MEDIA={handsAdult:"chest-compressions.gif"};   // add entries as files are verified
+const MEDIA={};   // empty until a real, licence-checked, clinically-approved image exists
 const mediaOK={};
 function art(host,key){
  const el=$(host);if(!el)return;
@@ -678,6 +686,7 @@ function applyLang(){
  $("hdr-elapsed").textContent=u.elapsed;$("hdr-exit").textContent=u.exit;
  $("btn-console").textContent=u.dispatcher;$("langsearch").placeholder=u.searchLang;
  $("btn-copy").textContent=u.copy;$("btn-home").textContent=u.startOver;
+ $("btn-share").textContent=u.share;$("btn-medics").textContent=u.medics;
  $("d-saylbl").textContent=u.sayThis;$("d-sellbl").textContent=u.callerSpeaks;
  $("d-codelbl").textContent=u.codeFor;$("d-linklbl").textContent=u.link;
  $("d-nextlbl").textContent=u.next;
@@ -742,7 +751,7 @@ $("btn-prep-done").onclick=()=>{if(current!=="s-prep")return;
 function beginCPR(){
  phase="compress";show("s-cpr");S.count=0;S.cycles=0;
  $("counter").classList.remove("small");$("tickwrap").classList.remove("breath");
- art("art-cpr",handArt());mark("Compressions started");
+ art("art-cpr",handArt());S.cprStarted=true;mark("Compressions started");
  const d=t();$("cue").textContent=d.say.place[S.who];
  say(d.say.place[S.who]);say(d.say.depth[S.who],{queue:true});say(d.say.go,{queue:true});
  setTimeout(()=>{if(phase==="compress")startBeat();},3800);
@@ -812,17 +821,46 @@ function backToCPR(){phase="compress";S.count=0;$("counter").textContent="0";
  art("art-cpr",handArt());show("s-cpr");startBeat();}
 
 $("btn-alive").onclick=()=>{mark("Breathing returned");stopBeat();clearBreaths();phase="watch";show("s-alive");say(t().aliveH);};
-$("btn-restart").onclick=()=>{mark("Re-arrest — compressions resumed");if(!S.t0)S.t0=Date.now();beginCPR();};
+/* If compressions were already given, the rescuer knows the patient's age, has
+   called, and the patient is already flat — go straight back. If CPR was never
+   started (they responded, or were breathing), run the steps that were skipped. */
+$("btn-restart").onclick=()=>{
+ if(current!=="s-alive")return;
+ if(!S.t0)S.t0=Date.now();
+ if(S.cprStarted){mark("Re-arrest — compressions resumed");beginCPR();}
+ else{mark("Deteriorated — arrest assumed");show("s-who");say(t().q3);}};
 $("btn-handover2").onclick=()=>{renderLog();show("s-hand");};
-$("btn-home").onclick=()=>{stopBeat();clearBreaths();stopVideo();phase="idle";S.t0=null;show("s-home");};
-function renderLog(){const ul=$("loglist");ul.innerHTML="";
- S.log.forEach(e=>{const li=document.createElement("li");
-  li.innerHTML="<time>"+mmss(e.at)+"</time><span>"+e.label+"</span>";ul.appendChild(li);});
+$("btn-home").onclick=()=>{stopBeat();clearBreaths();stopVideo();phase="idle";S.t0=null;S.cprStarted=false;show("s-home");};
+function renderLog(){
+ const ul=$("loglist");ul.innerHTML="";let day="";
+ S.log.forEach(e=>{
+  const ts=e.ts||S.t0||Date.now(),d=dayOf(ts);
+  if(d!==day){day=d;const h=document.createElement("li");h.className="day";
+   h.innerHTML="<b>"+d+"</b>";ul.appendChild(h);}
+  const li=document.createElement("li");
+  li.innerHTML="<time>"+hhmmss(ts)+"</time><span>"+e.label+"<em>+"+mmss(e.at)+"</em></span>";
+  ul.appendChild(li);});
  const li=document.createElement("li");
  li.innerHTML="<time>—</time><span>"+S.total+" compressions guided at "+BPM+"/min</span>";ul.appendChild(li);}
-$("btn-copy").onclick=async()=>{const txt=S.log.map(e=>mmss(e.at)+"  "+e.label).join("\n")+"\ncompressions guided: "+S.total;
- try{await navigator.clipboard.writeText(txt);$("btn-copy").textContent="✓";
-  setTimeout(()=>$("btn-copy").textContent=t().ui.copy,1500);}catch(e){}};
+function logText(){
+ let out=[],day="";
+ S.log.forEach(e=>{const ts=e.ts||Date.now(),d=dayOf(ts);
+  if(d!==day){day=d;out.push("",d);}
+  out.push(hhmmss(ts)+"  +"+mmss(e.at)+"  "+e.label);});
+ out.push("","Compressions guided: "+S.total+" at "+BPM+"/min");
+ out.push("Recorded by CPR Coach — guidance only, not a clinical record.");
+ return out.join("\n").trim();}
+$("btn-copy").onclick=async()=>{const u=t().ui;
+ try{await navigator.clipboard.writeText(logText());$("btn-copy").textContent="✓ "+u.copied;
+  setTimeout(()=>$("btn-copy").textContent=u.copy,1800);}catch(e){}};
+/* Paramedics may want the record on their own device — AirDrop, WhatsApp, email. */
+$("btn-share").onclick=async()=>{const u=t().ui;
+ const data={title:"CPR record",text:logText()};
+ if(navigator.share){try{await navigator.share(data);return;}catch(e){}}
+ try{await navigator.clipboard.writeText(logText());$("btn-share").textContent="✓ "+u.copied;
+  setTimeout(()=>$("btn-share").textContent=u.share,1800);}catch(e){}};
+$("btn-medics").onclick=()=>{if(current!=="s-cpr"&&current!=="s-aed")return;
+ mark("Paramedics took over");stopBeat();clearBreaths();phase="watch";renderLog();show("s-hand");};
 
 let peerLibP=null;
 function loadPeerLib(){

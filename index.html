@@ -111,7 +111,8 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .art{width:100%;max-width:320px;margin:0 auto;display:block;color:var(--ink)}
 .art .hi{fill:var(--pulse);stroke:none}
 .art .hiS{stroke:var(--pulse)}
-.art img,.artimg{width:100%;max-width:320px;margin:0 auto;display:block;border-radius:14px}
+.artimg{width:100%;max-width:300px;max-height:26vh;object-fit:contain;margin:0 auto 4px;display:block;border-radius:14px}
+@media(max-height:700px){.artimg{max-height:18vh}}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{min-height:0;width:auto;padding:11px 16px;border-radius:999px;font-size:16px;font-weight:600;
  background:transparent;color:var(--ink);border:2px solid var(--hair)}
@@ -306,6 +307,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
         <button id="d-next"><span id="d-nextlbl"></span> →</button></div>
       <label class="d-sel"><span id="d-sellbl"></span><select id="d-langsel"></select></label>
       <button class="b-amber" id="d-speak">🔊 <span id="d-speaklbl"></span></button>
+    </div>
     <div class="row d-ms">
       <button class="ms" id="d-mark-recog"><small id="d-recoglbl"></small><b>—:—</b></button>
       <button class="ms" id="d-mark-first"><small id="d-firstlbl"></small><b>—:—</b></button>
@@ -435,7 +437,7 @@ function langOrder(){
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
  aedStep:0,log:[],cprStarted:false,dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
  vision:false,seenRate:null,stream:null,peer:null,feeds:{},sel:null,lastSwapPrompt:0};
-const BUILD="2026-08-14d";
+const BUILD="2026-08-14e";
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>LANG_REGISTRY[S.lang]||LANG_REGISTRY.en;
@@ -449,7 +451,9 @@ const BACK={"s-breath":"s-resp","s-who":"s-breath","s-call":"s-who","s-prep":"s-
 function setHeader(id){
  const m=HDR[id]||"brand";
  $("hdr-brand").style.display=(m==="brand")?"flex":"none";
- $("buildtag").style.display=(id==="s-home")?"inline":"none";
+ /* Diagnostic only: visible with ?debug=1 so a tester can confirm which build they
+    are looking at. Hidden otherwise — it does not help anyone survive. */
+ $("buildtag").style.display=(id==="s-home"&&DEBUG)?"inline":"none";
  $("buildtag").textContent=BUILD;
  $("hdr-back").style.display=(m==="back"&&BACK[id])?"flex":"none";
  const showClock=(m==="clock"||m==="exit");
@@ -519,8 +523,16 @@ function loadLang(code){
  if(LANG_REGISTRY[code])return Promise.resolve(true);
  if(loading[code])return loading[code];
  loading[code]=new Promise(res=>{const s=document.createElement("script");
-  s.src="lang/"+code+".js";s.async=true;
-  s.onload=()=>res(!!LANG_REGISTRY[code]);s.onerror=()=>res(false);
+  /* GitHub Pages caches lang/*.js at its CDN. An earlier build shipped empty packs;
+     without a version query the CDN can keep serving those, and language switching
+     silently stops working. */
+  s.src="lang/"+code+".js?v="+BUILD;s.async=true;
+  s.onload=()=>{
+   const p=LANG_REGISTRY[code];
+   const good=!!(p&&p.ui&&p.say&&p.article);
+   if(!good)console.error("CPR Coach: lang/"+code+".js loaded but registered nothing usable");
+   res(good);};
+  s.onerror=()=>{console.error("CPR Coach: could not load lang/"+code+".js");res(false);};
   document.head.appendChild(s);});
  return loading[code];
 }
@@ -627,7 +639,14 @@ function mmss(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
    assets/img/. The SVG is always rendered first, so the screen is never empty and
    never waits on a file. If the image loads, it replaces the drawing in place.
    Attribution lives in README.md and CREDITS.md, never on an emergency screen. */
-const MEDIA={};   // empty until a real, licence-checked, clinically-approved image exists
+/* Real media, keyed by illustration slot; paths relative to index.html.
+   Verify licence AND clinical accuracy before adding — see CREDITS.md. */
+const MEDIA={
+ handsAdult  :"images/Chest_compressions.gif",
+ handsChild  :"images/Chest_compressions.gif",
+ handsInfant :"images/Infant_two_finger_CPR_jpg.webp",
+ breathInfant:"images/CPR_Infant_Mouth_To_Nose.png"
+};
 const mediaOK={};
 function art(host,key){
  const el=$(host);if(!el)return;
@@ -638,7 +657,7 @@ function art(host,key){
   if(el.dataset.key===key){el.innerHTML="";img.className="artimg";img.alt="";el.appendChild(img);}};
  img.onerror=()=>{mediaOK[key]=false;};
  el.dataset.key=key;
- img.src="assets/img/"+file;
+ img.src=file;
 }
 function handArt(){return S.who==="adult"?"handsAdult":S.who==="child"?"handsChild":"handsInfant";}
 
@@ -712,7 +731,11 @@ function buildChips(){
   sel.appendChild(o);});
  sel.onchange=async()=>{
   const c=sel.value;
-  if(!await loadLang(c)){sel.value=S.lang;return;}
+  if(!await loadLang(c)){
+   sel.value=S.lang;
+   const o=[...sel.options].find(x=>x.value===c);
+   if(o)o.textContent=o.textContent.replace(/ ✕$/,"")+" ✕";   // visible, not silent
+   return;}
   S.lang=c;applyLang();buildChips();buildDLangs();
   if(phase==="compress"&&current==="s-cpr")say(t().say.go);
  };
@@ -763,7 +786,8 @@ let breathTimers=[],breathCd=null;
 function clearBreaths(){breathTimers.forEach(clearTimeout);breathTimers=[];if(breathCd)clearInterval(breathCd);breathCd=null;}
 function doBreaths(){
  const d=t();phase="breaths";stopBeat();clearBreaths();
- $("counter").classList.add("small");$("tickwrap").classList.add("breath");art("art-cpr","breath");
+ $("counter").classList.add("small");$("tickwrap").classList.add("breath");
+ art("art-cpr",S.who==="infant"?"breathInfant":"breath");
  [[0,d.say.b1,"—"],[2600,d.say.b2,"1 / 2"],[6600,d.say.b3,"2 / 2"]].forEach(function(x){
   breathTimers.push(setTimeout(function(){if(phase!=="breaths")return;
    $("counter").textContent=x[2];$("cue").textContent=x[1];say(x[1]);},x[0]));});
@@ -932,7 +956,11 @@ function buildDLangs(){
   if(l.code===S.dLang)o.selected=true;sel.appendChild(o);});
  sel.onchange=async()=>{
   const c=sel.value;
-  if(!await loadLang(c)){sel.value=S.dLang;return;}
+  if(!await loadLang(c)){
+   sel.value=S.dLang;
+   const o=[...sel.options].find(x=>x.value===c);
+   if(o)o.textContent=o.textContent.replace(/ ✕$/,"")+" ✕";
+   return;}
   S.dLang=c;S.dLink=location.origin+location.pathname+"?code="+S.dCode+"&lang="+S.dLang;
   dRender();};
 }

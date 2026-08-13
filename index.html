@@ -67,24 +67,13 @@ body[dir="rtl"]{direction:rtl}
  border:2px solid var(--hair);color:var(--ink);font-size:15px;font-weight:700;white-space:nowrap;
  display:flex;align-items:center;gap:6px}
 .hbtn.icon{padding:9px 13px;font-size:17px}
+.hsel{font:inherit;font-size:15px;font-weight:700;padding:9px 12px;border-radius:999px;
+ border:2px solid var(--hair);background:transparent;color:var(--ink);max-width:44vw;min-height:42px}
 .mark{display:flex;align-items:center;gap:8px;background:none;border:none;padding:4px 0;width:auto;min-height:0}
 .mark svg{width:24px;height:24px;flex:none}
 .mark span{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--slate)}
 #buildtag{font-size:10px;font-weight:700;color:var(--hair);letter-spacing:.06em;white-space:nowrap}
 #hdr-clock{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-#langsheet{display:none;position:sticky;top:var(--bar);z-index:5;background:var(--paper);
- padding:4px var(--pad) 12px;border-bottom:1px solid var(--hair)}
-#langsheet.on{display:block}
-#langsearch{width:100%;font:inherit;font-size:17px;font-weight:600;padding:14px 16px;margin-bottom:8px;
- border:2px solid var(--hair);border-radius:14px;background:transparent;color:var(--ink)}
-#langlist{max-height:min(40vh,300px);overflow-y:auto;-webkit-overflow-scrolling:touch;
- display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
-.lrow{display:flex;align-items:baseline;gap:7px;justify-content:flex-start;text-align:start;
- min-height:44px;padding:9px 13px;border-radius:11px;background:transparent;border:2px solid var(--hair);
- color:var(--ink);font-size:16px;font-weight:700;width:100%}
-.lrow em{font-style:normal;font-size:12px;font-weight:600;color:var(--slate);letter-spacing:.03em}
-.lrow[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.lrow[aria-selected="true"] em{color:rgba(250,250,247,.7)}
 .textlink{display:inline;width:auto;min-height:0;padding:0;background:none;border:none;
  color:var(--slate);font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 
@@ -148,14 +137,14 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
  font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--slate)}
 .d-quote{font-size:clamp(21px,5vw,30px);font-weight:800;line-height:1.24;letter-spacing:-.02em}
 .d-coach{font-size:14px;font-weight:600;color:var(--slate);margin-top:10px;line-height:1.4}
-.d-nav{display:grid;grid-template-columns:64px 1fr;gap:10px;margin-top:14px}
-.d-nav button{min-height:60px;font-size:18px}
-.d-play{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:10px}
-.d-play button{min-height:56px;font-size:16px}
-.d-sel{display:flex;flex-direction:column;gap:3px}
-.d-sel span{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--slate)}
-.d-sel select{font:inherit;font-size:16px;font-weight:700;padding:12px 14px;border-radius:14px;
- border:2px solid var(--hair);background:transparent;color:var(--ink);min-height:56px}
+.d-nav{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;margin-top:16px}
+.d-nav button{min-height:58px;font-size:17px}
+.d-say>.d-sel{margin-top:12px}
+.d-say>#d-speak{margin-top:10px;min-height:58px;font-size:17px;width:100%}
+.d-sel{display:flex;flex-direction:column;gap:5px}
+.d-sel>span{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--slate)}
+.d-sel select{font:inherit;font-size:17px;font-weight:700;padding:14px;border-radius:14px;
+ border:2px solid var(--hair);background:transparent;color:var(--ink);min-height:58px;width:100%}
 #hdr-elapsed{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);
  margin-inline-end:2px}
 .ms{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:76px;
@@ -213,15 +202,12 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
   </div>
   <div id="hdr-right">
     <button class="hbtn icon" id="btn-sound" aria-label="Sound">🔊</button>
-    <button class="hbtn" id="btn-lang"><span aria-hidden="true">🌐</span> <span id="lang-label">English</span> ▾</button>
+    <select class="hsel" id="langsel" aria-label="Language"></select>
     <button class="textlink" id="btn-console" style="margin-inline-end:2px"></button>
     <button class="hbtn" id="hdr-exit" style="display:none"></button>
   </div>
 </header>
-<div id="langsheet">
-  <input id="langsearch" type="search" placeholder="Search language" autocomplete="off" style="display:none">
-  <div id="langlist" role="listbox"></div>
-</div>
+
 
 <section class="screen on" id="s-home">
   <div class="grow"><h1 id="t-home-h"></h1></div>
@@ -316,14 +302,10 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
       <div class="d-quote" id="d-quote"></div>
       <div class="d-coach" id="d-coach"></div>
       <div class="d-nav">
-        <button class="b-quiet" id="d-prev" aria-label="Previous">←</button>
+        <button class="b-quiet" id="d-prev">← <span id="d-prevlbl"></span></button>
         <button id="d-next"><span id="d-nextlbl"></span> →</button></div>
-      <div class="d-play">
-        <button class="b-amber" id="d-speak">🔊 <span id="d-speaklbl">Play in English</span></button>
-        <label class="d-sel"><span id="d-sellbl"></span>
-          <select id="d-langsel"></select></label>
-      </div>
-    </div>
+      <label class="d-sel"><span id="d-sellbl"></span><select id="d-langsel"></select></label>
+      <button class="b-amber" id="d-speak">🔊 <span id="d-speaklbl"></span></button>
     <div class="row d-ms">
       <button class="ms" id="d-mark-recog"><small id="d-recoglbl"></small><b>—:—</b></button>
       <button class="ms" id="d-mark-first"><small id="d-firstlbl"></small><b>—:—</b></button>
@@ -420,7 +402,7 @@ registerLang("en",{
   {s:"Put him flat on his back on the floor. Kneel beside him, heel of your hand in the centre of his chest.",e:"Position and hand placement in one sentence."},
   {s:"Push down hard, twice a second, and do not stop until I tell you.",e:"Start the beat. Count aloud with them for the first ten."},
   {s:"Two minutes. If someone else is there, swap over now.",e:"Prompt a compressor change every two minutes."}],
- ui:{medics:"🚑 Paramedics here",share:"Share",copied:"Copied",step:"Step",of:"of",lastOne:"last one",elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable"},
+ ui:{back:"Back",copyLink:"Copy link",yourLang:"Language",medics:"🚑 Paramedics here",share:"Share",copied:"Copied",step:"Step",of:"of",lastOne:"last one",elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable"},
  article:{h:"How to do CPR on an adult",
   p:"Cardiac arrest kills within minutes. Chest compressions started by whoever is standing there — before an ambulance arrives — are the single biggest factor in whether someone survives. You do not need training, and you cannot make a person in cardiac arrest worse by trying.",
   s:[["1. Check for a response","Shout at them and squeeze their shoulder. If there is no response at all, they need help immediately."],
@@ -453,7 +435,7 @@ function langOrder(){
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
  aedStep:0,log:[],cprStarted:false,dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
  vision:false,seenRate:null,stream:null,peer:null,feeds:{},sel:null,lastSwapPrompt:0};
-const BUILD="2026-08-14c";
+const BUILD="2026-08-14d";
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>LANG_REGISTRY[S.lang]||LANG_REGISTRY.en;
@@ -492,7 +474,7 @@ function armScreen(sc){
 function show(id){
  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
  const sc=$(id);sc.classList.add("on");current=id;setHeader(id);
- $("langsheet").classList.remove("on");window.scrollTo(0,0);
+ window.scrollTo(0,0);
  armScreen(sc);
  const n=FLOW.indexOf(id);
  trace("SHOW "+id+(n>=0?"  (step "+(n+1)+" of "+FLOW.length+")":""));
@@ -676,7 +658,7 @@ function applyLang(){
   li.innerHTML="<b>"+(i+1)+"</b><span>"+s+"</span>";ul.appendChild(li);});
  $("btn-aed").textContent=d.aedBtn;$("btn-alive").textContent=d.aliveBtn;$("btn-swap").textContent=d.swap;
  $("btn-breaths").textContent=S.breaths?d.breathsOff:d.breathsOn;
- $("btn-video").textContent=d.videoBtn;$("lang-label").textContent=d.name;
+ $("btn-video").textContent=d.videoBtn;
  $("t-code-h").textContent=d.codeH;$("t-code-note").textContent=d.codeNote;
  $("btn-code-go").textContent=d.codeGo;$("btn-code-back").textContent=d.codeBack;
  $("t-alive-h").textContent=d.aliveH;$("t-alive-p").textContent=d.aliveP;
@@ -684,12 +666,12 @@ function applyLang(){
  $("btn-handover2").textContent=d.handH2;$("btn-aed-back").textContent=d.aedBack;
  const u=d.ui;
  $("hdr-elapsed").textContent=u.elapsed;$("hdr-exit").textContent=u.exit;
- $("btn-console").textContent=u.dispatcher;$("langsearch").placeholder=u.searchLang;
+ $("btn-console").textContent=u.dispatcher;
  $("btn-copy").textContent=u.copy;$("btn-home").textContent=u.startOver;
  $("btn-share").textContent=u.share;$("btn-medics").textContent=u.medics;
  $("d-saylbl").textContent=u.sayThis;$("d-sellbl").textContent=u.callerSpeaks;
- $("d-codelbl").textContent=u.codeFor;$("d-linklbl").textContent=u.link;
- $("d-nextlbl").textContent=u.next;
+ $("d-codelbl").textContent=u.codeFor;$("d-linklbl").textContent=u.copyLink;
+ $("d-nextlbl").textContent=u.next;$("d-prevlbl").textContent=u.back;
  $("d-recoglbl").textContent=u.arrestRec;$("d-firstlbl").textContent=u.firstComp;
  if(!S.peer)$("d-vidlbl").textContent=u.openVideo;
  if(!S.running)$("d-metro").textContent="▶ "+u.metronome+" · "+BPM+"/min";
@@ -704,32 +686,36 @@ function applyLang(){
   const p=document.createElement("p");p.textContent=bd;box.appendChild(p);});
  if(phase==="aed")renderAED();
 }
-$("btn-lang").onclick=()=>{
- const on=$("langsheet").classList.toggle("on");
- if(on){$("langsearch").value="";buildChips();
-  if(LANG_INDEX.length>8)setTimeout(()=>$("langsearch").focus(),50);}
-};
-$("langsearch").oninput=()=>buildChips($("langsearch").value);
-function buildChips(filter){
- /* A wrapping chip row stops scaling past about eight languages, so this is a
-    scrollable list with search that appears only once the list gets long. */
- $("langsearch").style.display=LANG_INDEX.length>8?"block":"none";
- const f=(filter||"").trim().toLowerCase();
- const box=$("langlist");box.innerHTML="";
- langOrder().filter(l=>!f||l.name.toLowerCase().includes(f)||l.en.toLowerCase().includes(f)||l.code===f)
-  .forEach(l=>{
-   const b=document.createElement("button");
-   b.className="lrow";b.setAttribute("role","option");
-   b.setAttribute("aria-selected",l.code===S.lang);
-   b.innerHTML=l.name+(l.en!==l.name?' <em>'+l.en+'</em>':'');
-   b.onclick=async()=>{
-    const ok=await loadLang(l.code);
-    if(!ok){b.innerHTML=l.name+' <em>'+t().ui.unavailable+'</em>';return;}
-    S.lang=l.code;applyLang();buildChips();buildDLangs();
-    $("langsheet").classList.remove("on");
-    if(phase==="compress"&&current==="s-cpr")say(t().say.go);
-   };
-   box.appendChild(b);});
+/* A language name must be readable by the person choosing it. For the rescuer's own
+   picker that means the native name; for the dispatcher it means the caller's language
+   rendered in the DISPATCHER's language — "Tamil" to an English call-taker, "तमिल" to a
+   Hindi one. Intl.DisplayNames does exactly this. */
+function langName(code,inLocale){
+ try{
+  const dn=new Intl.DisplayNames([inLocale],{type:"language"});
+  const n=dn.of(code);
+  if(n&&n.toLowerCase()!==String(code).toLowerCase())return n.charAt(0).toUpperCase()+n.slice(1);
+ }catch(e){}
+ const l=LANG_INDEX.find(x=>x.code===code);
+ return l?l.en:code;
+}
+/* A native <select> instead of a custom sheet: one tap, scrolls to any length,
+   uses the platform picker on mobile, and there is far less of it to break. */
+function buildChips(){
+ const sel=$("langsel");if(!sel)return;
+ sel.innerHTML="";
+ langOrder().forEach(l=>{
+  const o=document.createElement("option");
+  o.value=l.code;
+  o.textContent=l.name+(l.en!==l.name?" · "+l.en:"");
+  if(l.code===S.lang)o.selected=true;
+  sel.appendChild(o);});
+ sel.onchange=async()=>{
+  const c=sel.value;
+  if(!await loadLang(c)){sel.value=S.lang;return;}
+  S.lang=c;applyLang();buildChips();buildDLangs();
+  if(phase==="compress"&&current==="s-cpr")say(t().say.go);
+ };
 }
 
 $("btn-start").onclick=()=>step("s-home","s-resp",()=>{
@@ -933,14 +919,16 @@ function dRender(){
  $("d-step").textContent=(i+1)+" / "+n;
  $("d-quote").textContent=own.dScript[i].s;
  $("d-coach").textContent=own.dScript[i].e;
- const cl=LANG_INDEX.find(l=>l.code===S.dLang);
- $("d-speaklbl").textContent=own.ui.playIn+" "+(cl?cl.name:"English");
+ $("d-speaklbl").textContent=own.ui.playIn+" "+langName(S.dLang,own.code);
 }
 function buildDLangs(){
  const sel=$("d-langsel");if(!sel)return;
  sel.innerHTML="";
+ const mine=t().code;
  langOrder().forEach(l=>{const o=document.createElement("option");
-  o.value=l.code;o.textContent=l.name+(l.en!==l.name?" · "+l.en:"");
+  o.value=l.code;
+  const inMine=langName(l.code,mine);
+  o.textContent=inMine+(l.name!==inMine?" · "+l.name:"");
   if(l.code===S.dLang)o.selected=true;sel.appendChild(o);});
  sel.onchange=async()=>{
   const c=sel.value;
@@ -961,7 +949,7 @@ $("d-metro").onclick=e=>{unlock();
  if(S.running){stopBeat();b.textContent="▶ "+u.metronome+" · "+BPM+"/min";b.classList.remove("b-amber");b.classList.add("b-quiet");}
  else{startBeat();b.textContent="■ "+u.metronome+" · "+BPM+"/min";b.classList.remove("b-quiet");b.classList.add("b-amber");}};
 $("d-copylink").onclick=async()=>{try{await navigator.clipboard.writeText(S.dLink);
- $("d-copylink").textContent="✓ Copied";setTimeout(()=>$("d-copylink").textContent="🔗 Copy link",1800);}catch(e){}};
+ $("d-copylink").textContent="✓ Copied";setTimeout(()=>$("d-copylink").innerHTML="🔗 <span id=\"d-linklbl\">"+t().ui.copyLink+"</span>",1800);}catch(e){}};
 $("d-startvid").onclick=async()=>{
  const u=t().ui;
  if(S.peer){stopVideo();$("d-vidlbl").textContent=u.openVideo;return;}

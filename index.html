@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#FAFAF7">
-<title>CPR Coach — Free Step-by-Step CPR Instructions with Live Metronome</title>
-<meta name="description" content="Free hands-only CPR guidance that works offline. Voice instructions, a 110 bpm compression metronome, AED steps and rescue breath timing in 6 languages. No app, no account.">
-<meta name="keywords" content="CPR, CPR instructions, how to do CPR, hands only CPR, chest compressions, CPR metronome, cardiac arrest, AED, defibrillator, rescue breaths, first aid, CPR Hindi, CPR Kannada, CPR Tamil, offline CPR guide">
+<title>CPR Guide — Step-by-Step CPR Instructions | CPR Coach</title>
+<meta name="description" content="Step-by-step CPR guidance with voice instructions, compression timing, AED and rescue-breath guidance. Get multilingual dispatcher assistance with optional live video support.">
+<meta name="keywords" content="CPR guide, CPR instructions, step by step CPR, how to do CPR, hands only CPR, chest compressions, CPR timing, CPR metronome, cardiac arrest, AED, defibrillator, rescue breaths, first aid, dispatcher CPR, telephone CPR, CPR Hindi, CPR Kannada, CPR Tamil, offline CPR guide">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <link rel="canonical" href="https://arunkumarkundra.github.io/cprcoach/">
 <link rel="alternate" hreflang="en" href="https://arunkumarkundra.github.io/cprcoach/?lang=en">
@@ -17,14 +17,14 @@
 <link rel="alternate" hreflang="ar" href="https://arunkumarkundra.github.io/cprcoach/?lang=ar">
 <link rel="alternate" hreflang="x-default" href="https://arunkumarkundra.github.io/cprcoach/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="CPR Coach">
-<meta property="og:title" content="CPR Coach — free CPR instructions that work offline">
-<meta property="og:description" content="One button. Voice guidance, a live compression beat, AED steps and rescue breath timing. Six languages. No app to install.">
+<meta property="og:title" content="CPR Coach — Step-by-Step CPR Guidance with Dispatcher Support">
+<meta property="og:description" content="Voice-guided CPR, compression timing, AED and rescue-breath guidance in multiple languages, with optional live dispatcher video assistance.">
 <meta property="og:url" content="https://arunkumarkundra.github.io/cprcoach/">
 <meta property="og:image" content="https://arunkumarkundra.github.io/cprcoach/assets/og-image.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="CPR Coach — free CPR instructions that work offline">
-<meta name="twitter:description" content="One button. Voice guidance, a live compression beat and AED steps in six languages.">
+<meta name="twitter:title" content="CPR Coach — Step-by-Step CPR Guidance, with Dispatcher Support">
+<meta name="twitter:description" content="Step-by-step CPR guidance with voice instructions, compression timing, AED support and multilingual dispatcher assistance with optional live video.">
 <meta name="twitter:image" content="https://arunkumarkundra.github.io/cprcoach/assets/og-image.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23FAFAF7"/><path d="M6 36h10l6-20 8 32 6-16h22" fill="none" stroke="%23E8412C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>'>
@@ -35,7 +35,7 @@
 "applicationCategory":"HealthApplication","operatingSystem":"Any web browser",
 "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"isAccessibleForFree":true,
 "inLanguage":["en","hi","kn","ta","es","ar"],
-"description":"Free offline CPR guidance with voice instructions, a compression metronome, AED steps and rescue breath timing."},
+"description":"Step-by-step CPR guidance with voice instructions, compression timing, AED support and multilingual dispatcher assistance. Works offline."},
 {"@type":"HowTo","name":"How to perform CPR on an adult","totalTime":"PT2M","step":[
 {"@type":"HowToStep","name":"Check for a response","text":"Shout and squeeze the shoulder. No response means they need help now."},
 {"@type":"HowToStep","name":"Check the breathing","text":"Watch the chest for 10 seconds. Gasping or irregular gulping is not normal breathing."},
@@ -450,6 +450,7 @@ function langOrder(){
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
  aedStep:0,log:[],dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
  vision:false,seenRate:null,stream:null,peer:null,feeds:{},sel:null,lastSwapPrompt:0};
+const BUILD="2026-08-13c";
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>LANG_REGISTRY[S.lang]||LANG_REGISTRY.en;
@@ -472,10 +473,19 @@ function setHeader(id){
  $("btn-console").style.display=(id==="s-home")?"inline":"none";
  $("appbar").classList.toggle("wide",id==="s-console");
 }
+let lockUntil=0;
+/* Swallow any button press within 450 ms of a screen change. Consecutive screens
+   place their answers in the same position, so a single fast touch — or a ghost
+   click on mobile — could otherwise advance two steps and skip a question. */
+document.addEventListener("click",e=>{
+ if(Date.now()<lockUntil&&e.target.closest&&e.target.closest("button")){
+  e.stopPropagation();e.preventDefault();}
+},true);
 function show(id){
  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
  $(id).classList.add("on");current=id;setHeader(id);
  $("langsheet").classList.remove("on");window.scrollTo(0,0);
+ lockUntil=Date.now()+450;
 }
 $("hdr-back").onclick=()=>{const b=BACK[current];if(b)show(b);};
 $("hdr-brand").onclick=()=>{if(phase==="idle"&&current!=="s-home")show("s-home");};
@@ -500,14 +510,43 @@ if("requestIdleCallback" in window)requestIdleCallback(prefetchLangs,{timeout:40
 let ac=null,nextBeat=0,timer=null,beatNo=0,keepAlive=null;
 function audio(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();
  if(ac.state!=="running")ac.resume().catch(()=>{});return ac;}
-function startKeepAlive(){
- if(keepAlive)return;
- keepAlive=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=");
- keepAlive.loop=true;keepAlive.volume=0.01;keepAlive.play().catch(()=>{});
- if("mediaSession" in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:"CPR compressions",artist:"CPR Coach"});
-  navigator.mediaSession.playbackState="playing";}catch(e){}}
+/* one second of real silence, 8 kHz mono — a zero-length loop is malformed and
+   some browsers refuse it or stall on it */
+function silentWav(){
+ const n=8000,b=new ArrayBuffer(44+n),v=new DataView(b);
+ const put=(o,str)=>{for(let i=0;i<str.length;i++)v.setUint8(o+i,str.charCodeAt(i));};
+ put(0,"RIFF");v.setUint32(4,36+n,true);put(8,"WAVEfmt ");v.setUint32(16,16,true);
+ v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,8000,true);
+ v.setUint32(28,8000,true);v.setUint16(32,1,true);v.setUint16(34,8,true);
+ put(36,"data");v.setUint32(40,n,true);
+ for(let i=0;i<n;i++)v.setUint8(44+i,128);
+ let s="";const u=new Uint8Array(b);
+ for(let i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);
+ return "data:audio/wav;base64,"+btoa(s);
 }
-function unlock(){audio();startKeepAlive();}
+function startKeepAlive(){
+ if(keepAlive||!ac)return;
+ try{
+  keepAlive=new Audio(silentWav());keepAlive.loop=true;keepAlive.volume=0.01;
+  keepAlive.play().then(()=>{
+   /* if holding the audio session suspended Web Audio, back it out —
+      the metronome matters more than background playback */
+   if(ac&&ac.state!=="running"){
+    try{keepAlive.pause();}catch(e){}
+    keepAlive=null;ac.resume().catch(()=>{});
+   }
+  }).catch(()=>{keepAlive=null;});
+  if("mediaSession" in navigator){try{
+   navigator.mediaSession.metadata=new MediaMetadata({title:"CPR compressions",artist:"CPR Coach"});
+   navigator.mediaSession.playbackState="playing";}catch(e){}}
+ }catch(e){keepAlive=null;}
+}
+function unlock(){audio();}
+function audioHealth(){
+ const b=$("btn-sound");if(!b)return;
+ if(S.muted){b.textContent="🔇";return;}
+ b.textContent=(ac&&ac.state==="running")?"🔊":"⚠";
+}
 document.addEventListener("pointerdown",unlock,{passive:true});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){audio();if(S.t0)keepAwake();}});
 function click(at,accent){
@@ -522,7 +561,7 @@ function click(at,accent){
 }
 function scheduler(){
  const c=audio();
- if(c.state!=="running"){timer=setTimeout(scheduler,120);return;}
+ if(c.state!=="running"){c.resume().catch(()=>{});audioHealth();timer=setTimeout(scheduler,120);return;}
  if(nextBeat<c.currentTime)nextBeat=c.currentTime+0.05;
  while(nextBeat<c.currentTime+0.15){
   beatNo++;const n=beatNo;click(nextBeat,n%10===0);
@@ -531,7 +570,8 @@ function scheduler(){
  timer=setTimeout(scheduler,25);
 }
 function startBeat(){if(S.running)return;S.running=true;beatNo=0;
- const c=audio();nextBeat=c.currentTime+0.1;startKeepAlive();scheduler();}
+ const c=audio();nextBeat=c.currentTime+0.1;scheduler();
+ setTimeout(()=>{startKeepAlive();audioHealth();},600);}
 function stopBeat(){S.running=false;clearTimeout(timer);document.documentElement.style.setProperty("--wash",0);}
 
 let voices=[];
@@ -562,7 +602,7 @@ function applyLang(){
  const d=t();
  document.body.setAttribute("dir",d.dir);document.documentElement.lang=S.lang;
  $("t-home-h").innerHTML=d.homeH;$("t-start").textContent=d.start;$("t-start-sub").textContent=d.startSub;
- $("t-disclaimer").innerHTML=d.disclaimer;
+ $("t-disclaimer").innerHTML=d.disclaimer+' <span style="opacity:.55">build '+BUILD+'</span>';
  $("t-q1").textContent=d.q1;$("t-q1-yes").textContent=d.q1y;$("t-q1-no").textContent=d.q1n;
  $("t-q2").textContent=d.q2;$("t-q2-warn").innerHTML=d.q2w;$("t-q2-yes").textContent=d.q2y;$("t-q2-no").textContent=d.q2n;
  $("t-q3").textContent=d.q3;$("t-adult").textContent=d.adult;$("t-child").textContent=d.child;$("t-infant").textContent=d.infant;
@@ -686,8 +726,13 @@ function tickClock(){if(!S.t0)return;const s=Math.round((Date.now()-S.t0)/1000);
  if(HDR[current]==="clock")$("hdr-clock").textContent=mmss(s);
  setTimeout(tickClock,500);}
 
-$("btn-sound").onclick=()=>{S.muted=!S.muted;$("btn-sound").textContent=S.muted?"🔇":"🔊";
- if(!S.muted){unlock();if(phase==="compress")say(t().say.go);}};
+$("btn-sound").onclick=()=>{
+ if(!S.muted&&ac&&ac.state!=="running"){          // warning state: retry, don't mute
+  ac.resume().then(audioHealth).catch(audioHealth);return;}
+ S.muted=!S.muted;
+ if(!S.muted){unlock();if(ac)ac.resume().catch(()=>{});
+  if(phase==="compress")say(t().say.go);}
+ audioHealth();};
 $("btn-breaths").onclick=()=>{S.breaths=!S.breaths;applyLang();
  mark(S.breaths?"Switched to 30:2 with breaths":"Switched to compression-only");
  $("cue").textContent=S.breaths?t().say.b1:t().say.go;};
@@ -871,7 +916,19 @@ buildChips();buildDLangs();applyLang();setHeader("s-home");
 if(q.get("role")==="dispatcher")$("btn-console").click();
 if(ulang&&ulang!=="en"&&LANG_INDEX.some(l=>l.code===ulang))
  loadLang(ulang).then(ok=>{if(ok){S.lang=ulang;applyLang();buildChips();buildDLangs();}});
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+/* Devices were running different cached builds, which looked like random missing
+   steps. Show the build, and reload automatically when a new one lands — but
+   never mid-resuscitation. */
+if("serviceWorker" in navigator)window.addEventListener("load",()=>{
+ navigator.serviceWorker.register("sw.js").then(reg=>{
+  reg.addEventListener("updatefound",()=>{
+   const nw=reg.installing;if(!nw)return;
+   nw.addEventListener("statechange",()=>{
+    if(nw.state==="installed"&&navigator.serviceWorker.controller&&phase==="idle")location.reload();
+   });
+  });
+ }).catch(()=>{});
+});
 </script>
 </body>
 </html>

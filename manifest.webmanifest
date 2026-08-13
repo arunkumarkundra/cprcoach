@@ -1,7 +1,7 @@
 {
  "name":"CPR Coach",
  "short_name":"CPR",
- "description":"Step-by-step CPR guidance with a live compression beat. Works offline.",
+ "description":"Step-by-step CPR guidance with voice instructions, compression timing, AED support and multilingual dispatcher assistance. Works offline.",
  "start_url":"./",
  "display":"standalone",
  "orientation":"any",

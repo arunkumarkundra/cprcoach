@@ -42,6 +42,7 @@ registerLang("es",{
    "Esto puede durar mucho más de lo que esperas. Continúa.",
    "No pares a comprobar la respiración salvo que se mueva o despierte."],
   swap2min:"Dos minutos. Si alguien puede relevarte, cambiad ahora. No pares más de unos segundos.",
+  bi1:"Para. Mantén la cabeza recta. No la inclines mucho hacia atrás.",bi2:"Cubre su boca y su nariz con tu boca. Sopla suavemente un segundo. Mira subir el pecho.",bi3:"Deja bajar el pecho. Un soplo suave más.",
   b1:"Para. Inclina la cabeza hacia atrás. Levanta el mentón.",
   b2:"Tápale la nariz. Cubre su boca con la tuya. Sopla un segundo. Mira subir el pecho.",
   b3:"Deja bajar el pecho. Sopla otra vez.",

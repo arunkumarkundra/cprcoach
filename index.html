@@ -386,6 +386,7 @@ registerLang("en",{
    "This can take much longer than you expect. Continue.",
    "Do not stop to check for breathing unless they move or wake."],
   swap2min:"Two minutes. If someone can take over, swap now. Do not pause for more than a few seconds.",
+  bi1:"Stop. Keep the head level. Do not tilt it far back.",bi2:"Cover their mouth and nose with your mouth. Puff gently for one second. Watch the chest rise.",bi3:"Let the chest fall. One more gentle puff.",
   b1:"Stop. Tilt the head back. Lift the chin.",
   b2:"Pinch the nose. Cover their mouth with yours. Blow one second. Watch the chest rise.",
   b3:"Let the chest fall. Blow once more.",
@@ -437,7 +438,7 @@ function langOrder(){
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
  aedStep:0,log:[],cprStarted:false,dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
  vision:false,seenRate:null,stream:null,peer:null,feeds:{},sel:null,lastSwapPrompt:0};
-const BUILD="2026-08-14e";
+const BUILD="2026-08-14f";
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>LANG_REGISTRY[S.lang]||LANG_REGISTRY.en;
@@ -644,8 +645,8 @@ function mmss(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
 const MEDIA={
  handsAdult  :"images/Chest_compressions.gif",
  handsChild  :"images/Chest_compressions.gif",
- handsInfant :"images/Infant_two_finger_CPR_jpg.webp",
- breathInfant:"images/CPR_Infant_Mouth_To_Nose.png"
+ handsInfant :"images/Infant_two_finger_CPR.png",
+ breathInfant:"images/Infant_Mouth_to_Mouth-and-Nose_Breathing.png"
 };
 const mediaOK={};
 function art(host,key){
@@ -665,7 +666,7 @@ function applyLang(){
  const d=t();
  document.body.setAttribute("dir",d.dir);document.documentElement.lang=S.lang;
  $("t-home-h").innerHTML=d.homeH;$("t-start").textContent=d.start;$("t-start-sub").textContent=d.startSub;
- $("t-disclaimer").innerHTML=d.disclaimer+' <span style="opacity:.55">build '+BUILD+'</span>';
+ $("t-disclaimer").innerHTML=d.disclaimer+(DEBUG?' <span style="opacity:.55">build '+BUILD+'</span>':'');
  $("t-q1").textContent=d.q1;$("t-q1-yes").textContent=d.q1y;$("t-q1-no").textContent=d.q1n;
  $("t-q2").textContent=d.q2;$("t-q2-warn").innerHTML=d.q2w;$("t-q2-yes").textContent=d.q2y;$("t-q2-no").textContent=d.q2n;
  $("t-q3").textContent=d.q3;$("t-adult").textContent=d.adult;$("t-child").textContent=d.child;$("t-infant").textContent=d.infant;
@@ -788,7 +789,11 @@ function doBreaths(){
  const d=t();phase="breaths";stopBeat();clearBreaths();
  $("counter").classList.add("small");$("tickwrap").classList.add("breath");
  art("art-cpr",S.who==="infant"?"breathInfant":"breath");
- [[0,d.say.b1,"—"],[2600,d.say.b2,"1 / 2"],[6600,d.say.b3,"2 / 2"]].forEach(function(x){
+ /* An infant's airway closes if the neck is over-extended, so infants get a
+    neutral-head script and a mouth-and-nose seal rather than the adult head-tilt. */
+ const inf=(S.who==="infant");
+ const L1=inf?d.say.bi1:d.say.b1, L2=inf?d.say.bi2:d.say.b2, L3=inf?d.say.bi3:d.say.b3;
+ [[0,L1,"—"],[2600,L2,"1 / 2"],[6600,L3,"2 / 2"]].forEach(function(x){
   breathTimers.push(setTimeout(function(){if(phase!=="breaths")return;
    $("counter").textContent=x[2];$("cue").textContent=x[1];say(x[1]);},x[0]));});
  let left=10;$("ticker").style.width="100%";
@@ -810,7 +815,7 @@ $("btn-sound").onclick=()=>{
  audioHealth();};
 $("btn-breaths").onclick=()=>{S.breaths=!S.breaths;applyLang();
  mark(S.breaths?"Switched to 30:2 with breaths":"Switched to compression-only");
- $("cue").textContent=S.breaths?t().say.b1:t().say.go;};
+ $("cue").textContent=S.breaths?(S.who==="infant"?t().say.bi1:t().say.b1):t().say.go;};
 $("btn-swap").onclick=()=>{const d=t();mark("Rescuer changed");
  clearBreaths();phase="compress";S.count=0;S.lastSwapPrompt=S.t0?(Date.now()-S.t0)/1000:0;
  $("counter").classList.remove("small");$("tickwrap").classList.remove("breath");

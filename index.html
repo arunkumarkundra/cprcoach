@@ -197,6 +197,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 </head>
 <body>
 <div id="wash"></div>
+<pre id="trace"></pre>
 
 <header id="appbar">
   <div id="hdr-left">
@@ -230,21 +231,21 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 </section>
 
 <section class="screen" id="s-resp">
-  <div class="grow"><h2 id="t-q1"></h2><div id="art-resp"></div></div>
+  <div class="grow"><span class="eyebrow stepno"></span><h2 id="t-q1"></h2><div id="art-resp"></div></div>
   <div class="foot stack">
     <button class="b-jade" data-go="resp-yes" id="t-q1-yes"></button>
     <button class="b-red" data-go="resp-no" id="t-q1-no"></button></div>
 </section>
 
 <section class="screen" id="s-breath">
-  <div class="grow"><h2 id="t-q2"></h2><div id="art-breath"></div><p class="note warn" id="t-q2-warn"></p></div>
+  <div class="grow"><span class="eyebrow stepno"></span><h2 id="t-q2"></h2><div id="art-breath"></div><p class="note warn" id="t-q2-warn"></p></div>
   <div class="foot stack">
     <button class="b-jade" data-go="breath-yes" id="t-q2-yes"></button>
     <button class="b-red" data-go="breath-no" id="t-q2-no"></button></div>
 </section>
 
 <section class="screen" id="s-who">
-  <div class="grow"><h2 id="t-q3"></h2></div>
+  <div class="grow"><span class="eyebrow stepno"></span><h2 id="t-q3"></h2></div>
   <div class="foot stack">
     <button data-who="adult" id="t-adult"></button>
     <button data-who="child" id="t-child"></button>
@@ -252,14 +253,14 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 </section>
 
 <section class="screen" id="s-call">
-  <div class="grow"><h2 id="t-call-h"></h2><p class="lede" id="t-call-p"></p></div>
+  <div class="grow"><span class="eyebrow stepno"></span><h2 id="t-call-h"></h2><p class="lede" id="t-call-p"></p></div>
   <div class="foot stack">
     <button class="b-red" id="btn-called"></button>
     <button class="b-quiet" id="btn-alone"></button></div>
 </section>
 
 <section class="screen" id="s-prep">
-  <div class="grow"><h2 id="t-prep-h"></h2><ul class="steps" id="prep-steps"></ul></div>
+  <div class="grow"><span class="eyebrow stepno"></span><h2 id="t-prep-h"></h2><ul class="steps" id="prep-steps"></ul></div>
   <div class="foot stack"><button class="b-red" id="btn-prep-done"></button></div>
 </section>
 
@@ -416,7 +417,7 @@ registerLang("en",{
   {s:"Put him flat on his back on the floor. Kneel beside him, heel of your hand in the centre of his chest.",e:"Position and hand placement in one sentence."},
   {s:"Push down hard, twice a second, and do not stop until I tell you.",e:"Start the beat. Count aloud with them for the first ten."},
   {s:"Two minutes. If someone else is there, swap over now.",e:"Prompt a compressor change every two minutes."}],
- ui:{elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable"},
+ ui:{step:"Step",of:"of",lastOne:"last one",elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable"},
  article:{h:"How to do CPR on an adult",
   p:"Cardiac arrest kills within minutes. Chest compressions started by whoever is standing there — before an ambulance arrives — are the single biggest factor in whether someone survives. You do not need training, and you cannot make a person in cardiac arrest worse by trying.",
   s:[["1. Check for a response","Shout at them and squeeze their shoulder. If there is no response at all, they need help immediately."],
@@ -449,7 +450,7 @@ function langOrder(){
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
  aedStep:0,log:[],dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
  vision:false,seenRate:null,stream:null,peer:null,feeds:{},sel:null,lastSwapPrompt:0};
-const BUILD="2026-08-14a";
+const BUILD="2026-08-14b";
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>LANG_REGISTRY[S.lang]||LANG_REGISTRY.en;
@@ -490,12 +491,36 @@ function show(id){
  const sc=$(id);sc.classList.add("on");current=id;setHeader(id);
  $("langsheet").classList.remove("on");window.scrollTo(0,0);
  armScreen(sc);
+ const n=FLOW.indexOf(id);
+ trace("SHOW "+id+(n>=0?"  (step "+(n+1)+" of "+FLOW.length+")":""));
+ if(n>=0&&S.t0)S.log.push({at:Math.round((Date.now()-S.t0)/1000),
+  label:"→ step "+(n+1)+"/"+FLOW.length+" "+id.replace("s-","")});
+}
+/* The single source of truth for the emergency sequence. Screens are numbered from
+   this array, so a missing number on screen is direct evidence of a skipped step. */
+const FLOW=["s-resp","s-breath","s-who","s-call","s-prep","s-cpr"];
+function stampSteps(){
+ const u=t().ui;
+ FLOW.forEach((id,i)=>{
+  const el=$(id)&&$(id).querySelector(".stepno");
+  if(!el)return;
+  el.textContent=u.step+" "+(i+1)+" "+u.of+" "+FLOW.length+(i===FLOW.length-2?" — "+u.lastOne:"");
+ });
+}
+/* Visible transition log. Open with ?debug=1 — it records every screen change and
+   every rejected event, so a skipped step can be proved rather than guessed at. */
+const DEBUG=new URLSearchParams(location.search).get("debug")==="1";
+function trace(msg){
+ if(!DEBUG)return;
+ const el=$("trace");el.classList.add("on");
+ el.textContent+=(S.t0?((Date.now()-S.t0)/1000).toFixed(2)+"s ":"--- ")+msg+"\n";
+ el.scrollTop=el.scrollHeight;
 }
 /* The state machine, not the DOM event, decides what may happen next. A handler
    that fires while the app is not on its origin screen is ignored outright, so a
    duplicated, delayed or replayed event can never skip a step. */
 function step(from,to,fn){
- if(current!==from)return false;
+ if(current!==from){trace("REJECTED "+from+"->"+to+" (app is on "+current+")");return false;}
  if(fn)fn();
  if(to)show(to);
  return true;
@@ -660,6 +685,7 @@ function applyLang(){
  if(!S.peer)$("d-vidlbl").textContent=u.openVideo;
  if(!S.running)$("d-metro").textContent="▶ "+u.metronome+" · "+BPM+"/min";
  if(!Object.keys(S.feeds).length)$("stagehint").textContent=u.waiting;
+ stampSteps();
  art("art-resp","shoulder");art("art-breath","chest");art("art-alive","recovery");
  if(phase==="compress")art("art-cpr",handArt());
  const a=d.article,box=$("article");box.innerHTML="";

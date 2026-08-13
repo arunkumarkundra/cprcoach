@@ -74,6 +74,18 @@ body[dir="rtl"]{direction:rtl}
 #langsheet{display:none;position:sticky;top:var(--bar);z-index:5;background:var(--paper);
  padding:4px var(--pad) 12px;border-bottom:1px solid var(--hair)}
 #langsheet.on{display:block}
+#langsearch{width:100%;font:inherit;font-size:17px;font-weight:600;padding:14px 16px;margin-bottom:8px;
+ border:2px solid var(--hair);border-radius:14px;background:transparent;color:var(--ink)}
+#langlist{max-height:min(52vh,420px);overflow-y:auto;-webkit-overflow-scrolling:touch;
+ display:flex;flex-direction:column;gap:6px}
+.lrow{display:flex;align-items:baseline;gap:10px;justify-content:flex-start;text-align:start;
+ min-height:56px;padding:12px 16px;border-radius:14px;background:transparent;border:2px solid var(--hair);
+ color:var(--ink);font-size:18px;font-weight:700;width:100%}
+.lrow em{font-style:normal;font-size:13px;font-weight:600;color:var(--slate);letter-spacing:.04em}
+.lrow[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.lrow[aria-selected="true"] em{color:rgba(250,250,247,.7)}
+.textlink{display:inline;width:auto;min-height:0;padding:0;background:none;border:none;
+ color:var(--slate);font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 
 .screen{position:relative;z-index:1;flex:1;display:none;flex-direction:column;padding:0 var(--pad) var(--pad)}
 .screen.on{display:flex}
@@ -131,6 +143,14 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .d-coach{font-size:14px;font-weight:600;color:var(--slate);margin-top:10px;line-height:1.4}
 .d-nav{display:grid;grid-template-columns:64px 1fr;gap:10px;margin-top:14px}
 .d-nav button{min-height:60px;font-size:18px}
+.d-play{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:10px}
+.d-play button{min-height:56px;font-size:16px}
+.d-sel{display:flex;flex-direction:column;gap:3px}
+.d-sel span{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--slate)}
+.d-sel select{font:inherit;font-size:16px;font-weight:700;padding:12px 14px;border-radius:14px;
+ border:2px solid var(--hair);background:transparent;color:var(--ink);min-height:56px}
+#hdr-elapsed{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--slate);
+ margin-inline-end:2px}
 .ms{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:76px;
  background:transparent;border:2px solid var(--hair);color:var(--ink);padding:12px 16px;justify-content:center}
 .ms small{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
@@ -142,9 +162,12 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .panel>summary::-webkit-details-marker{display:none}
 .panel[open]>summary{border-bottom:1px solid var(--hair)}
 .panel .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px}
+.d-video{border:2px solid var(--hair);border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
 .codebox{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.codebox b{font-size:clamp(32px,8vw,46px);font-weight:800;letter-spacing:.1em;font-variant-numeric:tabular-nums}
-.codebox .cbtn{width:auto;min-height:52px;padding:12px 18px;font-size:15px}
+.codebox small{display:block;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--slate)}
+.codebox b{display:block;font-size:clamp(30px,7vw,42px);font-weight:800;letter-spacing:.1em;font-variant-numeric:tabular-nums;line-height:1.1}
+.cbtns{display:flex;gap:8px}
+.codebox .cbtn{width:auto;min-height:50px;padding:11px 16px;font-size:15px}
 .stagewrap{position:relative}
 #stage{width:100%;aspect-ratio:4/3;background:#0B0D0F;border-radius:12px;object-fit:contain;display:block}
 #ratebadge{position:absolute;top:10px;inset-inline-start:10px;background:rgba(11,13,15,.82);color:#fff;
@@ -160,9 +183,9 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 
 @media(min-width:700px){.screen,#appbar{max-width:760px;margin-inline:auto;width:100%}
  #s-console,#appbar.wide{max-width:1120px}.b-huge{min-height:220px}}
-@media(min-width:900px){.d-wrap{display:grid;grid-template-columns:1.1fr 1fr;align-items:start;gap:16px}
+@media(min-width:900px){.d-wrap{display:grid;grid-template-columns:1.15fr .85fr;align-items:start;gap:16px}
  .d-say{grid-column:1;grid-row:1}.d-ms{grid-column:1;grid-row:2}.d-beat{grid-column:1;grid-row:3}
- .panel.lang{grid-column:1;grid-row:4}.panel.video{grid-column:2;grid-row:1/span 4}}
+ .d-video{grid-column:2;grid-row:1/span 3;align-self:stretch}}
 @media(max-height:520px) and (orientation:landscape){
  :root{--pad:14px;--bar:44px}#counter{font-size:min(19vh,110px)}#cue{font-size:16px;min-height:2.2em}
  h1{font-size:26px}h2{font-size:21px}.b-huge{min-height:110px;font-size:25px}
@@ -179,7 +202,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
       <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 36h10l6-20 8 32 6-16h26" fill="none" stroke="#E8412C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>CPR Coach</span></button>
     <button class="hbtn icon" id="hdr-back" aria-label="Back" style="display:none">←</button>
-    <span id="hdr-clock" style="display:none">0:00</span>
+    <span id="hdr-elapsed" style="display:none">Elapsed</span><span id="hdr-clock" style="display:none">0:00</span>
   </div>
   <div id="hdr-right">
     <button class="hbtn icon" id="btn-sound" aria-label="Sound">🔊</button>
@@ -187,16 +210,18 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <button class="hbtn" id="hdr-exit" style="display:none">Exit</button>
   </div>
 </header>
-<div id="langsheet"><div class="chips" id="langchips"></div></div>
+<div id="langsheet">
+  <input id="langsearch" type="search" placeholder="Search language" autocomplete="off" style="display:none">
+  <div id="langlist" role="listbox"></div>
+</div>
 
 <section class="screen on" id="s-home">
   <div class="grow"><h1 id="t-home-h"></h1></div>
   <div class="foot stack">
     <button class="b-red b-huge" id="btn-start"><span id="t-start"></span><small id="t-start-sub"></small></button>
-    <button class="b-quiet" id="btn-console">Dispatcher console</button>
     <p class="disclaimer" id="t-disclaimer"></p>
     <div class="article" id="article"></div>
-    <p class="credit">Illustrations original to this project, released to the public domain. Protocol based on current AHA and Red Cross resuscitation guidance; pending clinical review.</p>
+    <p class="credit">Illustrations original to this project, released to the public domain. Protocol based on current AHA and Red Cross resuscitation guidance; pending clinical review.<br><button class="textlink" id="btn-console">Dispatcher console →</button></p>
   </div>
 </section>
 
@@ -285,31 +310,32 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
       <div class="d-nav">
         <button class="b-quiet" id="d-prev" aria-label="Previous">←</button>
         <button id="d-next">Next →</button></div>
-      <button class="b-amber" id="d-speak" style="margin-top:10px;min-height:60px;font-size:17px">🔊 Read aloud to caller</button>
+      <div class="d-play">
+        <button class="b-amber" id="d-speak">🔊 <span id="d-speaklbl">Play in English</span></button>
+        <label class="d-sel"><span>Caller speaks</span>
+          <select id="d-langsel"></select></label>
+      </div>
     </div>
     <div class="row d-ms">
       <button class="ms" id="d-mark-recog"><small>Arrest recognised</small><b>—:—</b></button>
       <button class="ms" id="d-mark-first"><small>First compression</small><b>—:—</b></button>
     </div>
-    <button class="b-red d-beat" id="d-metro">▶ Start beat · 110/min</button>
-    <details class="panel video">
-      <summary>Video <span id="d-vstat">closed</span></summary>
-      <div class="body">
-        <div class="codebox"><b id="d-code">——————</b>
-          <button class="b-quiet cbtn" id="d-copylink">🔗 Copy link</button></div>
-        <button class="b-amber" id="d-startvid" style="min-height:60px;font-size:17px">📹 Open video session</button>
-        <div class="stagewrap">
-          <video id="stage" playsinline autoplay muted></video>
-          <div id="ratebadge">—</div>
-          <div id="stagehint">Read the code to the caller, or send the link.</div>
+    <div class="d-video">
+      <div class="codebox">
+        <div><small>Code for the caller</small><b id="d-code">——————</b></div>
+        <div class="cbtns">
+          <button class="b-quiet cbtn" id="d-copylink">🔗 Link</button>
+          <button class="b-quiet cbtn" id="d-startvid">📹 Open video</button>
         </div>
-        <div id="tiles"></div>
       </div>
-    </details>
-    <details class="panel lang">
-      <summary>Caller's language <span id="d-langstat">English</span></summary>
-      <div class="body"><div class="chips" id="d-langs"></div></div>
-    </details>
+      <div class="stagewrap" id="stagewrap" hidden>
+        <video id="stage" playsinline autoplay muted></video>
+        <div id="ratebadge">—</div>
+        <div id="stagehint">Waiting for a rescuer to join.</div>
+      </div>
+      <div id="tiles"></div>
+    </div>
+    <button class="b-quiet d-beat" id="d-metro">▶ Metronome · 110/min</button>
   </div>
 </section>
 
@@ -406,8 +432,20 @@ registerLang("en",{
 
 <script>
 "use strict";
-const LANG_INDEX=[{code:"en",name:"English"},{code:"hi",name:"हिन्दी"},{code:"kn",name:"ಕನ್ನಡ"},
- {code:"ta",name:"தமிழ்"},{code:"es",name:"Español"},{code:"ar",name:"العربية"}];
+const LANG_INDEX=[
+ {code:"en",name:"English",en:"English"},
+ {code:"hi",name:"हिन्दी",en:"Hindi"},
+ {code:"kn",name:"ಕನ್ನಡ",en:"Kannada"},
+ {code:"ta",name:"தமிழ்",en:"Tamil"},
+ {code:"es",name:"Español",en:"Spanish"},
+ {code:"ar",name:"العربية",en:"Arabic"}];
+/* Device languages float to the top so the likely choice is the first thing seen. */
+function langOrder(){
+ const nav=(navigator.languages||[navigator.language||"en"]).map(x=>x.split("-")[0]);
+ return LANG_INDEX.slice().sort((a,b)=>{
+  const ai=nav.indexOf(a.code),bi=nav.indexOf(b.code);
+  return (ai<0?99:ai)-(bi<0?99:bi);});
+}
 
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
  aedStep:0,log:[],dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
@@ -426,7 +464,9 @@ function setHeader(id){
  const m=HDR[id]||"brand";
  $("hdr-brand").style.display=(m==="brand")?"flex":"none";
  $("hdr-back").style.display=(m==="back"&&BACK[id])?"flex":"none";
- $("hdr-clock").style.display=(m==="clock"||m==="exit")?"inline":"none";
+ const showClock=(m==="clock"||m==="exit");
+ $("hdr-clock").style.display=showClock?"inline":"none";
+ $("hdr-elapsed").style.display=showClock?"inline":"none";
  $("hdr-exit").style.display=(m==="exit")?"flex":"none";
  $("btn-sound").style.display=(id==="s-home")?"none":"flex";
  $("appbar").classList.toggle("wide",id==="s-console");
@@ -548,20 +588,32 @@ function applyLang(){
   const p=document.createElement("p");p.textContent=bd;box.appendChild(p);});
  if(phase==="aed")renderAED();
 }
-$("btn-lang").onclick=()=>$("langsheet").classList.toggle("on");
-function buildChips(){
- const box=$("langchips");box.innerHTML="";
- LANG_INDEX.forEach(l=>{
-  const b=document.createElement("button");b.className="chip";b.textContent=l.name;
-  b.setAttribute("aria-pressed",l.code===S.lang);
-  b.onclick=async()=>{
-   const ok=await loadLang(l.code);
-   if(!ok){b.textContent=l.name+" ✕";return;}
-   S.lang=l.code;applyLang();buildChips();buildDLangs();
-   $("langsheet").classList.remove("on");
-   if(phase==="compress"&&current==="s-cpr")say(t().say.go);
-  };
-  box.appendChild(b);});
+$("btn-lang").onclick=()=>{
+ const on=$("langsheet").classList.toggle("on");
+ if(on){$("langsearch").value="";buildChips();
+  if(LANG_INDEX.length>8)setTimeout(()=>$("langsearch").focus(),50);}
+};
+$("langsearch").oninput=()=>buildChips($("langsearch").value);
+function buildChips(filter){
+ /* A wrapping chip row stops scaling past about eight languages, so this is a
+    scrollable list with search that appears only once the list gets long. */
+ $("langsearch").style.display=LANG_INDEX.length>8?"block":"none";
+ const f=(filter||"").trim().toLowerCase();
+ const box=$("langlist");box.innerHTML="";
+ langOrder().filter(l=>!f||l.name.toLowerCase().includes(f)||l.en.toLowerCase().includes(f)||l.code===f)
+  .forEach(l=>{
+   const b=document.createElement("button");
+   b.className="lrow";b.setAttribute("role","option");
+   b.setAttribute("aria-selected",l.code===S.lang);
+   b.innerHTML=l.name+(l.en!==l.name?' <em>'+l.en+'</em>':'');
+   b.onclick=async()=>{
+    const ok=await loadLang(l.code);
+    if(!ok){b.innerHTML=l.name+' <em>unavailable</em>';return;}
+    S.lang=l.code;applyLang();buildChips();buildDLangs();
+    $("langsheet").classList.remove("on");
+    if(phase==="compress"&&current==="s-cpr")say(t().say.go);
+   };
+   box.appendChild(b);});
 }
 
 $("btn-start").onclick=()=>{unlock();S.t0=Date.now();S.log=[];S.total=0;S.lastSwapPrompt=0;
@@ -687,7 +739,8 @@ function stopVideo(){S.vision=false;
  if(S.stream){S.stream.getTracks().forEach(x=>x.stop());S.stream=null;}
  if(S.peer){try{S.peer.destroy();}catch(e){}S.peer=null;}
  S.feeds={};S.sel=null;$("tiles").innerHTML="";$("stage").srcObject=null;
- $("ratebadge").style.display="none";$("stagehint").style.display="grid";}
+ $("ratebadge").style.display="none";$("stagehint").style.display="grid";
+ $("stagewrap").hidden=true;}
 function startVision(video){
  S.vision=true;
  const cv=document.createElement("canvas");cv.width=48;cv.height=36;
@@ -722,19 +775,27 @@ $("btn-console").onclick=()=>{unlock();S.dT0=Date.now();S.dStep=0;
 function dClock(){if(!S.dT0)return;$("hdr-clock").textContent=mmss(Math.round((Date.now()-S.dT0)/1000));setTimeout(dClock,500);}
 function dPack(){return LANG_REGISTRY[S.dLang]||LANG_REGISTRY.en;}
 function dRender(){
- const p=dPack(),n=p.dScript.length,i=((S.dStep%n)+n)%n;
+ /* The dispatcher reads the script in THEIR language; only the playback is in the
+    caller's. Showing Devanagari to an English-speaking call-taker helped nobody. */
+ const own=t(),n=own.dScript.length,i=((S.dStep%n)+n)%n;
  $("d-step").textContent=(i+1)+" / "+n;
- $("d-quote").textContent=p.dScript[i].s;$("d-coach").textContent=p.dScript[i].e;
- $("d-langstat").textContent=p.name;
+ $("d-quote").textContent=own.dScript[i].s;
+ $("d-coach").textContent=own.dScript[i].e;
+ const cl=LANG_INDEX.find(l=>l.code===S.dLang);
+ $("d-speaklbl").textContent="Play in "+(cl?cl.name:"English");
+ $("d-speak").style.display=(S.dLang===S.lang)?"none":"flex";
 }
 function buildDLangs(){
- const box=$("d-langs");box.innerHTML="";
- LANG_INDEX.forEach(l=>{const b=document.createElement("button");b.className="chip";b.textContent=l.name;
-  b.setAttribute("aria-pressed",l.code===S.dLang);
-  b.onclick=async()=>{const ok=await loadLang(l.code);if(!ok){b.textContent=l.name+" ✕";return;}
-   S.dLang=l.code;S.dLink=location.origin+location.pathname+"?code="+S.dCode+"&lang="+S.dLang;
-   dRender();buildDLangs();};
-  box.appendChild(b);});
+ const sel=$("d-langsel");if(!sel)return;
+ sel.innerHTML="";
+ langOrder().forEach(l=>{const o=document.createElement("option");
+  o.value=l.code;o.textContent=l.name+(l.en!==l.name?" · "+l.en:"");
+  if(l.code===S.dLang)o.selected=true;sel.appendChild(o);});
+ sel.onchange=async()=>{
+  const c=sel.value;
+  if(!await loadLang(c)){sel.value=S.dLang;return;}
+  S.dLang=c;S.dLink=location.origin+location.pathname+"?code="+S.dCode+"&lang="+S.dLang;
+  dRender();};
 }
 $("d-next").onclick=()=>{S.dStep++;dRender();};
 $("d-prev").onclick=()=>{S.dStep--;dRender();};
@@ -745,20 +806,21 @@ $("d-mark-recog").onclick=e=>{const b=e.currentTarget;
 $("d-mark-first").onclick=e=>{const b=e.currentTarget;
  b.querySelector("b").textContent=mmss(Math.round((Date.now()-S.dT0)/1000));b.classList.add("done");};
 $("d-metro").onclick=e=>{unlock();
- if(S.running){stopBeat();e.currentTarget.textContent="▶ Start beat · 110/min";}
- else{startBeat();e.currentTarget.textContent="■ Stop beat · 110/min";}};
+ if(S.running){stopBeat();e.currentTarget.textContent="▶ Metronome · "+BPM+"/min";e.currentTarget.classList.remove("b-amber");e.currentTarget.classList.add("b-quiet");}
+ else{startBeat();e.currentTarget.textContent="■ Metronome · "+BPM+"/min";e.currentTarget.classList.remove("b-quiet");e.currentTarget.classList.add("b-amber");}};
 $("d-copylink").onclick=async()=>{try{await navigator.clipboard.writeText(S.dLink);
  $("d-copylink").textContent="✓ Copied";setTimeout(()=>$("d-copylink").textContent="🔗 Copy link",1800);}catch(e){}};
 $("d-startvid").onclick=async()=>{
- if(S.peer){stopVideo();$("d-startvid").textContent="📹 Open video session";$("d-vstat").textContent="closed";return;}
+ if(S.peer){stopVideo();$("d-startvid").textContent="📹 Open video";return;}
  $("d-startvid").textContent="…";
  const lib=await loadPeerLib();
- if(!lib){$("stagehint").textContent="Video library unavailable offline.";$("d-startvid").textContent="📹 Open video session";return;}
+ if(!lib){$("d-startvid").textContent="📹 Open video";return;}
  S.peer=new Peer(ROOM(S.dCode));
- S.peer.on("open",()=>{$("d-startvid").textContent="■ End video session";$("d-vstat").textContent="waiting";
+ $("stagewrap").hidden=false;
+ S.peer.on("open",()=>{$("d-startvid").textContent="■ End video";
   $("stagehint").textContent="Waiting for a rescuer to join.";});
  S.peer.on("error",()=>{$("stagehint").textContent="Code in use. Exit and reopen for a new code.";
-  $("d-startvid").textContent="📹 Open video session";});
+  $("d-startvid").textContent="📹 Open video";$("stagewrap").hidden=true;});
  S.peer.on("call",c=>{c.answer();
   c.on("stream",st=>addFeed(c.peer,st));c.on("close",()=>removeFeed(c.peer));});
 };
@@ -770,14 +832,13 @@ function addFeed(id,stream){
  const lab=document.createElement("span");lab.textContent="Rescuer "+n;
  div.appendChild(v);div.appendChild(lab);div.onclick=()=>selectFeed(id);
  $("tiles").appendChild(div);
- $("d-vstat").textContent=n+" joined";$("stagehint").style.display="none";
+ $("stagehint").style.display="none";
  if(!S.sel)selectFeed(id);
 }
 function removeFeed(id){
  delete S.feeds[id];
  const el=document.querySelector('.tile[data-id="'+id+'"]');if(el)el.remove();
  const rest=Object.keys(S.feeds);
- $("d-vstat").textContent=rest.length?rest.length+" joined":"waiting";
  if(S.sel===id){S.sel=null;
   if(rest.length)selectFeed(rest[0]);
   else{$("stage").srcObject=null;S.vision=false;$("ratebadge").style.display="none";
@@ -794,6 +855,7 @@ const q=new URLSearchParams(location.search);
 const ulang=q.get("lang"),ucode=q.get("code");
 if(ucode&&/^\d{6}$/.test(ucode))$("codeinput").value=ucode;
 buildChips();buildDLangs();applyLang();setHeader("s-home");
+if(q.get("role")==="dispatcher")$("btn-console").click();
 if(ulang&&ulang!=="en"&&LANG_INDEX.some(l=>l.code===ulang))
  loadLang(ulang).then(ok=>{if(ok){S.lang=ulang;applyLang();buildChips();buildDLangs();}});
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));

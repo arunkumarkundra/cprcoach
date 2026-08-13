@@ -70,6 +70,7 @@ body[dir="rtl"]{direction:rtl}
 .mark{display:flex;align-items:center;gap:8px;background:none;border:none;padding:4px 0;width:auto;min-height:0}
 .mark svg{width:24px;height:24px;flex:none}
 .mark span{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--slate)}
+#buildtag{font-size:10px;font-weight:700;color:var(--hair);letter-spacing:.06em;white-space:nowrap}
 #hdr-clock{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 #langsheet{display:none;position:sticky;top:var(--bar);z-index:5;background:var(--paper);
  padding:4px var(--pad) 12px;border-bottom:1px solid var(--hair)}
@@ -119,6 +120,9 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
  display:grid;place-items:center;font-size:15px;font-weight:800}
 .steps figure{flex:none;width:70px;color:var(--ink)}
 .art{width:100%;max-width:320px;margin:0 auto;display:block;color:var(--ink)}
+.art .hi{fill:var(--pulse);stroke:none}
+.art .hiS{stroke:var(--pulse)}
+.art img,.artimg{width:100%;max-width:320px;margin:0 auto;display:block;border-radius:14px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{min-height:0;width:auto;padding:11px 16px;border-radius:999px;font-size:16px;font-weight:600;
  background:transparent;color:var(--ink);border:2px solid var(--hair)}
@@ -199,6 +203,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <button class="mark" id="hdr-brand">
       <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 36h10l6-20 8 32 6-16h26" fill="none" stroke="#E8412C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>CPR Coach</span></button>
+    <span id="buildtag"></span>
     <button class="hbtn icon" id="hdr-back" aria-label="Back" style="display:none">←</button>
     <span id="hdr-elapsed" style="display:none"></span><span id="hdr-clock" style="display:none">0:00</span>
   </div>
@@ -340,16 +345,27 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 
 <script>
 const SVG={
-shoulder:'<svg class="art" viewBox="0 0 220 110" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 86h150"/><circle cx="62" cy="60" r="16"/><path d="M78 66c22-4 44-2 62 6M74 76c20 2 40 4 58 10"/><path d="M150 22c-10 6-16 14-18 24"/><path d="M148 16l6 10-11 2z" fill="currentColor" stroke="none"/><path d="M96 40c6-8 14-12 22-12" stroke-dasharray="5 6"/></svg>',
-chest:'<svg class="art" viewBox="0 0 220 110" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 88h184"/><circle cx="52" cy="62" r="16"/><path d="M68 68c30-6 62-4 90 8M66 78c28 2 56 6 84 12"/><path d="M118 30v18M104 34l14 14 14-14" stroke-width="5"/><path d="M100 20c8 6 26 6 36 0" stroke-dasharray="5 6"/></svg>',
-flat:'<svg class="art" viewBox="0 0 220 110" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 92h200" stroke-width="6"/><circle cx="46" cy="68" r="15"/><path d="M61 74h96l24 16M61 84h84"/><path d="M20 100h180" stroke-dasharray="3 8" stroke-width="3"/></svg>',
-tilt:'<svg class="art" viewBox="0 0 220 130" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M92 104c-16-6-26-22-24-40 2-22 20-38 42-38 20 0 34 12 38 28"/><circle cx="132" cy="46" r="4" fill="currentColor" stroke="none"/><path d="M108 74c8 6 20 6 28 0"/><path d="M92 104h96"/><path d="M150 30c14-4 26 0 34 10" stroke-dasharray="5 6"/><path d="M186 34l6 10-12 2z" fill="currentColor" stroke="none"/></svg>',
-handsAdult:'<svg class="art" viewBox="0 0 220 140" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="110" cy="96" rx="66" ry="34"/><path d="M110 62v-6M76 74c14-10 44-10 68 0" stroke-dasharray="4 6"/><rect x="84" y="34" width="52" height="30" rx="12"/><rect x="90" y="14" width="52" height="30" rx="12"/><path d="M110 2v8" stroke-width="5"/><path d="M100 6l10-6 10 6" fill="currentColor" stroke="none"/></svg>',
-handsChild:'<svg class="art" viewBox="0 0 220 140" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="110" cy="98" rx="54" ry="28"/><rect x="88" y="46" width="44" height="28" rx="11"/><path d="M110 20v18" stroke-width="5"/><path d="M100 24l10-8 10 8" fill="currentColor" stroke="none"/></svg>',
-handsInfant:'<svg class="art" viewBox="0 0 220 140" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="110" cy="98" rx="42" ry="22"/><path d="M100 44v28M120 44v28" stroke-width="9" stroke-linecap="round"/><path d="M110 12v20" stroke-width="5"/><path d="M100 16l10-8 10 8" fill="currentColor" stroke="none"/><path d="M84 84h52" stroke-dasharray="4 6" stroke-width="3"/></svg>',
-breath:'<svg class="art" viewBox="0 0 220 140" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M60 118c-14-8-22-26-18-44 5-24 26-40 50-38 18 2 30 14 34 30"/><path d="M126 66c10-14 28-16 40-6"/><circle cx="146" cy="34" r="16"/><path d="M118 52c6-6 14-8 22-6" stroke-width="6"/><path d="M96 90c8 4 18 4 26 0"/></svg>',
-pads:'<svg class="art" viewBox="0 0 220 150" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M74 24c-14 6-24 20-24 38v50c0 18 14 32 32 32h56c18 0 32-14 32-32V62c0-18-10-32-24-38"/><path d="M74 24c8-8 18-12 36-12s28 4 36 12"/><rect x="66" y="46" width="36" height="30" rx="8" fill="currentColor" stroke="none" opacity=".85"/><rect x="120" y="88" width="36" height="30" rx="8" fill="currentColor" stroke="none" opacity=".85"/><path d="M180 40l-14 22h12l-12 22" stroke-width="5"/></svg>',
-recovery:'<svg class="art" viewBox="0 0 220 120" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 98h200" stroke-width="6"/><circle cx="52" cy="66" r="15"/><path d="M64 60l16-8"/><path d="M67 76c26-6 52-4 76 6"/><path d="M143 82l24-4 16 18"/><path d="M96 82l-6 16M120 84l4 14"/></svg>'};
+/* Redrawn for clarity: body outlines are recognisable, the action point is
+   filled in the accent colour, and motion is a solid arrow rather than dashes. */
+shoulder:'<svg class="art" viewBox="0 0 240 130" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 112h212" stroke-width="7"/><ellipse cx="56" cy="74" rx="22" ry="24"/><path d="M78 84c18-10 40-12 62-8l52 10c10 2 16 10 16 20"/><path d="M78 96c20 4 42 8 62 14"/><rect class="hi" x="88" y="52" width="46" height="26" rx="13"/><path class="hiS" d="M100 44v-6M111 40l-11 8 11 8" stroke-width="5"/><path class="hiS" d="M122 44v-6M133 40l-11 8 11 8" stroke-width="5"/><path d="M40 40c8-12 22-18 38-16" stroke-width="4"/><path d="M84 20l-8 6 6 8z" fill="currentColor" stroke="none"/></svg>',
+
+chest:'<svg class="art" viewBox="0 0 240 140" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M84 26c-16 8-26 24-26 42v46c0 18 14 30 32 30h60c18 0 32-12 32-30V68c0-18-10-34-26-42"/><path d="M84 26c8-10 20-14 36-14s28 4 36 14"/><path d="M120 12v22"/><path class="hiS" d="M78 62c14 10 28 14 42 14s28-4 42-14" stroke-width="4" stroke-dasharray="7 7"/><path class="hiS" d="M186 44c14-6 30-2 40 10" stroke-width="4"/><path class="hiS" d="M228 46l4 12-13 1z" fill="var(--pulse)" stroke="none"/><path d="M120 86c0 10 0 20 0 28" stroke-width="4" stroke-dasharray="6 8"/></svg>',
+
+flat:'<svg class="art" viewBox="0 0 240 120" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 96h224" stroke-width="9"/><path d="M14 108h212" stroke-width="4" stroke-dasharray="5 9"/><ellipse cx="48" cy="72" rx="20" ry="22"/><path d="M68 68h84l40 4 26 22"/><path d="M68 88h100"/><path class="hiS" d="M104 30h56M132 14v16" stroke-width="6"/><path class="hiS" d="M120 42l12 14 12-14" fill="none" stroke-width="6"/></svg>',
+
+tilt:'<svg class="art" viewBox="0 0 240 150" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M74 128c-20-10-32-32-28-56 5-30 32-48 62-42 22 4 36 20 40 40"/><circle cx="140" cy="52" r="5" fill="currentColor" stroke="none"/><path d="M104 84c10 8 24 8 34 0"/><path d="M60 128h140" stroke-width="7"/><rect class="hi" x="132" y="86" width="44" height="22" rx="11"/><rect class="hi" x="60" y="34" width="44" height="22" rx="11"/><path class="hiS" d="M168 30c16 0 28 10 32 24" stroke-width="5"/><path class="hiS" d="M204 44l-2 14-12-6z" fill="var(--pulse)" stroke="none"/></svg>',
+
+handsAdult:'<svg class="art" viewBox="0 0 240 170" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M76 60c-12 8-20 24-20 42v40c0 16 12 28 28 28h72c16 0 28-12 28-28V102c0-18-8-34-20-42"/><path d="M76 60c10-10 24-14 44-14s34 4 44 14"/><path d="M120 46V28" stroke-width="4"/><circle cx="120" cy="16" r="14"/><path d="M70 96c16 8 34 12 50 12s34-4 50-12" stroke-width="4" stroke-dasharray="7 7"/><rect class="hi" x="92" y="96" width="56" height="26" rx="13"/><rect class="hi" x="92" y="72" width="56" height="26" rx="13" opacity=".55"/><path class="hiS" d="M120 148v14M108 154l12 14 12-14" stroke-width="6"/></svg>',
+
+handsChild:'<svg class="art" viewBox="0 0 240 170" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M84 68c-10 8-16 22-16 38v34c0 15 11 26 26 26h52c15 0 26-11 26-26v-34c0-16-6-30-16-38"/><path d="M84 68c9-9 21-12 36-12s27 3 36 12"/><path d="M120 56V40" stroke-width="4"/><circle cx="120" cy="28" r="12"/><rect class="hi" x="96" y="92" width="48" height="26" rx="13"/><path class="hiS" d="M120 142v12M109 148l11 13 11-13" stroke-width="6"/></svg>',
+
+handsInfant:'<svg class="art" viewBox="0 0 240 170" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M90 78c-8 7-13 18-13 30v26c0 13 9 22 22 22h42c13 0 22-9 22-22v-26c0-12-5-23-13-30"/><path d="M90 78c8-8 18-11 30-11s22 3 30 11"/><path d="M120 67V50" stroke-width="4"/><circle cx="120" cy="38" r="14"/><path d="M92 96h56" stroke-width="3" stroke-dasharray="6 7"/><path class="hi" d="M110 100v26M130 100v26" stroke="var(--pulse)" stroke-width="13" stroke-linecap="round" fill="none"/><path class="hiS" d="M120 144v10M111 149l9 11 9-11" stroke-width="5"/></svg>',
+
+breath:'<svg class="art" viewBox="0 0 240 160" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M64 138c-20-10-32-32-28-56 5-28 30-46 58-42 20 3 34 17 40 34"/><path d="M96 96c10 6 22 6 32 0"/><path d="M40 138h150" stroke-width="7"/><path d="M134 74c12-16 32-18 46-6"/><circle cx="166" cy="40" r="18"/><rect class="hi" x="118" y="58" width="34" height="18" rx="9"/><path class="hiS" d="M150 96c14 4 24 0 30-8" stroke-width="5"/><path class="hiS" d="M184 84l-2 14-12-7z" fill="var(--pulse)" stroke="none"/><path class="hiS" d="M62 62c-6-10-4-22 4-30" stroke-width="4"/></svg>',
+
+pads:'<svg class="art" viewBox="0 0 240 170" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M78 40c-14 8-24 24-24 42v52c0 18 14 32 32 32h68c18 0 32-14 32-32V82c0-18-10-34-24-42"/><path d="M78 40c10-10 22-16 42-16s32 6 42 16"/><path d="M120 24V8" stroke-width="4"/><rect class="hi" x="66" y="56" width="44" height="36" rx="10"/><rect class="hi" x="130" y="104" width="44" height="36" rx="10"/><path d="M88 74h0M152 122h0"/><path class="hiS" d="M206 52l-16 26h14l-14 28" stroke-width="6"/></svg>',
+
+recovery:'<svg class="art" viewBox="0 0 240 140" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 116h224" stroke-width="8"/><ellipse cx="54" cy="76" rx="21" ry="23"/><path d="M70 64l20-12" stroke-width="6"/><path d="M75 88c28-8 58-6 84 6"/><path d="M159 94l30-8 22 24" stroke-width="6"/><path d="M104 96l-10 20M132 100l6 16" stroke-width="6"/><path class="hiS" d="M46 54c-6-10-4-20 4-26" stroke-width="4"/><path class="hiS" d="M54 24l-8 8 10 6z" fill="var(--pulse)" stroke="none"/></svg>'};
 </script>
 
 <script>
@@ -450,7 +466,7 @@ function langOrder(){
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
  aedStep:0,log:[],dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
  vision:false,seenRate:null,stream:null,peer:null,feeds:{},sel:null,lastSwapPrompt:0};
-const BUILD="2026-08-13c";
+const BUILD="2026-08-13e";
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>LANG_REGISTRY[S.lang]||LANG_REGISTRY.en;
@@ -464,6 +480,8 @@ const BACK={"s-breath":"s-resp","s-who":"s-breath","s-call":"s-who","s-prep":"s-
 function setHeader(id){
  const m=HDR[id]||"brand";
  $("hdr-brand").style.display=(m==="brand")?"flex":"none";
+ $("buildtag").style.display=(id==="s-home")?"inline":"none";
+ $("buildtag").textContent=BUILD;
  $("hdr-back").style.display=(m==="back"&&BACK[id])?"flex":"none";
  const showClock=(m==="clock"||m==="exit");
  $("hdr-clock").style.display=showClock?"inline":"none";
@@ -595,7 +613,23 @@ let wakeLock=null;
 async function keepAwake(){try{if("wakeLock"in navigator)wakeLock=await navigator.wakeLock.request("screen");}catch(e){}}
 function mark(l){S.log.push({at:S.t0?Math.round((Date.now()-S.t0)/1000):0,label:l});}
 function mmss(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
-function art(host,key){const el=$(host);if(el)el.innerHTML=SVG[key]||"";}
+/* Real media (Wikimedia GIFs/photos) overrides a drawing when the file exists in
+   assets/img/. The SVG is always rendered first, so the screen is never empty and
+   never waits on a file. If the image loads, it replaces the drawing in place.
+   Attribution lives in README.md and CREDITS.md, never on an emergency screen. */
+const MEDIA={handsAdult:"chest-compressions.gif"};   // add entries as files are verified
+const mediaOK={};
+function art(host,key){
+ const el=$(host);if(!el)return;
+ el.innerHTML=SVG[key]||"";
+ const file=MEDIA[key];if(!file||mediaOK[key]===false)return;
+ const img=new Image();
+ img.onload=()=>{mediaOK[key]=true;
+  if(el.dataset.key===key){el.innerHTML="";img.className="artimg";img.alt="";el.appendChild(img);}};
+ img.onerror=()=>{mediaOK[key]=false;};
+ el.dataset.key=key;
+ img.src="assets/img/"+file;
+}
 function handArt(){return S.who==="adult"?"handsAdult":S.who==="child"?"handsChild":"handsInfant";}
 
 function applyLang(){
@@ -916,19 +950,21 @@ buildChips();buildDLangs();applyLang();setHeader("s-home");
 if(q.get("role")==="dispatcher")$("btn-console").click();
 if(ulang&&ulang!=="en"&&LANG_INDEX.some(l=>l.code===ulang))
  loadLang(ulang).then(ok=>{if(ok){S.lang=ulang;applyLang();buildChips();buildDLangs();}});
-/* Devices were running different cached builds, which looked like random missing
-   steps. Show the build, and reload automatically when a new one lands — but
-   never mid-resuscitation. */
-if("serviceWorker" in navigator)window.addEventListener("load",()=>{
- navigator.serviceWorker.register("sw.js").then(reg=>{
-  reg.addEventListener("updatefound",()=>{
-   const nw=reg.installing;if(!nw)return;
-   nw.addEventListener("statechange",()=>{
-    if(nw.state==="installed"&&navigator.serviceWorker.controller&&phase==="idle")location.reload();
-   });
-  });
- }).catch(()=>{});
-});
+/* NO SERVICE WORKER. A cached worker could pin a stale copy of itself, so fixes
+   never reached the device and the app appeared to lose steps at random. Until
+   the UI settles, every load comes straight from the network. This block removes
+   any worker and cache left behind by an earlier build. */
+(async function purgeStaleBuilds(){
+ try{
+  if("serviceWorker" in navigator){
+   const regs=await navigator.serviceWorker.getRegistrations();
+   let had=false;
+   for(const r of regs){await r.unregister();had=true;}
+   if(window.caches){const ks=await caches.keys();for(const k of ks)await caches.delete(k);}
+   if(had&&phase==="idle")location.reload(true);
+  }
+ }catch(e){}
+})();
 </script>
 </body>
 </html>

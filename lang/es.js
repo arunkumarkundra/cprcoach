@@ -60,6 +60,7 @@ registerLang("es",{
   {s:"Póngalo boca arriba en el suelo. Arrodíllese al lado, la mano en el centro del pecho.",e:"Una sola frase."},
   {s:"Comprima fuerte, dos veces por segundo, y no pare hasta que yo lo diga.",e:"Inicia el ritmo."},
   {s:"Dos minutos. Si hay alguien más, cambien ahora.",e:"Relevo cada dos minutos."}],
+ ui:{elapsed:"Transcurrido",exit:"Salir",next:"Siguiente",sayThis:"Dile esto a quien llama",callerSpeaks:"Idioma de quien llama",playIn:"Reproducir en",codeFor:"Código para quien llama",link:"Enlace",openVideo:"Abrir vídeo",endVideo:"Cerrar vídeo",waiting:"Esperando a que alguien se una.",noComp:"No se ven compresiones",arrestRec:"Parada reconocida",firstComp:"Primera compresión",metronome:"Metrónomo",rescuer:"Reanimador",copy:"Copiar",startOver:"Empezar de nuevo",dispatcher:"Operador",searchLang:"Buscar idioma",unavailable:"no disponible"},
  article:{h:"Cómo hacer RCP a un adulto",
   p:"La parada cardiaca mata en minutos. Las compresiones torácicas que inicia quien está allí — antes de que llegue la ambulancia — son el factor más determinante para sobrevivir. No hace falta formación, y no puedes empeorar a una persona en parada intentándolo.",
   s:[["1. Comprueba si responde","Grítale y apriétale el hombro. Si no hay ninguna respuesta, necesita ayuda inmediata."],

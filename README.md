@@ -199,3 +199,13 @@ and cannot fail. Packs themselves load lazily — only English is ever parsed at
 2. Native-speaker review of every string, then clinical review of the back-translation.
 3. Field testing on low-end Android over 2G, in a stairwell, in daylight.
 4. Only then remove the beta badge and let search engines index the HowTo schema.
+
+---
+
+## Attribution
+
+Chest compression animation from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif),
+licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0).
+**Author name still to be recorded — see `CREDITS.md`.**
+
+Infant illustrations generated at the maintainer's request; no third-party rights asserted.

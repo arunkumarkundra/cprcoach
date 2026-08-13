@@ -76,12 +76,12 @@ body[dir="rtl"]{direction:rtl}
 #langsheet.on{display:block}
 #langsearch{width:100%;font:inherit;font-size:17px;font-weight:600;padding:14px 16px;margin-bottom:8px;
  border:2px solid var(--hair);border-radius:14px;background:transparent;color:var(--ink)}
-#langlist{max-height:min(52vh,420px);overflow-y:auto;-webkit-overflow-scrolling:touch;
- display:flex;flex-direction:column;gap:6px}
-.lrow{display:flex;align-items:baseline;gap:10px;justify-content:flex-start;text-align:start;
- min-height:56px;padding:12px 16px;border-radius:14px;background:transparent;border:2px solid var(--hair);
- color:var(--ink);font-size:18px;font-weight:700;width:100%}
-.lrow em{font-style:normal;font-size:13px;font-weight:600;color:var(--slate);letter-spacing:.04em}
+#langlist{max-height:min(40vh,300px);overflow-y:auto;-webkit-overflow-scrolling:touch;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.lrow{display:flex;align-items:baseline;gap:7px;justify-content:flex-start;text-align:start;
+ min-height:44px;padding:9px 13px;border-radius:11px;background:transparent;border:2px solid var(--hair);
+ color:var(--ink);font-size:16px;font-weight:700;width:100%}
+.lrow em{font-style:normal;font-size:12px;font-weight:600;color:var(--slate);letter-spacing:.03em}
 .lrow[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .lrow[aria-selected="true"] em{color:rgba(250,250,247,.7)}
 .textlink{display:inline;width:auto;min-height:0;padding:0;background:none;border:none;
@@ -182,10 +182,8 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .tile span{position:absolute;inset-inline-start:5px;bottom:4px;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px #000}
 
 @media(min-width:700px){.screen,#appbar{max-width:760px;margin-inline:auto;width:100%}
- #s-console,#appbar.wide{max-width:1120px}.b-huge{min-height:220px}}
-@media(min-width:900px){.d-wrap{display:grid;grid-template-columns:1.15fr .85fr;align-items:start;gap:16px}
- .d-say{grid-column:1;grid-row:1}.d-ms{grid-column:1;grid-row:2}.d-beat{grid-column:1;grid-row:3}
- .d-video{grid-column:2;grid-row:1/span 3;align-self:stretch}}
+ #s-console,#appbar.wide{max-width:760px}.b-huge{min-height:220px}}
+
 @media(max-height:520px) and (orientation:landscape){
  :root{--pad:14px;--bar:44px}#counter{font-size:min(19vh,110px)}#cue{font-size:16px;min-height:2.2em}
  h1{font-size:26px}h2{font-size:21px}.b-huge{min-height:110px;font-size:25px}
@@ -202,12 +200,13 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
       <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 36h10l6-20 8 32 6-16h26" fill="none" stroke="#E8412C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>CPR Coach</span></button>
     <button class="hbtn icon" id="hdr-back" aria-label="Back" style="display:none">←</button>
-    <span id="hdr-elapsed" style="display:none">Elapsed</span><span id="hdr-clock" style="display:none">0:00</span>
+    <span id="hdr-elapsed" style="display:none"></span><span id="hdr-clock" style="display:none">0:00</span>
   </div>
   <div id="hdr-right">
     <button class="hbtn icon" id="btn-sound" aria-label="Sound">🔊</button>
     <button class="hbtn" id="btn-lang"><span aria-hidden="true">🌐</span> <span id="lang-label">English</span> ▾</button>
-    <button class="hbtn" id="hdr-exit" style="display:none">Exit</button>
+    <button class="textlink" id="btn-console" style="margin-inline-end:2px"></button>
+    <button class="hbtn" id="hdr-exit" style="display:none"></button>
   </div>
 </header>
 <div id="langsheet">
@@ -221,7 +220,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <button class="b-red b-huge" id="btn-start"><span id="t-start"></span><small id="t-start-sub"></small></button>
     <p class="disclaimer" id="t-disclaimer"></p>
     <div class="article" id="article"></div>
-    <p class="credit">Illustrations original to this project, released to the public domain. Protocol based on current AHA and Red Cross resuscitation guidance; pending clinical review.<br><button class="textlink" id="btn-console">Dispatcher console →</button></p>
+    <p class="credit">Illustrations original to this project, released to the public domain. Protocol based on current AHA and Red Cross resuscitation guidance; pending clinical review.</p>
   </div>
 </section>
 
@@ -297,45 +296,45 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 <section class="screen" id="s-hand">
   <div class="grow" style="justify-content:flex-start"><h2 id="t-hand-h"></h2><ul class="log" id="loglist"></ul></div>
   <div class="foot stack">
-    <button class="b-quiet" id="btn-copy">Copy</button>
-    <button class="b-quiet" id="btn-home">Start over</button></div>
+    <button class="b-quiet" id="btn-copy"></button>
+    <button class="b-quiet" id="btn-home"></button></div>
 </section>
 
 <section class="screen" id="s-console">
   <div class="d-wrap">
     <div class="d-say">
-      <div class="lbl"><span>Say this to the caller</span><span id="d-step"></span></div>
+      <div class="lbl"><span id="d-saylbl"></span><span id="d-step"></span></div>
       <div class="d-quote" id="d-quote"></div>
       <div class="d-coach" id="d-coach"></div>
       <div class="d-nav">
         <button class="b-quiet" id="d-prev" aria-label="Previous">←</button>
-        <button id="d-next">Next →</button></div>
+        <button id="d-next"><span id="d-nextlbl"></span> →</button></div>
       <div class="d-play">
         <button class="b-amber" id="d-speak">🔊 <span id="d-speaklbl">Play in English</span></button>
-        <label class="d-sel"><span>Caller speaks</span>
+        <label class="d-sel"><span id="d-sellbl"></span>
           <select id="d-langsel"></select></label>
       </div>
     </div>
     <div class="row d-ms">
-      <button class="ms" id="d-mark-recog"><small>Arrest recognised</small><b>—:—</b></button>
-      <button class="ms" id="d-mark-first"><small>First compression</small><b>—:—</b></button>
+      <button class="ms" id="d-mark-recog"><small id="d-recoglbl"></small><b>—:—</b></button>
+      <button class="ms" id="d-mark-first"><small id="d-firstlbl"></small><b>—:—</b></button>
     </div>
     <div class="d-video">
       <div class="codebox">
-        <div><small>Code for the caller</small><b id="d-code">——————</b></div>
+        <div><small id="d-codelbl"></small><b id="d-code">——————</b></div>
         <div class="cbtns">
-          <button class="b-quiet cbtn" id="d-copylink">🔗 Link</button>
-          <button class="b-quiet cbtn" id="d-startvid">📹 Open video</button>
+          <button class="b-quiet cbtn" id="d-copylink">🔗 <span id="d-linklbl"></span></button>
+          <button class="b-quiet cbtn" id="d-startvid">📹 <span id="d-vidlbl"></span></button>
         </div>
       </div>
       <div class="stagewrap" id="stagewrap" hidden>
         <video id="stage" playsinline autoplay muted></video>
         <div id="ratebadge">—</div>
-        <div id="stagehint">Waiting for a rescuer to join.</div>
+        <div id="stagehint"></div>
       </div>
       <div id="tiles"></div>
     </div>
-    <button class="b-quiet d-beat" id="d-metro">▶ Metronome · 110/min</button>
+    <button class="b-quiet d-beat" id="d-metro"></button>
   </div>
 </section>
 
@@ -418,6 +417,7 @@ registerLang("en",{
   {s:"Put him flat on his back on the floor. Kneel beside him, heel of your hand in the centre of his chest.",e:"Position and hand placement in one sentence."},
   {s:"Push down hard, twice a second, and do not stop until I tell you.",e:"Start the beat. Count aloud with them for the first ten."},
   {s:"Two minutes. If someone else is there, swap over now.",e:"Prompt a compressor change every two minutes."}],
+ ui:{elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable"},
  article:{h:"How to do CPR on an adult",
   p:"Cardiac arrest kills within minutes. Chest compressions started by whoever is standing there — before an ambulance arrives — are the single biggest factor in whether someone survives. You do not need training, and you cannot make a person in cardiac arrest worse by trying.",
   s:[["1. Check for a response","Shout at them and squeeze their shoulder. If there is no response at all, they need help immediately."],
@@ -469,6 +469,7 @@ function setHeader(id){
  $("hdr-elapsed").style.display=showClock?"inline":"none";
  $("hdr-exit").style.display=(m==="exit")?"flex":"none";
  $("btn-sound").style.display=(id==="s-home")?"none":"flex";
+ $("btn-console").style.display=(id==="s-home")?"inline":"none";
  $("appbar").classList.toggle("wide",id==="s-console");
 }
 function show(id){
@@ -579,6 +580,17 @@ function applyLang(){
  $("t-alive-h").textContent=d.aliveH;$("t-alive-p").textContent=d.aliveP;
  $("btn-restart").textContent=d.restart;$("t-hand-h").textContent=d.handH;
  $("btn-handover2").textContent=d.handH2;$("btn-aed-back").textContent=d.aedBack;
+ const u=d.ui;
+ $("hdr-elapsed").textContent=u.elapsed;$("hdr-exit").textContent=u.exit;
+ $("btn-console").textContent=u.dispatcher;$("langsearch").placeholder=u.searchLang;
+ $("btn-copy").textContent=u.copy;$("btn-home").textContent=u.startOver;
+ $("d-saylbl").textContent=u.sayThis;$("d-sellbl").textContent=u.callerSpeaks;
+ $("d-codelbl").textContent=u.codeFor;$("d-linklbl").textContent=u.link;
+ $("d-nextlbl").textContent=u.next;
+ $("d-recoglbl").textContent=u.arrestRec;$("d-firstlbl").textContent=u.firstComp;
+ if(!S.peer)$("d-vidlbl").textContent=u.openVideo;
+ if(!S.running)$("d-metro").textContent="▶ "+u.metronome+" · "+BPM+"/min";
+ if(!Object.keys(S.feeds).length)$("stagehint").textContent=u.waiting;
  art("art-resp","shoulder");art("art-breath","chest");art("art-alive","recovery");
  if(phase==="compress")art("art-cpr",handArt());
  const a=d.article,box=$("article");box.innerHTML="";
@@ -608,7 +620,7 @@ function buildChips(filter){
    b.innerHTML=l.name+(l.en!==l.name?' <em>'+l.en+'</em>':'');
    b.onclick=async()=>{
     const ok=await loadLang(l.code);
-    if(!ok){b.innerHTML=l.name+' <em>unavailable</em>';return;}
+    if(!ok){b.innerHTML=l.name+' <em>'+t().ui.unavailable+'</em>';return;}
     S.lang=l.code;applyLang();buildChips();buildDLangs();
     $("langsheet").classList.remove("on");
     if(phase==="compress"&&current==="s-cpr")say(t().say.go);
@@ -708,7 +720,8 @@ function renderLog(){const ul=$("loglist");ul.innerHTML="";
  const li=document.createElement("li");
  li.innerHTML="<time>—</time><span>"+S.total+" compressions guided at "+BPM+"/min</span>";ul.appendChild(li);}
 $("btn-copy").onclick=async()=>{const txt=S.log.map(e=>mmss(e.at)+"  "+e.label).join("\n")+"\ncompressions guided: "+S.total;
- try{await navigator.clipboard.writeText(txt);$("btn-copy").textContent="✓";}catch(e){}};
+ try{await navigator.clipboard.writeText(txt);$("btn-copy").textContent="✓";
+  setTimeout(()=>$("btn-copy").textContent=t().ui.copy,1500);}catch(e){}};
 
 let peerLibP=null;
 function loadPeerLib(){
@@ -762,7 +775,7 @@ function startVision(video){
     bad.style.display="block";bad.textContent=S.seenRate+" /min";
     bad.classList.toggle("warn",S.seenRate<95||S.seenRate>130);}
   }
-  if(last&&now-last>4000){iv=[];bad.style.display="block";bad.textContent="No compressions seen";bad.classList.add("warn");}
+  if(last&&now-last>4000){iv=[];bad.style.display="block";bad.textContent=t().ui.noComp;bad.classList.add("warn");}
   requestAnimationFrame(loop);
  })();
 }
@@ -782,8 +795,7 @@ function dRender(){
  $("d-quote").textContent=own.dScript[i].s;
  $("d-coach").textContent=own.dScript[i].e;
  const cl=LANG_INDEX.find(l=>l.code===S.dLang);
- $("d-speaklbl").textContent="Play in "+(cl?cl.name:"English");
- $("d-speak").style.display=(S.dLang===S.lang)?"none":"flex";
+ $("d-speaklbl").textContent=own.ui.playIn+" "+(cl?cl.name:"English");
 }
 function buildDLangs(){
  const sel=$("d-langsel");if(!sel)return;
@@ -806,21 +818,22 @@ $("d-mark-recog").onclick=e=>{const b=e.currentTarget;
 $("d-mark-first").onclick=e=>{const b=e.currentTarget;
  b.querySelector("b").textContent=mmss(Math.round((Date.now()-S.dT0)/1000));b.classList.add("done");};
 $("d-metro").onclick=e=>{unlock();
- if(S.running){stopBeat();e.currentTarget.textContent="▶ Metronome · "+BPM+"/min";e.currentTarget.classList.remove("b-amber");e.currentTarget.classList.add("b-quiet");}
- else{startBeat();e.currentTarget.textContent="■ Metronome · "+BPM+"/min";e.currentTarget.classList.remove("b-quiet");e.currentTarget.classList.add("b-amber");}};
+ const u=t().ui,b=e.currentTarget;
+ if(S.running){stopBeat();b.textContent="▶ "+u.metronome+" · "+BPM+"/min";b.classList.remove("b-amber");b.classList.add("b-quiet");}
+ else{startBeat();b.textContent="■ "+u.metronome+" · "+BPM+"/min";b.classList.remove("b-quiet");b.classList.add("b-amber");}};
 $("d-copylink").onclick=async()=>{try{await navigator.clipboard.writeText(S.dLink);
  $("d-copylink").textContent="✓ Copied";setTimeout(()=>$("d-copylink").textContent="🔗 Copy link",1800);}catch(e){}};
 $("d-startvid").onclick=async()=>{
- if(S.peer){stopVideo();$("d-startvid").textContent="📹 Open video";return;}
- $("d-startvid").textContent="…";
+ const u=t().ui;
+ if(S.peer){stopVideo();$("d-vidlbl").textContent=u.openVideo;return;}
+ $("d-vidlbl").textContent="…";
  const lib=await loadPeerLib();
- if(!lib){$("d-startvid").textContent="📹 Open video";return;}
+ if(!lib){$("d-vidlbl").textContent=u.openVideo;return;}
  S.peer=new Peer(ROOM(S.dCode));
  $("stagewrap").hidden=false;
- S.peer.on("open",()=>{$("d-startvid").textContent="■ End video";
-  $("stagehint").textContent="Waiting for a rescuer to join.";});
- S.peer.on("error",()=>{$("stagehint").textContent="Code in use. Exit and reopen for a new code.";
-  $("d-startvid").textContent="📹 Open video";$("stagewrap").hidden=true;});
+ S.peer.on("open",()=>{$("d-vidlbl").textContent=u.endVideo;$("stagehint").textContent=u.waiting;});
+ S.peer.on("error",()=>{$("stagehint").textContent="⚠";
+  $("d-vidlbl").textContent=u.openVideo;$("stagewrap").hidden=true;});
  S.peer.on("call",c=>{c.answer();
   c.on("stream",st=>addFeed(c.peer,st));c.on("close",()=>removeFeed(c.peer));});
 };
@@ -829,7 +842,7 @@ function addFeed(id,stream){
  const n=Object.keys(S.feeds).length;
  const div=document.createElement("div");div.className="tile";div.dataset.id=id;
  const v=document.createElement("video");v.playsInline=true;v.autoplay=true;v.muted=true;v.srcObject=stream;
- const lab=document.createElement("span");lab.textContent="Rescuer "+n;
+ const lab=document.createElement("span");lab.textContent=t().ui.rescuer+" "+n;
  div.appendChild(v);div.appendChild(lab);div.onclick=()=>selectFeed(id);
  $("tiles").appendChild(div);
  $("stagehint").style.display="none";

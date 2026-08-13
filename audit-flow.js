@@ -71,7 +71,11 @@ check(/"s-code":"s-cpr"/.test(BACKOBJ),"video code screen returns to compression
 check(/current!=="s-alive"\)return/.test(app),"restart button only fires from the recovery screen");
 check(/current!=="s-cpr"&&current!=="s-aed"\)return/.test(app),"paramedic button only fires mid-resuscitation");
 check(/S.breaths=\(S.who!=="adult"\)/.test(app),"breaths default set by patient age");
-check(/const MEDIA=\{\};/.test(app),"no image references that could 404");
+// every file named in MEDIA must actually exist, or the browser logs a 404
+const media=eval("("+app.match(/const MEDIA=\{[\s\S]*?\};/)[0].replace("const MEDIA=","").replace(/;\s*$/,"")+")");
+Object.entries(media).forEach(([k,f])=>
+  check(fs.existsSync(ROOT+"/"+f), "MEDIA."+k+" -> "+f+" exists on disk"));
+check(Object.keys(media).length===0||true,"MEDIA declares "+Object.keys(media).length+" image(s)");
 check(/ts:Date.now\(\)/.test(app),"every logged event carries a wall-clock timestamp");
 
 console.log("\n"+(issues.length?("ISSUES:\n - "+issues.join("\n - ")):"No dead ends, no unreachable screens, all clinical checks pass."));

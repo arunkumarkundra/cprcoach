@@ -590,11 +590,28 @@ exists, is non-trivially sized, calls `registerLang` with the right code, parses
 registers, and has complete key parity with English including array lengths. **Run it
 before every commit.**
 
-## 8. Imagery — currently none
+## 8. Imagery
 
-**`SVG` is empty. The app ships no diagrams.**
+**`SVG` is empty — no hand-drawn diagrams.** Real photographs and animations are used
+instead, declared in `MEDIA` and stored in `images/`:
 
-Hand-drawn line art was tried and removed. An ambiguous diagram is worse than no diagram:
+| Slot | File | Shown on |
+|---|---|---|
+| `handsAdult`, `handsChild` | `Chest_compressions.gif` | compression screen, adult and child |
+| `handsInfant` | `Infant_two_finger_CPR_jpg.webp` | compression screen, infant |
+| `breathInfant` | `CPR_Infant_Mouth_To_Nose.png` | rescue-breath pause, infant |
+
+`art()` loads the file and shows it only on success, so a missing or slow file costs
+nothing — the screen simply carries text and voice. Images are capped at 26vh (18vh on
+short screens) so they never crowd the compression counter. `tests/audit-flow.js` asserts
+every path in `MEDIA` exists on disk, which prevents the 404 class of bug.
+
+**Outstanding: no image currently in the repository has verified provenance, and two carry
+burnt-in text in a language the user may not read.** See `CREDITS.md`.
+
+### Why hand-drawn diagrams were removed
+
+An ambiguous diagram is worse than no diagram:
 a rescuer who misreads it is worse off than one who only hears the instruction, and on a
 screen governed by "nothing that does not help someone survive", a confusing picture fails
 that test outright. Text and voice carry the protocol on their own.

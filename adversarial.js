@@ -1,9 +1,10 @@
 /* Adversarial flow test: fire the event patterns a real browser produces that a
    jsdom "one click per screen" harness never sees. */
+const ROOT=require('path').join(__dirname,'..');
 const fs=require('fs');const {JSDOM}=require('jsdom');
 let fails=0,checks=0;
 const ok=(c,m)=>{checks++;if(!c){fails++;console.log("  FAIL "+m);}else console.log("  ok   "+m);};
-const html=fs.readFileSync('index.html','utf8');
+const html=fs.readFileSync(ROOT+'/index.html','utf8');
 const dom=new JSDOM(html,{runScripts:"dangerously",url:"https://x.test/",pretendToBeVisual:true});
 const w=dom.window,doc=w.document;
 w.AudioContext=class{constructor(){this.state="running";this.currentTime=0;this.destination={};}

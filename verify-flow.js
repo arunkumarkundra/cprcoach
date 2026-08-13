@@ -1,7 +1,8 @@
 /* Renders every emergency screen exactly as a user sees it, with its step number.
    If a step is ever skipped, the numbering makes it visible immediately. */
+const ROOT=require('path').join(__dirname,'..');
 const fs=require('fs');const {JSDOM}=require('jsdom');
-const dom=new JSDOM(fs.readFileSync('index.html','utf8'),{runScripts:"dangerously",url:"https://x.test/?debug=1",pretendToBeVisual:true});
+const dom=new JSDOM(fs.readFileSync(ROOT+'/index.html','utf8'),{runScripts:"dangerously",url:"https://x.test/?debug=1",pretendToBeVisual:true});
 const w=dom.window,doc=w.document;
 w.AudioContext=class{constructor(){this.state="running";this.currentTime=0;this.destination={};}
  resume(){return Promise.resolve();}

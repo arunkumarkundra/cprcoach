@@ -1,6 +1,6 @@
 # CPR Coach — Project Specification
 
-**Build of record: `2026-08-14f`** · Status: **beta, not clinically approved**
+**Build of record: `2026-08-14h`** · Status: **beta, not clinically approved**
 
 ---
 
@@ -422,6 +422,7 @@ Re-arrest — compressions resumed
 Deteriorated — arrest assumed
 Paramedics took over
 Video joined, code NNNNNN
+Camera stopped by rescuer
 → step N/6 <screen>
 ```
 
@@ -572,7 +573,7 @@ Packs whose code matches a device language are prefetched at browser idle.
 
 ### Pack schema
 
-47 top-level keys.
+48 top-level keys.
 
 ```
 name, code (BCP-47), dir ("ltr"|"rtl")
@@ -580,17 +581,18 @@ homeH, start, startSub, disclaimer
 q1, q1y, q1n, q2, q2w, q2y, q2n, q3, adult, child, infant
 callH, callP, called, alone
 prepH, prep[3], prepDone
-aedBtn, aliveBtn, swap, breathsOn, breathsOff, videoBtn
+aedBtn, aliveBtn, swap, breathsOn, breathsOff, videoBtn, videoLive
 codeH, codeNote, codeGo, codeBack
 aliveH, aliveP, restart, handH, handH2, aedBack, newRescuer
 say: { place{adult,child,infant}, depth{adult,child,infant}, go, keep[6],
        swap2min, b1,b2,b3, bi1,bi2,bi3, resume, aed, clear, shock, prep }
 aedSteps[5]  { h, n, art }
 dScript[6]   { s, e }
-ui{30 keys}  elapsed, exit, next, back, sayThis, callerSpeaks, playIn, codeFor,
+ui{34 keys}  elapsed, exit, next, back, sayThis, callerSpeaks, playIn, codeFor,
              copyLink, openVideo, endVideo, waiting, noComp, arrestRec, firstComp,
              metronome, rescuer, copy, startOver, dispatcher, step, of, lastOne,
-             medics, share, copied, yourLang, searchLang, link, unavailable
+             medics, share, copied, yourLang, searchLang, link, unavailable,
+             needSix, noNet, noCam, noReach
 article      { h, p, s[7] }
 ```
 
@@ -633,8 +635,11 @@ its option with ✕ in the picker. It does not fail quietly.
 
 `art()` loads the file and shows it only on success, so a missing or slow file costs
 nothing — the screen carries text and voice. Images cap at 34vh (24vh on short screens) so
-they never crowd the counter, and tapping one opens it full screen. Page-wide pinch-zoom
-stays disabled; a rescuer must not be able to zoom the buttons out of reach. `tests/audit-flow.js` asserts every path in `MEDIA` exists on
+they never crowd the counter, and tapping one opens it full screen over a dark backdrop.
+The overlay closes on any tap and after 20 s, and the metronome, voice and count keep
+running behind it — looking at a picture must never pause the resuscitation. Page-wide
+pinch-zoom stays disabled (`user-scalable=no`); a rescuer with wet or shaking hands must
+not be able to zoom the buttons out of reach. `tests/audit-flow.js` asserts every path in `MEDIA` exists on
 disk, which prevents the 404 class of bug.
 
 **Three conditions before any image ships:**

@@ -1,0 +1,11 @@
+{
+  "name": "cprcoach",
+  "private": true,
+  "description": "Test harness only. The app itself is a single static index.html with no build step and no runtime dependencies.",
+  "scripts": {
+    "test": "node tests/check-spec.js && node tests/check-langs.js && node tests/audit-flow.js && node tests/test.js && node tests/adversarial.js && node tests/verify-flow.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}

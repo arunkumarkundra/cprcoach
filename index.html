@@ -214,7 +214,19 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 <div id="wash"></div>
 <div id="zoom" aria-hidden="true"><img alt=""><button id="zoom-close" aria-label="Close">✕</button></div>
  
-<pre id="trace"></pre>
+
+<style>
+#joinbanner{margin-top:14px;padding:12px 14px;border-radius:12px;text-align:start;
+ background:rgba(232,65,44,.10);border:1px solid rgba(232,65,44,.35)}
+#joinbanner b{display:block;font-size:26px;letter-spacing:.14em;line-height:1.2}
+#joinbanner i{display:block;margin-top:4px;font-size:13px;opacity:.85;font-style:normal}
+#d-roomstate{display:flex;align-items:center;gap:8px;margin:10px 2px 2px;font-size:13px;opacity:.85}
+#d-roomstate::before{content:"";width:9px;height:9px;border-radius:50%;background:#8a8a8a;flex:0 0 auto}
+#d-roomstate.live::before{background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.18)}
+.cbtns{flex-wrap:wrap}
+</style>
+
+<pre id="trace"></pre> 
 
 <header id="appbar">
   <div id="hdr-left">
@@ -235,7 +247,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 
 
 <section class="screen on" id="s-home">
-  <div class="grow"><h1 id="t-home-h"></h1></div>
+  <div class="grow"><h1 id="t-home-h"></h1><div id="joinbanner" hidden></div></div>
   <div class="foot stack">
     <button class="b-red b-huge" id="btn-start"><span id="t-start"></span><small id="t-start-sub"></small></button>
     <p class="disclaimer" id="t-disclaimer"></p>
@@ -341,10 +353,12 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
       <div class="codebox">
         <div><small id="d-codelbl"></small><b id="d-code">——————</b></div>
         <div class="cbtns">
+          <button class="b-quiet cbtn" id="d-copycode">🔢 <span id="d-codelbl2"></span></button>
           <button class="b-quiet cbtn" id="d-copylink">🔗 <span id="d-linklbl"></span></button>
           <button class="b-quiet cbtn" id="d-startvid">📹 <span id="d-vidlbl"></span></button>
         </div>
       </div>
+      <div id="d-roomstate"></div>
       <div class="stagewrap" id="stagewrap" hidden>
         <video id="stage" playsinline autoplay muted></video>
         <div id="ratebadge">—</div>
@@ -430,7 +444,7 @@ registerLang("en",{
   {s:"Put him flat on his back on the floor. Kneel beside him, heel of your hand in the centre of his chest.",e:"Position and hand placement in one sentence."},
   {s:"Push down hard, twice a second, and do not stop until I tell you.",e:"Start the beat. Count aloud with them for the first ten."},
   {s:"Two minutes. If someone else is there, swap over now.",e:"Prompt a compressor change every two minutes."}],
- ui:{back:"Back",copyLink:"Copy link",yourLang:"Language",medics:"🚑 Paramedics here",share:"Share",copied:"Copied",step:"Step",of:"of",lastOne:"then start pushing",elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable",needSix:"Enter all 6 digits.",noNet:"No connection. Keep pushing — video is optional.",noCam:"Camera unavailable. Keep pushing.",noReach:"Could not reach the control room. Keep pushing."},
+ ui:{back:"Back",copyLink:"Copy link",yourLang:"Language",medics:"🚑 Paramedics here",share:"Share",copied:"Copied",step:"Step",of:"of",lastOne:"then start pushing",elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable",needSix:"Enter all 6 digits.",noNet:"No connection. Keep pushing — video is optional.",noCam:"Camera unavailable. Keep pushing.",noReach:"Could not reach the control room. Keep pushing.",joining:"Connecting to the control room…",copyCode:"Copy code",showVideo:"Show video",hideVideo:"Hide video",roomOpening:"Opening room…",roomWaiting:"Room open — waiting for a rescuer",roomLive:"Rescuer connected",roomOffline:"Room offline — retrying",roomClosed:"Room closed",codeCarried:"Dispatcher video code received. It will be ready for you when you reach the compressions step.",copyManual:"Copy this code:"},
  article:{h:"How to do CPR on an adult",
   p:"Cardiac arrest kills within minutes. Chest compressions started by whoever is standing there — before an ambulance arrives — are the single biggest factor in whether someone survives. You do not need training, and you cannot make a person in cardiac arrest worse by trying.",
   s:[["1. Check for a response","Shout at them and squeeze their shoulder. If there is no response at all, they need help immediately."],
@@ -926,6 +940,28 @@ function loadPeerLib(){
  return peerLibP;
 }
 const ROOM=c=>"cprcoach-room-"+c;
+/* New strings fall back to English so a language pack that has not caught up
+   yet degrades to readable text rather than to "undefined". */
+const U=(k,fb)=>{const u=t().ui;return (u&&u[k])||fb;};
+
+/* Clipboard writes fail silently on plain HTTP and in some embedded browsers.
+   A dispatcher who thinks they copied a code and pasted nothing is worse off
+   than one who was shown the code to read aloud. */
+async function copyText(txt,btn){
+ let ok=false;
+ try{await navigator.clipboard.writeText(txt);ok=true;}
+ catch(e){
+  try{const ta=document.createElement("textarea");ta.value=txt;
+   ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.opacity="0";
+   document.body.appendChild(ta);ta.select();
+   ok=document.execCommand("copy");document.body.removeChild(ta);}catch(e2){}
+ }
+ const keep=btn.innerHTML;
+ btn.textContent=ok?("✓ "+(t().ui.copied||"Copied")):"⚠";
+ setTimeout(()=>{btn.innerHTML=keep;},1600);
+ if(!ok)window.prompt(U("copyManual","Copy this code:"),txt);
+}
+
 /* One control, two jobs: start sharing, or stop it. Stopping the camera touches
    nothing else — the metronome, the voice and the count carry on. Restarting does not
    ask for the code again, so a mis-tap costs one more tap rather than a re-entry. */
@@ -936,6 +972,7 @@ function setVideoBtn(on){
  else b.textContent=d.videoBtn;
 }
 function stopMyCamera(){
+ cancelJoin();
  if(S.stream){S.stream.getTracks().forEach(x=>x.stop());S.stream=null;}
  if(S.peer){try{S.peer.destroy();}catch(e){}S.peer=null;}
  mark("Camera stopped by rescuer");
@@ -943,9 +980,23 @@ function stopMyCamera(){
 }
 $("btn-video").onclick=()=>{
  if(S.peer){stopMyCamera();return;}
- show("s-code");$("codeinput").value=S.lastCode||"";$("codeinput").focus();};
- 
+ show("s-code");
+ /* S.lastCode is now seeded from ?code= on load, so a shared link survives to
+    this screen. It used to be empty here, which silently erased the code the
+    dispatcher had just sent. */
+ $("codeinput").value=S.lastCode||"";$("codeinput").focus();};
+
 $("btn-code-back").onclick=()=>show("s-cpr");
+
+/* The join used to report success the moment the rescuer's OWN peer opened. A
+   call to a room that is not listening fails afterwards, with peer-unavailable,
+   so the rescuer got a live red dot over a dead connection and the dispatcher
+   got nothing. Success is now confirmed by a data channel that actually reaches
+   the room, and a failed attempt is retried for a minute rather than abandoned:
+   the dispatcher may still be reaching for the console. */
+let joinTimer=null,joinTries=0;
+function cancelJoin(){clearTimeout(joinTimer);joinTimer=null;joinTries=0;}
+
 $("btn-code-go").onclick=async()=>{
  const code=$("codeinput").value.trim(),d=t();
  if(!/^\d{6}$/.test(code)){$("t-code-note").textContent=d.ui.needSix;return;}
@@ -954,18 +1005,97 @@ $("btn-code-go").onclick=async()=>{
  if(!lib){$("t-code-note").textContent=d.ui.noNet;$("btn-code-go").textContent=d.codeGo;return;}
  try{S.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});}
  catch(e){$("t-code-note").textContent=d.ui.noCam;$("btn-code-go").textContent=d.codeGo;return;}
+ S.lastCode=code;
+ cancelJoin();
  S.peer=new Peer();
- S.peer.on("open",()=>{S.peer.call(ROOM(code),S.stream);S.lastCode=code;
-  mark("Video joined, code "+code);setVideoBtn(true);show("s-cpr");});
- 
- S.peer.on("error",()=>{$("t-code-note").textContent=d.ui.noReach;$("btn-code-go").textContent=d.codeGo;});
+ S.peer.on("open",()=>{joinTries=0;attemptJoin(code);});
+ S.peer.on("error",err=>{
+  if(err&&err.type==="peer-unavailable"){retryJoin(code);return;}
+  $("t-code-note").textContent=t().ui.noReach;
+  $("btn-code-go").textContent=t().codeGo;});
 };
-function stopVideo(){S.vision=false;
+function attemptJoin(code){
+ if(!S.peer||S.peer.destroyed)return;
+ let settled=false;
+ const conn=S.peer.connect(ROOM(code));
+ conn.on("open",()=>{settled=true;cancelJoin();
+  S.peer.call(ROOM(code),S.stream);
+  mark("Video joined, code "+code);
+  setVideoBtn(true);
+  $("btn-code-go").textContent=t().codeGo;
+  $("t-code-note").textContent="";
+  /* Do not yank the rescuer off a screen they have already left. */
+  if(current==="s-code")show("s-cpr");});
+ conn.on("error",()=>{if(!settled)retryJoin(code);});
+ clearTimeout(joinTimer);
+ joinTimer=setTimeout(()=>{if(!settled)retryJoin(code);},4000);
+}
+function retryJoin(code){
+ clearTimeout(joinTimer);
+ if(++joinTries>20){
+  $("t-code-note").textContent=t().ui.noReach;
+  $("btn-code-go").textContent=t().codeGo;return;}
+ $("t-code-note").textContent=U("joining","Connecting to the control room…");
+ joinTimer=setTimeout(()=>attemptJoin(code),3000);
+}
+
+/* THE ROOM IS OPENED WITH THE CONSOLE, NOT WITH A BUTTON.
+   The dispatcher sends no media — answering a call needs no camera and no
+   permission — so making the room optional bought nothing and cost the one
+   thing that matters: a rescuer joining a room that was not yet listening was
+   rejected outright and had to join all over again, with no sign to either
+   side that anything had gone wrong. The stage stays hidden until a feed
+   arrives, because hiding an empty rectangle is a display decision and must
+   never again be tangled up with whether the connection exists. */
+let roomTimer=null;
+function roomState(txt,live){
+ const el=$("d-roomstate");if(!el)return;
+ el.textContent=txt;el.classList.toggle("live",!!live);
+}
+function newCode(){
+ S.dCode=String(Math.floor(100000+Math.random()*900000));
+ $("d-code").textContent=S.dCode;
+ S.dLink=location.origin+location.pathname+"?code="+S.dCode+"&lang="+S.dLang;
+}
+async function openRoom(){
+ roomState(U("roomOpening","Opening room…"),false);
+ const lib=await loadPeerLib();
+ if(!lib){roomState(U("roomOffline","Room offline — retrying"),false);return;}
+ if(!S.dCode||current!=="s-console")return;
+ S.peer=new Peer(ROOM(S.dCode));
+ S.peer.on("open",()=>{
+  roomState(U("roomWaiting","Room open — waiting for a rescuer"),true);
+  $("stagehint").textContent=t().ui.waiting;});
+ S.peer.on("disconnected",()=>{try{S.peer.reconnect();}catch(e){}});
+ S.peer.on("error",err=>{
+  const type=err&&err.type;
+  /* A rescuer hanging up raises peer-unavailable. That is not a room fault. */
+  if(type==="peer-unavailable")return;
+  /* Someone else already holds this code. Take another rather than loop. */
+  if(type==="unavailable-id")newCode();
+  roomState(U("roomOffline","Room offline — retrying"),false);
+  clearTimeout(roomTimer);
+  roomTimer=setTimeout(()=>{if(current==="s-console")reopenRoom();},4000);});
+ S.peer.on("call",c=>{c.answer();
+  c.on("stream",st=>addFeed(c.peer,st));
+  c.on("close",()=>removeFeed(c.peer));});
+}
+function reopenRoom(){
+ if(S.peer){try{S.peer.destroy();}catch(e){}S.peer=null;}
+ openRoom();
+}
+function closeRoom(){
+ clearTimeout(roomTimer);S.vision=false;
  if(S.stream){S.stream.getTracks().forEach(x=>x.stop());S.stream=null;}
  if(S.peer){try{S.peer.destroy();}catch(e){}S.peer=null;}
  S.feeds={};S.sel=null;$("tiles").innerHTML="";$("stage").srcObject=null;
  $("ratebadge").style.display="none";$("stagehint").style.display="grid";
- $("stagewrap").hidden=true;}
+ $("stagewrap").hidden=true;
+ roomState(U("roomClosed","Room closed"),false);
+}
+/* Retained under its old name: anything else that tore the session down still works. */
+function stopVideo(){closeRoom();}
+
 function startVision(video){
  S.vision=true;
  const cv=document.createElement("canvas");cv.width=48;cv.height=36;
@@ -993,12 +1123,18 @@ function startVision(video){
 }
 
 $("btn-console").onclick=()=>{unlock();S.dT0=Date.now();S.dStep=0;
- S.dCode=String(Math.floor(100000+Math.random()*900000));
- $("d-code").textContent=S.dCode;
- S.dLink=location.origin+location.pathname+"?code="+S.dCode+"&lang="+S.dLang;
- dRender();buildDLangs();show("s-console");dClock();};
+ closeRoom();
+ newCode();
+ dRender();buildDLangs();dLabels();show("s-console");dClock();
+ openRoom();};
 function dClock(){if(!S.dT0)return;$("hdr-clock").textContent=mmss(Math.round((Date.now()-S.dT0)/1000));setTimeout(dClock,500);}
 function dPack(){return LANG_REGISTRY[S.dLang]||LANG_REGISTRY.en;}
+function dLabels(){
+ const cc=$("d-codelbl2");if(cc)cc.textContent=U("copyCode","Copy code");
+ const w=$("stagewrap");
+ $("d-vidlbl").textContent=(w&&w.hidden)
+  ?U("showVideo",t().ui.openVideo):U("hideVideo","Hide video");
+}
 function dRender(){
  /* The dispatcher reads the script in THEIR language; only the playback is in the
     caller's. Showing Devanagari to an English-speaking call-taker helped nobody. */
@@ -1025,7 +1161,7 @@ function buildDLangs(){
    if(o)o.textContent=o.textContent.replace(/ ✕$/,"")+" ✕";
    return;}
   S.dLang=c;S.dLink=location.origin+location.pathname+"?code="+S.dCode+"&lang="+S.dLang;
-  dRender();};
+  dRender();dLabels();};
 }
 $("d-next").onclick=()=>{S.dStep++;dRender();};
 $("d-prev").onclick=()=>{S.dStep--;dRender();};
@@ -1039,22 +1175,14 @@ $("d-metro").onclick=e=>{unlock();
  const u=t().ui,b=e.currentTarget;
  if(S.running){stopBeat();b.textContent="▶ "+u.metronome+" · "+BPM+"/min";b.classList.remove("b-amber");b.classList.add("b-quiet");}
  else{startBeat();b.textContent="■ "+u.metronome+" · "+BPM+"/min";b.classList.remove("b-quiet");b.classList.add("b-amber");}};
-$("d-copylink").onclick=async()=>{try{await navigator.clipboard.writeText(S.dLink);
- $("d-copylink").textContent="✓ Copied";setTimeout(()=>$("d-copylink").innerHTML="🔗 <span id=\"d-linklbl\">"+t().ui.copyLink+"</span>",1800);}catch(e){}};
-$("d-startvid").onclick=async()=>{
- const u=t().ui;
- if(S.peer){stopVideo();$("d-vidlbl").textContent=u.openVideo;return;}
- $("d-vidlbl").textContent="…";
- const lib=await loadPeerLib();
- if(!lib){$("d-vidlbl").textContent=u.openVideo;return;}
- S.peer=new Peer(ROOM(S.dCode));
- $("stagewrap").hidden=false;
- S.peer.on("open",()=>{$("d-vidlbl").textContent=u.endVideo;$("stagehint").textContent=u.waiting;});
- S.peer.on("error",()=>{$("stagehint").textContent="⚠";
-  $("d-vidlbl").textContent=u.openVideo;$("stagewrap").hidden=true;});
- S.peer.on("call",c=>{c.answer();
-  c.on("stream",st=>addFeed(c.peer,st));c.on("close",()=>removeFeed(c.peer));});
-};
+/* Six digits read aloud beat a URL every time on a phone call. The link is kept
+   for the cases where a message can be sent, but the code is the primary object. */
+$("d-copycode").onclick=e=>copyText(S.dCode||"",e.currentTarget);
+$("d-copylink").onclick=e=>copyText(S.dLink||"",e.currentTarget);
+/* Show or hide the stage. This no longer opens or closes anything. */
+$("d-startvid").onclick=()=>{
+ const w=$("stagewrap");w.hidden=!w.hidden;dLabels();};
+
 function addFeed(id,stream){
  if(S.feeds[id])return;S.feeds[id]=stream;
  const n=Object.keys(S.feeds).length;
@@ -1063,7 +1191,12 @@ function addFeed(id,stream){
  const lab=document.createElement("span");lab.textContent=t().ui.rescuer+" "+n;
  div.appendChild(v);div.appendChild(lab);div.onclick=()=>selectFeed(id);
  $("tiles").appendChild(div);
+ /* A feed arriving reveals the stage by itself. Nobody should have to guess that
+    a picture is waiting behind a collapsed panel. */
+ $("stagewrap").hidden=false;
  $("stagehint").style.display="none";
+ roomState(U("roomLive","Rescuer connected"),true);
+ dLabels();
  if(!S.sel)selectFeed(id);
 }
 function removeFeed(id){
@@ -1073,7 +1206,10 @@ function removeFeed(id){
  if(S.sel===id){S.sel=null;
   if(rest.length)selectFeed(rest[0]);
   else{$("stage").srcObject=null;S.vision=false;$("ratebadge").style.display="none";
-   $("stagehint").style.display="grid";$("stagehint").textContent="Waiting for a rescuer to join.";}}
+   $("stagehint").style.display="grid";$("stagehint").textContent=t().ui.waiting;}}
+ /* The room stays open. A rescuer whose phone dropped can walk straight back in
+    on the same code. */
+ if(!rest.length)roomState(U("roomWaiting","Room open — waiting for a rescuer"),true);
 }
 function selectFeed(id){
  S.sel=id;
@@ -1084,7 +1220,22 @@ function selectFeed(id){
 
 const q=new URLSearchParams(location.search);
 const ulang=q.get("lang"),ucode=q.get("code");
-if(ucode&&/^\d{6}$/.test(ucode))$("codeinput").value=ucode;
+/* A code arriving in the URL has to survive until the rescuer reaches the video
+   step, which is several screens away. It used to be written straight into the
+   input, where the video button's own handler overwrote it with S.lastCode —
+   empty at that point — so every link the dispatcher shared silently delivered
+   nothing. The code now lives in state, and the input is filled from state. */
+if(ucode&&/^\d{6}$/.test(ucode)){
+ S.lastCode=ucode;
+ $("codeinput").value=ucode;
+ const b=$("joinbanner");
+ if(b){
+  const num=document.createElement("b");num.textContent=ucode;
+  const msg=document.createElement("i");
+  msg.textContent=U("codeCarried","Dispatcher video code received. It will be ready for you when you reach the compressions step.");
+  b.appendChild(num);b.appendChild(msg);b.hidden=false;}
+}
+ 
 buildChips();buildDLangs();applyLang();setHeader("s-home");
 if(q.get("role")==="dispatcher")$("btn-console").click();
 if(ulang&&ulang!=="en"&&LANG_INDEX.some(l=>l.code===ulang))

@@ -93,14 +93,17 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .b-red{background:var(--pulse);color:#fff}.b-jade{background:var(--jade);color:#fff}.b-amber{background:var(--amber);color:#fff}
 
 .b-quiet{background:transparent;color:var(--slate);border:2px solid var(--hair);min-height:58px;font-size:16px;font-weight:600}
-/* Recording indicator. Deliberately a brighter red than --pulse (which is the
-   metronome wash) so the two are never confused at a glance. Motion is removed for
-   anyone who has asked their phone to reduce motion; the dot stays solid and bright. */
-.rec{display:inline-block;width:13px;height:13px;border-radius:50%;background:#FF2A18;flex:none;
- box-shadow:0 0 0 3px rgba(255,42,24,.22),0 0 10px 2px rgba(255,42,24,.7);
- animation:recpulse 1.05s ease-in-out infinite}
-@keyframes recpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
-@media (prefers-reduced-motion:reduce){.rec{animation:none;opacity:1}}
+/* Recording indicator, modelled on the LED on a camera rather than a UI animation:
+   the dot never changes size or position, it just cycles between lit and dark red.
+   A moving shape near a button invites a tap; a glowing one reads as status.
+   Deliberately a brighter red than --pulse (the metronome wash) so the two are never
+   confused. Motion is removed for anyone who has asked their phone to reduce motion. */
+.rec{display:inline-block;width:14px;height:14px;border-radius:50%;flex:none;background:#FF2A18;
+ box-shadow:0 0 11px 3px rgba(255,42,24,.85);animation:recglow 1.3s ease-in-out infinite}
+@keyframes recglow{
+ 0%,100%{background:#FF2A18;box-shadow:0 0 11px 3px rgba(255,42,24,.85)}
+ 50%{background:#4E0A03;box-shadow:0 0 2px 0 rgba(255,42,24,.15)}}
+@media (prefers-reduced-motion:reduce){.rec{animation:none;background:#FF2A18}}
 #btn-video.live{color:var(--ink);border-color:#FF2A18} 
 .b-huge{min-height:clamp(150px,30vh,240px);font-size:clamp(29px,7.6vw,44px);font-weight:800;border-radius:26px;flex-direction:column;gap:8px}
 .b-huge small{font-size:15px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.82}
@@ -366,10 +369,10 @@ const LANG_REGISTRY={};
 function registerLang(code,pack){LANG_REGISTRY[code]=pack;}
 registerLang("en",{
  name:"English",code:"en-US",dir:"ltr",
- homeH:"CPR, step by step.<br>This will talk you through it.",
+ homeH:"CPR, step by step instructions.",
  start:"SOMEONE COLLAPSED",startSub:"Tap to begin",
  disclaimer:"<b>Beta — not clinically approved.</b> Follows current AHA and Red Cross guidance, but has not been through clinical review and may contain errors. It does not replace training or medical care. Call your local emergency number first.",
- q1:"Shout at them and squeeze their shoulder. Any response?",
+ q1:"Shout at them and shake their shoulders. Any response?",
  q1y:"✋ Yes — they moved or spoke",q1n:"❌ No — nothing at all",
  q2:"Watch their chest for 10 seconds. Are they breathing normally?",
  q2w:"<b>Gasping, snoring or irregular gulps are not normal breathing.</b> That is the sound of a heart that has stopped. If you are unsure, choose No.",
@@ -384,15 +387,15 @@ registerLang("en",{
    ["tilt","Kneel beside their chest. Tilt the head back, lift the chin."],
    ["chest","Open or cut away clothing so you can see the bare chest."]],
  prepDone:"Ready — start pushing",
- aedBtn:"⚡ Defibrillator",aliveBtn:"🫁 They're breathing",
- swap:"🤝 Handing over",breathsOn:"🫁 Add rescue breaths",breathsOff:"🤲 Compressions only",
- videoBtn:"📹 Join dispatcher video",
- codeH:"Enter the 6-digit code the dispatcher gave you.",
- codeNote:"Your camera turns on so the dispatcher can see. Keep talking on the phone call.",
+ aedBtn:"⚡ Defibrillator here",aliveBtn:"🫁 They've started breathing",
+ swap:"🤝 Someone else takes over",breathsOn:"🫁 Add rescue breaths",breathsOff:"🤲 Compressions only",
+ videoBtn:"📹 Share my camera",videoLive:"Camera on — tap to stop",
+ codeH:"Enter the 6-digit code the control room gave you.",
+ codeNote:"Your camera turns on so the ambulance control room can see. Keep talking on the phone call.",
  codeGo:"📹 Connect",codeBack:"Not now — keep pushing",
  aliveH:"Roll them onto their side, head tilted back, mouth pointing down.",
  aliveP:"Stay with them. If breathing stops or turns to gasping, start compressions again immediately.",
- restart:"They stopped breathing — restart",handH:"What happened",handH2:"Show this to the crew",
+ restart:"They stopped breathing — restart",handH:"What happened",handH2:"Show this to the ambulance team",
  aedBack:"↩ Back to compressions",
  newRescuer:"You are the responder now. Same speed, same depth.",
  say:{place:{adult:"Heel of one hand in the centre of the chest. Other hand on top. Lock your elbows.",
@@ -427,7 +430,7 @@ registerLang("en",{
   {s:"Put him flat on his back on the floor. Kneel beside him, heel of your hand in the centre of his chest.",e:"Position and hand placement in one sentence."},
   {s:"Push down hard, twice a second, and do not stop until I tell you.",e:"Start the beat. Count aloud with them for the first ten."},
   {s:"Two minutes. If someone else is there, swap over now.",e:"Prompt a compressor change every two minutes."}],
- ui:{back:"Back",copyLink:"Copy link",yourLang:"Language",medics:"🚑 Paramedics here",share:"Share",copied:"Copied",step:"Step",of:"of",lastOne:"last one",elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable"},
+ ui:{back:"Back",copyLink:"Copy link",yourLang:"Language",medics:"🚑 Paramedics here",share:"Share",copied:"Copied",step:"Step",of:"of",lastOne:"then start pushing",elapsed:"Elapsed",exit:"Exit",next:"Next",sayThis:"Say this to the caller",callerSpeaks:"Caller speaks",playIn:"Play in",codeFor:"Code for the caller",link:"Link",openVideo:"Open video",endVideo:"End video",waiting:"Waiting for a rescuer to join.",noComp:"No compressions seen",arrestRec:"Arrest recognised",firstComp:"First compression",metronome:"Metronome",rescuer:"Rescuer",copy:"Copy",startOver:"Start over",dispatcher:"Dispatcher",searchLang:"Search language",unavailable:"unavailable",needSix:"Enter all 6 digits.",noNet:"No connection. Keep pushing — video is optional.",noCam:"Camera unavailable. Keep pushing.",noReach:"Could not reach the control room. Keep pushing."},
  article:{h:"How to do CPR on an adult",
   p:"Cardiac arrest kills within minutes. Chest compressions started by whoever is standing there — before an ambulance arrives — are the single biggest factor in whether someone survives. You do not need training, and you cannot make a person in cardiac arrest worse by trying.",
   s:[["1. Check for a response","Shout at them and squeeze their shoulder. If there is no response at all, they need help immediately."],
@@ -460,7 +463,7 @@ function langOrder(){
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
  aedStep:0,log:[],cprStarted:false,dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
  vision:false,seenRate:null,stream:null,peer:null,feeds:{},sel:null,lastSwapPrompt:0};
-const BUILD="2026-08-14g";
+const BUILD="2026-08-14h";
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>LANG_REGISTRY[S.lang]||LANG_REGISTRY.en;
@@ -929,7 +932,7 @@ const ROOM=c=>"cprcoach-room-"+c;
 function setVideoBtn(on){
  const b=$("btn-video"),d=t();
  b.classList.toggle("live",!!on);
- if(on)b.innerHTML='<span class="rec"></span>'+d.ui.endVideo;
+ if(on)b.innerHTML='<span class="rec"></span>'+d.videoLive;
  else b.textContent=d.videoBtn;
 }
 function stopMyCamera(){
@@ -945,17 +948,17 @@ $("btn-video").onclick=()=>{
 $("btn-code-back").onclick=()=>show("s-cpr");
 $("btn-code-go").onclick=async()=>{
  const code=$("codeinput").value.trim(),d=t();
- if(!/^\d{6}$/.test(code)){$("t-code-note").textContent="6 digits.";return;}
+ if(!/^\d{6}$/.test(code)){$("t-code-note").textContent=d.ui.needSix;return;}
  $("btn-code-go").textContent="…";
  const lib=await loadPeerLib();
- if(!lib){$("t-code-note").textContent="No connection. Keep pushing — video is optional.";$("btn-code-go").textContent=d.codeGo;return;}
+ if(!lib){$("t-code-note").textContent=d.ui.noNet;$("btn-code-go").textContent=d.codeGo;return;}
  try{S.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});}
- catch(e){$("t-code-note").textContent="Camera unavailable. Keep pushing.";$("btn-code-go").textContent=d.codeGo;return;}
+ catch(e){$("t-code-note").textContent=d.ui.noCam;$("btn-code-go").textContent=d.codeGo;return;}
  S.peer=new Peer();
  S.peer.on("open",()=>{S.peer.call(ROOM(code),S.stream);S.lastCode=code;
   mark("Video joined, code "+code);setVideoBtn(true);show("s-cpr");});
  
- S.peer.on("error",()=>{$("t-code-note").textContent="Could not reach the dispatcher. Keep pushing.";$("btn-code-go").textContent=d.codeGo;});
+ S.peer.on("error",()=>{$("t-code-note").textContent=d.ui.noReach;$("btn-code-go").textContent=d.codeGo;});
 };
 function stopVideo(){S.vision=false;
  if(S.stream){S.stream.getTracks().forEach(x=>x.stop());S.stream=null;}

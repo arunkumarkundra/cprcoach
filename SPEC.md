@@ -632,8 +632,9 @@ its option with ✕ in the picker. It does not fail quietly.
 | `breathInfant` | `Infant_Mouth_to_Mouth-and-Nose_Breathing.png` | rescue-breath pause, infant |
 
 `art()` loads the file and shows it only on success, so a missing or slow file costs
-nothing — the screen carries text and voice. Images cap at 26vh (18vh on short screens) so
-they never crowd the counter. `tests/audit-flow.js` asserts every path in `MEDIA` exists on
+nothing — the screen carries text and voice. Images cap at 34vh (24vh on short screens) so
+they never crowd the counter, and tapping one opens it full screen. Page-wide pinch-zoom
+stays disabled; a rescuer must not be able to zoom the buttons out of reach. `tests/audit-flow.js` asserts every path in `MEDIA` exists on
 disk, which prevents the 404 class of bug.
 
 **Three conditions before any image ships:**

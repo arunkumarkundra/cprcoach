@@ -91,7 +91,17 @@ button{font:inherit;border:none;border-radius:18px;cursor:pointer;min-height:74p
 button:active{transform:scale(.975);filter:brightness(1.15)}
 button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .b-red{background:var(--pulse);color:#fff}.b-jade{background:var(--jade);color:#fff}.b-amber{background:var(--amber);color:#fff}
+
 .b-quiet{background:transparent;color:var(--slate);border:2px solid var(--hair);min-height:58px;font-size:16px;font-weight:600}
+/* Recording indicator. Deliberately a brighter red than --pulse (which is the
+   metronome wash) so the two are never confused at a glance. Motion is removed for
+   anyone who has asked their phone to reduce motion; the dot stays solid and bright. */
+.rec{display:inline-block;width:13px;height:13px;border-radius:50%;background:#FF2A18;flex:none;
+ box-shadow:0 0 0 3px rgba(255,42,24,.22),0 0 10px 2px rgba(255,42,24,.7);
+ animation:recpulse 1.05s ease-in-out infinite}
+@keyframes recpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+@media (prefers-reduced-motion:reduce){.rec{animation:none;opacity:1}}
+#btn-video.live{color:var(--ink);border-color:#FF2A18} 
 .b-huge{min-height:clamp(150px,30vh,240px);font-size:clamp(29px,7.6vw,44px);font-weight:800;border-radius:26px;flex-direction:column;gap:8px}
 .b-huge small{font-size:15px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.82}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -111,8 +121,17 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .art{width:100%;max-width:320px;margin:0 auto;display:block;color:var(--ink)}
 .art .hi{fill:var(--pulse);stroke:none}
 .art .hiS{stroke:var(--pulse)}
-.artimg{width:100%;max-width:300px;max-height:26vh;object-fit:contain;margin:0 auto 4px;display:block;border-radius:14px}
-@media(max-height:700px){.artimg{max-height:18vh}}
+.artimg{width:100%;max-width:440px;max-height:34vh;object-fit:contain;margin:0 auto 4px;display:block;border-radius:14px;cursor:zoom-in}
+@media(max-height:700px){.artimg{max-height:24vh}}
+/* Tap an illustration to see it full screen. One finger, any tap closes it, and it
+   closes itself after 20 s so nobody stops compressions to study a picture. Page-wide
+   pinch-zoom stays off (user-scalable=no in the viewport tag) — a rescuer with wet or
+   shaking hands must not be able to zoom the buttons off the screen. */
+#zoom{position:fixed;inset:0;z-index:40;background:rgba(11,13,15,.94);
+ display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:16px}
+#zoom.on{display:flex}
+#zoom img{max-width:100%;max-height:76vh;object-fit:contain;border-radius:14px;background:#fff}
+#zoom button{width:auto;min-height:62px;padding:14px 34px;background:#fff;color:var(--ink);font-size:26px;font-weight:800} 
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{min-height:0;width:auto;padding:11px 16px;border-radius:999px;font-size:16px;font-weight:600;
  background:transparent;color:var(--ink);border:2px solid var(--hair)}
@@ -190,6 +209,8 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 </head>
 <body>
 <div id="wash"></div>
+<div id="zoom" aria-hidden="true"><img alt=""><button id="zoom-close" aria-label="Close">✕</button></div>
+ 
 <pre id="trace"></pre>
 
 <header id="appbar">
@@ -216,7 +237,8 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <button class="b-red b-huge" id="btn-start"><span id="t-start"></span><small id="t-start-sub"></small></button>
     <p class="disclaimer" id="t-disclaimer"></p>
     <div class="article" id="article"></div>
-    <p class="credit">Protocol based on current AHA and Red Cross resuscitation guidance; pending clinical review.</p>
+    
+   
   </div>
 </section>
 
@@ -344,9 +366,9 @@ const LANG_REGISTRY={};
 function registerLang(code,pack){LANG_REGISTRY[code]=pack;}
 registerLang("en",{
  name:"English",code:"en-US",dir:"ltr",
- homeH:"If someone has collapsed,<br>start here.",
+ homeH:"CPR, step by step.<br>This will talk you through it.",
  start:"SOMEONE COLLAPSED",startSub:"Tap to begin",
- disclaimer:"<b>Beta — not clinically approved.</b> Early prototype under review; may contain errors. Does not replace training or medical care. Call your local emergency number first.",
+ disclaimer:"<b>Beta — not clinically approved.</b> Follows current AHA and Red Cross guidance, but has not been through clinical review and may contain errors. It does not replace training or medical care. Call your local emergency number first.",
  q1:"Shout at them and squeeze their shoulder. Any response?",
  q1y:"✋ Yes — they moved or spoke",q1n:"❌ No — nothing at all",
  q2:"Watch their chest for 10 seconds. Are they breathing normally?",
@@ -438,7 +460,7 @@ function langOrder(){
 const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
  aedStep:0,log:[],cprStarted:false,dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
  vision:false,seenRate:null,stream:null,peer:null,feeds:{},sel:null,lastSwapPrompt:0};
-const BUILD="2026-08-14f";
+const BUILD="2026-08-14g";
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>LANG_REGISTRY[S.lang]||LANG_REGISTRY.en;
@@ -655,12 +677,26 @@ function art(host,key){
  const file=MEDIA[key];if(!file||mediaOK[key]===false)return;
  const img=new Image();
  img.onload=()=>{mediaOK[key]=true;
-  if(el.dataset.key===key){el.innerHTML="";img.className="artimg";img.alt="";el.appendChild(img);}};
+  if(el.dataset.key===key){el.innerHTML="";img.className="artimg";img.alt="";
+   img.onclick=()=>openZoom(file);el.appendChild(img);}};
  img.onerror=()=>{mediaOK[key]=false;};
  el.dataset.key=key;
  img.src=file;
 }
 function handArt(){return S.who==="adult"?"handsAdult":S.who==="child"?"handsChild":"handsInfant";}
+/* A full-screen look at an illustration. The metronome, the voice and the count all
+   keep running — nothing about the resuscitation pauses. Any tap closes it, and it
+   closes itself after 20 s so it can never become a screen someone is stranded on. */
+let zoomTimer=null;
+function openZoom(src){
+ const z=$("zoom");z.querySelector("img").src=src;
+ z.classList.add("on");z.setAttribute("aria-hidden","false");
+ clearTimeout(zoomTimer);zoomTimer=setTimeout(closeZoom,20000);
+}
+function closeZoom(){const z=$("zoom");z.classList.remove("on");
+ z.setAttribute("aria-hidden","true");clearTimeout(zoomTimer);}
+$("zoom").onclick=closeZoom;
+ 
 
 function applyLang(){
  const d=t();
@@ -678,7 +714,7 @@ function applyLang(){
   li.innerHTML="<b>"+(i+1)+"</b><span>"+s+"</span>";ul.appendChild(li);});
  $("btn-aed").textContent=d.aedBtn;$("btn-alive").textContent=d.aliveBtn;$("btn-swap").textContent=d.swap;
  $("btn-breaths").textContent=S.breaths?d.breathsOff:d.breathsOn;
- $("btn-video").textContent=d.videoBtn;
+ setVideoBtn(!!S.peer); 
  $("t-code-h").textContent=d.codeH;$("t-code-note").textContent=d.codeNote;
  $("btn-code-go").textContent=d.codeGo;$("btn-code-back").textContent=d.codeBack;
  $("t-alive-h").textContent=d.aliveH;$("t-alive-p").textContent=d.aliveP;
@@ -887,7 +923,25 @@ function loadPeerLib(){
  return peerLibP;
 }
 const ROOM=c=>"cprcoach-room-"+c;
-$("btn-video").onclick=()=>{show("s-code");$("codeinput").focus();};
+/* One control, two jobs: start sharing, or stop it. Stopping the camera touches
+   nothing else — the metronome, the voice and the count carry on. Restarting does not
+   ask for the code again, so a mis-tap costs one more tap rather than a re-entry. */
+function setVideoBtn(on){
+ const b=$("btn-video"),d=t();
+ b.classList.toggle("live",!!on);
+ if(on)b.innerHTML='<span class="rec"></span>'+d.ui.endVideo;
+ else b.textContent=d.videoBtn;
+}
+function stopMyCamera(){
+ if(S.stream){S.stream.getTracks().forEach(x=>x.stop());S.stream=null;}
+ if(S.peer){try{S.peer.destroy();}catch(e){}S.peer=null;}
+ mark("Camera stopped by rescuer");
+ setVideoBtn(false);
+}
+$("btn-video").onclick=()=>{
+ if(S.peer){stopMyCamera();return;}
+ show("s-code");$("codeinput").value=S.lastCode||"";$("codeinput").focus();};
+ 
 $("btn-code-back").onclick=()=>show("s-cpr");
 $("btn-code-go").onclick=async()=>{
  const code=$("codeinput").value.trim(),d=t();
@@ -898,8 +952,9 @@ $("btn-code-go").onclick=async()=>{
  try{S.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});}
  catch(e){$("t-code-note").textContent="Camera unavailable. Keep pushing.";$("btn-code-go").textContent=d.codeGo;return;}
  S.peer=new Peer();
- S.peer.on("open",()=>{S.peer.call(ROOM(code),S.stream);mark("Video joined, code "+code);
-  $("btn-video").textContent="📹 ● live";show("s-cpr");});
+ S.peer.on("open",()=>{S.peer.call(ROOM(code),S.stream);S.lastCode=code;
+  mark("Video joined, code "+code);setVideoBtn(true);show("s-cpr");});
+ 
  S.peer.on("error",()=>{$("t-code-note").textContent="Could not reach the dispatcher. Keep pushing.";$("btn-code-go").textContent=d.codeGo;});
 };
 function stopVideo(){S.vision=false;

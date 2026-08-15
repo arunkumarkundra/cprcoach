@@ -1,6 +1,6 @@
 # CPR Coach — Project Specification
 
-**Build of record: `2026-08-14h`** · Status: **beta, not clinically approved**
+**Build of record: `2026-08-14i`** · Status: **beta, not clinically approved**
 
 ---
 
@@ -368,9 +368,25 @@ Five steps, advanced manually:
 4. Nobody touch them. Let it analyse. *(Say it out loud: stand clear.)*
 5. If it says shock, press the button. Then push again immediately.
 
+Each screen carries a bare `N / 5` progress count. It deliberately does not use the
+`Step N of 6` wording of the triage flow — this is a detour inside step 6, not a seventh
+step, and reusing the phrasing would imply the rescuer had lost their place.
+
+Steps 1–4 advance on a button labelled **Next**. Step 5 is labelled **⚡ Done — back to
+compressions** instead, because it is the only press that writes a clinical event
+(`Shock delivered or advised`) into the handover record; a bare arrow gave the rescuer no
+way to know that. On step 5 the quiet **↩ Back to compressions** button is hidden, since it
+reaches the same screen while silently dropping the shock from the record the paramedics
+read — offering both made that entry a coin flip. No dead end results: the amber button
+returns to compressions either way.
+
 Step 5 returns to `s-cpr` and **restarts the beat automatically** — resuming compressions
 immediately post-shock is the point, and the app does not wait for a tap to prove it.
-**↩ Back to compressions** is available at any step.
+**↩ Back to compressions** is available on steps 1–4.
+
+**Open for clinical review:** an AED that reports *no shock advised* currently logs the
+same event as one that delivered a shock. Splitting step 5 in two would fix the record but
+adds a decision mid-resuscitation, which §2 resists. Not resolved here.
 
 ### 6.13 `s-alive` — Recovery position
 
@@ -573,7 +589,7 @@ Packs whose code matches a device language are prefetched at browser idle.
 
 ### Pack schema
 
-48 top-level keys.
+49 top-level keys.
 
 ```
 name, code (BCP-47), dir ("ltr"|"rtl")
@@ -583,7 +599,7 @@ callH, callP, called, alone
 prepH, prep[3], prepDone
 aedBtn, aliveBtn, swap, breathsOn, breathsOff, videoBtn, videoLive
 codeH, codeNote, codeGo, codeBack
-aliveH, aliveP, restart, handH, handH2, aedBack, newRescuer
+aliveH, aliveP, restart, handH, handH2, aedBack, aedDone, newRescuer
 say: { place{adult,child,infant}, depth{adult,child,infant}, go, keep[6],
        swap2min, b1,b2,b3, bi1,bi2,bi3, resume, aed, clear, shock, prep }
 aedSteps[5]  { h, n, art }

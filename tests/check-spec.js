@@ -50,7 +50,7 @@ const LANG_REGISTRY={};function registerLang(c,p){LANG_REGISTRY[c]=p;}
 const en=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1])[1];
 eval(en.replace('const LANG_REGISTRY={};','').replace('function registerLang(code,pack){LANG_REGISTRY[code]=pack;}',''));
 const p=LANG_REGISTRY.en;
-ok(Object.keys(p).length===48 && spec.includes("48 top-level keys"), "pack has 48 top-level keys");
+ok(Object.keys(p).length===49 && spec.includes("49 top-level keys"), "pack has 49 top-level keys");
 ok(Object.keys(p.ui).length===34 && spec.includes("ui{34 keys}"), "34 ui strings");
 ok(p.say.keep.length===6 && spec.includes("one of six lines"), "six cue lines");
 ok(p.aedSteps.length===5 && spec.includes("aedSteps[5]"), "five AED steps");

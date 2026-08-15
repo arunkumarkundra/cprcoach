@@ -1,0 +1,33 @@
+# Runs the full test suite on every commit to main, straight from the GitHub website.
+# No terminal needed: after each commit a tick or a cross appears next to it, and
+# clicking the cross shows exactly which check failed. A failing run also emails you.
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  suite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install jsdom
+        run: npm install jsdom --no-save
+      - name: SPEC.md matches the code
+        run: node tests/check-spec.js
+      - name: Language packs complete
+        run: node tests/check-langs.js
+      - name: No dead ends, all images present
+        run: node tests/audit-flow.js
+      - name: Behaviour (85 checks)
+        run: node tests/test.js
+      - name: Adversarial (14 checks)
+        run: node tests/adversarial.js
+      - name: Six steps in order
+        run: node tests/verify-flow.js

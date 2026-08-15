@@ -27,7 +27,7 @@ registerLang("es",{
  aliveH:"Gíralo de lado, con la cabeza hacia atrás y la boca hacia abajo.",
  aliveP:"Quédate con él. Si deja de respirar o empieza a jadear, reanuda las compresiones de inmediato.",
  restart:"Dejó de respirar — reanudar",handH:"Qué ha pasado",handH2:"Muestra esto al equipo de la ambulancia",
- aedBack:"↩ Volver a comprimir",
+ aedBack:"↩ Volver a comprimir",aedDone:"⚡ Hecho — vuelve a comprimir",
  newRescuer:"Ahora el responsable eres tú. Mismo ritmo, misma profundidad.",
  say:{place:{adult:"Talón de una mano en el centro del pecho. La otra encima. Bloquea los codos.",
    child:"Talón de una mano en el centro del pecho.",

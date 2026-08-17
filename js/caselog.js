@@ -154,9 +154,10 @@
       "box-shadow:0 18px 60px rgba(0,0,0,.45)}" +
       "#caselog .cl-top{display:flex;align-items:center;justify-content:space-between;gap:12px;" +
       "padding:16px 18px;border-bottom:2px solid rgba(0,0,0,.10)}" +
-      "#caselog .cl-top h2{margin:0;font-size:19px;font-weight:800}" +
+      "#caselog .cl-top h2{margin:0;font-size:19px;font-weight:800;flex:1 1 auto;min-width:0;" +
+      "white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
       "#caselog .cl-x{border:0;background:transparent;font-size:22px;line-height:1;min-height:44px;" +
-      "min-width:44px;cursor:pointer;color:inherit}" +
+      "min-width:44px;flex:0 0 auto;cursor:pointer;color:inherit}" +
       "#caselog .cl-body{overflow:auto;-webkit-overflow-scrolling:touch;padding:8px 18px 4px}" +
       "#caselog ol{list-style:none;margin:0;padding:0}" +
       "#caselog li{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.07);" +

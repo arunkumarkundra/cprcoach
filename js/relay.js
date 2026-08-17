@@ -1,40 +1,35 @@
 /* CPR Coach — instruction relay
    =================================================================
-   Folder: js/relay.js
-   Load AFTER the main application script and AFTER js/speech.js.
+   Folder: js/relay.js   (replaces the earlier version of this file)
+   Load AFTER js/video.js.
 
    WHAT THIS DOES
-   The dispatcher can already see the caller's camera but has no way to be
-   heard by them. This adds one button to the console: "Speak on caller's
-   phone". Pressing it makes the caller's own handset read the current
-   script line aloud, in the caller's own language.
+   The console's existing "🔊 Play in <language>" button now does one job
+   in two places: it reads the current script line aloud on the console
+   speaker, exactly as before, and — if the caller's camera is connected —
+   the caller's own handset reads the same line aloud in the caller's own
+   language at the same time.
 
-   THE IMPORTANT DESIGN DECISION
-   No text ever crosses the connection. Only a step number does — 0 to 5.
-   The caller's phone then speaks the line from its OWN language pack.
+   WHY ONE BUTTON AND NOT TWO
+   The first version added a separate "Speak on caller's phone" button.
+   That was wrong for two reasons. It asked the dispatcher to decide,
+   mid-resuscitation, which of two nearly identical controls to press —
+   the sort of choice §2 of the spec exists to remove. And when no camera
+   was connected it read "Caller's phone not connected", which is alarming
+   and misleading to a dispatcher who is already talking to that caller on
+   the telephone. Nothing is wrong in that situation; there is simply no
+   video link, which is the normal case.
 
-   Three things follow from that, and they are the reason it is built this
-   way rather than by sending words:
-     · The caller can only ever hear one of the six clinically reviewed
-       lines. A dispatcher cannot improvise medical instructions through
-       this channel, whether by accident or otherwise.
-     · Nothing needs translating in transit. No translation service, no
-       network round trip, no chance of a mistranslation reaching a
-       resuscitation.
-     · A dispatcher who speaks no Tamil can still deliver correct Tamil.
+   Now there is one button. It always plays on the console. It also plays
+   on the caller's handset whenever that is possible, and says so
+   afterwards. It never reports the absence of a video link as a fault.
 
-   The channel also carries two harmless housekeeping messages: the caller
-   announces which language its app is set to, so the console can select it
-   without guessing, and the caller confirms when a line has actually been
-   spoken, so the dispatcher knows it landed.
-
-   WHAT IT DOES NOT DO
-   It is not a substitute for the voice call. It carries no audio, no
-   free text and no two-way conversation. It rides on the same PeerJS
-   data path as the video, so it inherits every limitation of that path:
-   the public broker, the absence of TURN servers, and total dependence on
-   the caller having pressed "Share my camera" first. If the connection is
-   not up, the button says so and does nothing.
+   THE IMPORTANT DESIGN DECISION, UNCHANGED
+   No text crosses the connection — only a step number, 0 to 5. The
+   caller's phone speaks the line from its OWN language pack. So the caller
+   can only ever hear one of the six clinically reviewed lines, nothing
+   needs translating in transit, and a dispatcher who speaks no Tamil still
+   delivers correct Tamil.
 */
 (function () {
   "use strict";
@@ -42,74 +37,61 @@
   var byId = function (id) { return document.getElementById(id); };
 
   var TX = {
-    en: { send: "Speak on caller's phone", heard: "Heard on caller's phone",
-          none: "Caller's phone not connected", room: "Control room" },
-    hi: { send: "कॉलर के फ़ोन पर बोलें", heard: "कॉलर के फ़ोन पर सुना गया",
-          none: "कॉलर का फ़ोन जुड़ा नहीं है", room: "कंट्रोल रूम" },
-    kn: { send: "ಕರೆ ಮಾಡಿದವರ ಫೋನ್‌ನಲ್ಲಿ ಹೇಳಿ", heard: "ಕರೆ ಮಾಡಿದವರ ಫೋನ್‌ನಲ್ಲಿ ಕೇಳಿಸಿದೆ",
-          none: "ಕರೆ ಮಾಡಿದವರ ಫೋನ್ ಸಂಪರ್ಕವಾಗಿಲ್ಲ", room: "ನಿಯಂತ್ರಣ ಕೊಠಡಿ" },
-    ta: { send: "அழைத்தவரின் தொலைபேசியில் பேசு", heard: "அழைத்தவரின் தொலைபேசியில் கேட்டது",
-          none: "அழைத்தவரின் தொலைபேசி இணைக்கப்படவில்லை", room: "கட்டுப்பாட்டு அறை" },
-    es: { send: "Hablar en el teléfono del llamante", heard: "Escuchado en el teléfono del llamante",
-          none: "El teléfono del llamante no está conectado", room: "Sala de control" },
-    ar: { send: "التحدث على هاتف المتصل", heard: "تم سماعه على هاتف المتصل",
-          none: "هاتف المتصل غير متصل", room: "غرفة التحكم" }
+    en: { also: "Also played on the caller's phone", room: "Control room" },
+    hi: { also: "कॉलर के फ़ोन पर भी सुनाया गया", room: "कंट्रोल रूम" },
+    kn: { also: "ಕರೆ ಮಾಡಿದವರ ಫೋನ್‌ನಲ್ಲಿಯೂ ಕೇಳಿಸಿದೆ", room: "ನಿಯಂತ್ರಣ ಕೊಠಡಿ" },
+    ta: { also: "அழைத்தவரின் தொலைபேசியிலும் ஒலித்தது", room: "கட்டுப்பாட்டு அறை" },
+    es: { also: "También reproducido en el teléfono del llamante", room: "Sala de control" },
+    ar: { also: "تم تشغيله أيضاً على هاتف المتصل", room: "غرفة التحكم" }
   };
   function tx() {
     var l = "en";
     try { if (typeof S !== "undefined" && S && S.lang) l = S.lang; } catch (e) {}
     return TX[l] || TX.en;
   }
-  function logIt(s) { try { if (window.caseLog) window.caseLog.add(s); } catch (e) {} }
+  function note(s) { try { if (window.caseLog) window.caseLog.add(s); } catch (e) {} }
 
   /* =================================================================
-     Peer discovery.
+     Finding the connection.
 
-     index.html creates its Peer objects inside two click handlers and
-     never announces them. Rather than edit those handlers, we watch for
-     S.peer to change and attach our listeners to whatever appears.
-     PeerJS uses an event emitter, so adding a second "call" listener does
-     not disturb the one index.html already registered.
+     index.html creates its Peer objects inside click handlers and never
+     announces them, so we watch S.peer and attach to whatever appears.
+     PeerJS is an event emitter, so our extra listeners sit alongside the
+     ones already registered rather than replacing them.
   ================================================================= */
-  var hooked = null;
-  var conns = {};          // dispatcher side: caller peer id -> DataConnection
-  var iAmDispatcher = false;
+  var hooked = null, conns = {}, iAmDispatcher = false;
 
   function watch() {
     var p = null;
     try { p = (typeof S !== "undefined" && S) ? S.peer : null; } catch (e) { p = null; }
-    if (p === hooked) { if (!p) { conns = {}; iAmDispatcher = false; paint(); } return; }
+    if (p === hooked) {
+      if (!p && iAmDispatcher) { conns = {}; iAmDispatcher = false; }
+      return;
+    }
     hooked = p;
     conns = {};
     iAmDispatcher = false;
     if (p) hook(p);
-    paint();
   }
 
   function hook(peer) {
-    var id = "";
-    try { id = String(peer.id || ""); } catch (e) {}
-    if (id.indexOf("cprcoach-room-") === 0) iAmDispatcher = true;
     try {
-      peer.on("open", function (openId) {
-        if (String(openId || "").indexOf("cprcoach-room-") === 0) iAmDispatcher = true;
-        paint();
+      if (String(peer.id || "").indexOf("cprcoach-room-") === 0) iAmDispatcher = true;
+      peer.on("open", function (id) {
+        if (String(id || "").indexOf("cprcoach-room-") === 0) iAmDispatcher = true;
       });
     } catch (e) {}
 
-    /* --- dispatcher side: a camera arrived, open a data channel back --- */
+    /* dispatcher side: a camera arrived, open a data channel back to it */
     try {
       peer.on("call", function (c) {
         iAmDispatcher = true;
-        /* Give the media negotiation a moment before opening a second
-           channel on the same connection; doing both at once made the
-           data channel fail to open on slow mobile networks. */
         setTimeout(function () { connectBack(peer, c.peer); }, 900);
         try { c.on("close", function () { drop(c.peer); }); } catch (e2) {}
       });
     } catch (e) {}
 
-    /* --- caller side: the console is opening a data channel to us --- */
+    /* caller side: the console is opening a data channel to us */
     try {
       peer.on("connection", function (conn) { bindCaller(conn); });
     } catch (e) {}
@@ -118,12 +100,13 @@
   function connectBack(peer, remoteId) {
     if (!remoteId || conns[remoteId]) return;
     var conn;
+    /* If this fails it raises a non-fatal error on the peer. js/video.js
+       now ignores those, which is what stopped it blanking the stage. */
     try { conn = peer.connect(remoteId, { reliable: true }); } catch (e) { return; }
     if (!conn) return;
     conn.on("open", function () {
       conns[remoteId] = conn;
-      logIt("Instruction channel open to caller's phone");
-      paint();
+      note("Instruction link to caller's phone open");
     });
     conn.on("data", function (msg) { fromCaller(msg); });
     conn.on("close", function () { drop(remoteId); });
@@ -133,9 +116,8 @@
   function drop(remoteId) {
     if (conns[remoteId]) {
       delete conns[remoteId];
-      logIt("Instruction channel to caller's phone closed");
+      note("Instruction link to caller's phone closed");
     }
-    paint();
   }
 
   function liveCount() {
@@ -145,32 +127,35 @@
   }
 
   /* =================================================================
-     Dispatcher side
+     Dispatcher side: one button, two speakers.
   ================================================================= */
-  var sendBtn = null, resetLbl = null;
+  var statusEl = null, statusT = null;
 
-  function makeButton() {
+  function makeStatus() {
+    if (statusEl) return;
     var anchor = byId("d-speak");
-    if (!anchor || sendBtn) return;
-    sendBtn = document.createElement("button");
-    sendBtn.id = "d-relay";
-    sendBtn.type = "button";
-    sendBtn.className = anchor.className;   // sits as a sibling of Play
-    sendBtn.style.marginTop = "8px";
-    sendBtn.textContent = "📲 " + tx().send;
-    sendBtn.onclick = send;
-    anchor.parentNode.insertBefore(sendBtn, anchor.nextSibling);
-    paint();
+    if (!anchor) return;
+    var css = document.createElement("style");
+    css.textContent =
+      "#d-relaystatus{margin-top:7px;font-size:12px;font-weight:700;line-height:1.35;" +
+      "color:var(--slate,#6B7480);display:none}" +
+      "#d-relaystatus.on{display:block}";
+    document.head.appendChild(css);
+    statusEl = document.createElement("div");
+    statusEl.id = "d-relaystatus";
+    statusEl.setAttribute("role", "status");
+    anchor.parentNode.insertBefore(statusEl, anchor.nextSibling);
   }
 
-  function paint() {
-    if (!sendBtn) return;
-    var n = liveCount();
-    var ok = iAmDispatcher && n > 0;
-    sendBtn.disabled = !ok;
-    sendBtn.style.opacity = ok ? "1" : ".45";
-    if (resetLbl) return;                   // a confirmation is on screen
-    sendBtn.textContent = ok ? ("📲 " + tx().send) : ("📲 " + tx().none);
+  /* Silence is the resting state. The line appears only to confirm that
+     something extra happened, never to report that it did not. */
+  function flash(text) {
+    makeStatus();
+    if (!statusEl) return;
+    statusEl.textContent = text;
+    statusEl.classList.add("on");
+    if (statusT) clearTimeout(statusT);
+    statusT = setTimeout(function () { statusEl.classList.remove("on"); }, 4000);
   }
 
   function stepNow() {
@@ -180,25 +165,33 @@
     } catch (e) { return 0; }
   }
 
-  function send() {
-    if (!liveCount()) return;
+  /* Wrap the Play button rather than replacing it: the original still
+     plays on the console speaker, untouched, and we add the second
+     destination afterwards. */
+  var armed = null;
+  function installPlay() {
+    var b = byId("d-speak");
+    if (!b || armed === b.onclick) return;
+    var prev = b.onclick;
+    b.onclick = function (ev) {
+      var r;
+      if (prev) r = prev.call(this, ev);
+      try { sendToCaller(); } catch (e) {}
+      return r;
+    };
+    armed = b.onclick;
+    makeStatus();
+  }
+
+  function sendToCaller() {
+    if (!iAmDispatcher || !liveCount()) return;   // no link: nothing to say about it
     var i = stepNow();
-    var payload = { k: "say", i: i };
     var sent = 0;
     for (var id in conns) {
       if (!conns[id] || !conns[id].open) continue;
-      try { conns[id].send(payload); sent++; } catch (e) {}
+      try { conns[id].send({ k: "say", i: i }); sent++; } catch (e) {}
     }
-    if (!sent) { paint(); return; }
-    logIt("Sent step " + (i + 1) + " to caller's phone");
-    flash("📲 …");
-  }
-
-  function flash(label) {
-    if (!sendBtn) return;
-    sendBtn.textContent = label;
-    if (resetLbl) clearTimeout(resetLbl);
-    resetLbl = setTimeout(function () { resetLbl = null; paint(); }, 2600);
+    if (sent) note("Step " + (i + 1) + " sent to caller's phone");
   }
 
   function fromCaller(msg) {
@@ -206,32 +199,28 @@
     if (msg.k === "hello") {
       adoptCallerLanguage(msg.lang);
     } else if (msg.k === "said") {
-      logIt("Caller's phone confirmed step " + ((msg.i | 0) + 1) + " spoken");
-      flash("✓ " + tx().heard);
+      note("Caller's phone confirmed step " + ((msg.i | 0) + 1) + " spoken");
+      flash("✓ " + tx().also);
     }
   }
 
-  /* The console's "caller speaks" dropdown was previously a guess. The
-     caller's handset knows the answer, so it tells us and we select it.
-     Everything the console shows stays in the dispatcher's own language;
-     only the playback language changes, which is what that control means. */
+  /* The "caller speaks" dropdown was a guess. The caller's handset knows
+     the answer, so it tells us and we select it. Everything the console
+     displays stays in the dispatcher's own language; only the playback
+     language changes, which is exactly what that control governs. */
   function adoptCallerLanguage(code) {
     if (!code) return;
     try {
       if (S.dLang === code) return;
       var apply = function () {
         S.dLang = code;
-        try {
-          S.dLink = location.origin + location.pathname + "?code=" + S.dCode + "&lang=" + code;
-        } catch (e) {}
+        try { S.dLink = location.origin + location.pathname + "?code=" + S.dCode + "&lang=" + code; } catch (e) {}
         try { if (typeof dRender === "function") dRender(); } catch (e) {}
         try { if (typeof buildDLangs === "function") buildDLangs(); } catch (e) {}
       };
       if (typeof loadLang === "function") {
         loadLang(code).then(function (ok) { if (ok) apply(); });
-      } else {
-        apply();
-      }
+      } else { apply(); }
     } catch (e) {}
   }
 
@@ -301,8 +290,8 @@
 
   /* ================================================================= */
   function install() {
-    makeButton();
-    setInterval(function () { watch(); paint(); }, 700);
+    installPlay();
+    setInterval(function () { watch(); installPlay(); }, 700);
   }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", install);

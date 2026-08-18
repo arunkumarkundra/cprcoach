@@ -22,12 +22,28 @@ ok(app.includes("mean*1.55+1.5") && spec.includes("mean × 1.55 + 1.5"), "video 
 ok(app.includes("seenRate<95||S.seenRate>130") && spec.includes("95–130/min"), "rate warning band");
 ok(app.includes("now-last>4000") && spec.includes("4 s"), "stillness alert 4 s");
 ok(app.includes("cv.width=48") && spec.includes("48×36"), "video downsample size");
-ok(/},9000\)/.test(app) && spec.includes("9 s"), "speech watchdog 9 s");
+/* The nine-second pause()/resume() watchdog was REMOVED: js/speech.js owns
+   speech now, and the watchdog fought its queue on every desktop. These two
+   assertions exist so it cannot come back by accident. */
+ok(!/},9000\)/.test(app), "no speech watchdog left in index.html");
+ok(!/function loadVoices\(\)/.test(app) && !/onvoiceschanged/.test(app),
+   "no second voice picker left in index.html");
+ok(!/\$\("btn-code-go"\)\.onclick=async/.test(app) &&
+   !/\$\("d-startvid"\)\.onclick=async/.test(app),
+   "no second video implementation left in index.html");
+ok(spec.includes("js/speech.js") && spec.includes("js/video.js"),
+   "spec documents the modules that own those behaviours");
 ok(app.includes("1250:880") && spec.includes("880 Hz") && spec.includes("1250 Hz"), "click frequencies");
 ok(app.includes("0.85:0.62") && spec.includes("0.62 / 0.85"), "click gains");
 ok(app.includes("scheduler,25") && spec.includes("25 ms"), "scheduler poll 25 ms");
 ok(app.includes("scheduler,120") && spec.includes("120 ms"), "suspended-context retry 120 ms");
 ok(app.includes("startKeepAlive();audioHealth();},600)") && spec.includes("600 ms"), "keep-alive delay 600 ms");
+ok(/function letSleep\(\)/.test(app) && /wakeLock\.release\(\)/.test(app),
+   "wake lock is released, not just requested");
+ok(/who:null/.test(app), "S.who starts unknown rather than defaulting to adult");
+ok(/clockT=setTimeout\(tickClock,500\)/.test(app) && /dClockT=setTimeout\(dClock,500\)/.test(app),
+   "clock loops cannot stack on re-entry");
+ok(/classList\.remove\("beating"\)/.test(app), "body.beating is cleared");
 
 const flow=(app.match(/const FLOW=\[[^\]]*\]/)||[])[0];
 ok(flow && spec.includes('const FLOW = ["s-resp","s-breath","s-who","s-call","s-prep","s-cpr"]'), "FLOW array documented");

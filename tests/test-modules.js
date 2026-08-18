@@ -15,7 +15,7 @@
    failure in this file points at one of the three modules and nowhere
    else. Requires jsdom, same as tests/test.js.
 
-   42 assertions.
+   55 assertions.
 */
 const { JSDOM } = require("jsdom");
 const fs = require("fs");
@@ -37,6 +37,7 @@ const HTML = `<!doctype html><html><body>
   <button id="d-metro"></button>
 </div></section></body></html>`;
 
+let ROOT;
 const dom = new JSDOM(HTML, { runScripts: "outside-only", pretendToBeVisual: true });
 const w = dom.window;
 
@@ -99,7 +100,7 @@ const wait = (ms) => new Promise(r => setTimeout(r, ms));
 (async () => {
   await ready;
   w.eval(app);
-  const ROOT = require("path").join(__dirname, "..");
+  ROOT = require("path").join(__dirname, "..");
   for (const f of ["js/haptic.js", "js/interval.js", "js/mirror.js"]) {
     w.eval(fs.readFileSync(require("path").join(ROOT, f), "utf8"));
   }
@@ -128,15 +129,22 @@ const wait = (ms) => new Promise(r => setTimeout(r, ms));
   ok(pulses.length === 0, "no vibration off the compression screen (console metronome)");
   w.eval("current='s-cpr'");
 
-  // automatic engagement when muted
-  $("btn-buzz").dispatchEvent(new w.Event("click"));   // explicit off
+  // tapping off stops it
+  $("btn-buzz").dispatchEvent(new w.Event("click"));
   pulses.length = 0;
-  ok($("btn-buzz").textContent === "📴", "explicit off honoured");
-  w.eval("S.muted = true;");
-  await wait(700);
-  ok($("btn-buzz").textContent === "📴", "explicit off is respected even when muted");
-  w.eval("for(var i=1;i<=3;i++) onBeat(i);");
-  ok(pulses.length === 0, "  and stays silent");
+  ok($("btn-buzz").textContent === "📴", "tapping again switches it off");
+  ok(pulses.length === 0, "switching off gives no confirmation pulse");
+  w.eval("for(var i=1;i<=5;i++) onBeat(i);");
+  ok(pulses.length === 0, "  and no further pulses");
+
+  // NOTHING may switch it on except a tap
+  w.eval("S.muted = true; ac.state = 'suspended'; S.running = true;");
+  await wait(900);
+  ok($("btn-buzz").textContent === "📴", "muting the app does NOT switch vibration on");
+  w.eval("for(var i=1;i<=5;i++) onBeat(i);");
+  ok(pulses.length === 0, "a failed audio context does NOT switch vibration on");
+  w.eval("S.muted = false; ac.state = 'running';");
+  ok($("btn-buzz").getAttribute("aria-pressed") === "false", "aria-pressed reflects off");
 
   console.log("\n=== INTERVAL ===");
   $("btn-console").dispatchEvent(new w.Event("click"));
@@ -223,6 +231,65 @@ const wait = (ms) => new Promise(r => setTimeout(r, ms));
   await wait(900);
   ok($("mirror").textContent.indexOf("js/relay.js") >= 0,
      "card names the file to fix rather than showing nothing");
+
+  console.log("\n=== relay.js relayBus ===");
+  // Load the real relay.js into a clean window and drive its bus directly.
+  const r = new JSDOM("<body><button id='d-speak'></button></body>",
+                      { runScripts: "outside-only", pretendToBeVisual: true });
+  await new Promise(res => {
+    if (r.window.document.readyState !== "loading") return res();
+    r.window.document.addEventListener("DOMContentLoaded", () => res());
+  });
+  r.window.eval(`var S={lang:"en",dStep:0,dCode:"111111",dLang:"en",peer:null};
+                 var LANG_REGISTRY={en:{dScript:[{s:"1"},{s:"2"},{s:"3"},{s:"4"},{s:"5"},{s:"6"}]}};
+                 function t(){return LANG_REGISTRY.en;}
+                 var LOG=[]; window.caseLog={add:function(s){LOG.push(s);}};`);
+  r.window.eval(fs.readFileSync(require("path").join(ROOT, "js/relay.js"), "utf8"));
+
+  const rb = r.window.relayBus;
+  ok(!!rb && typeof rb.on === "function" && typeof rb.send === "function"
+        && typeof rb.live === "function", "relay.js exposes window.relayBus");
+  ok(rb.live() === 0 && rb.send({ k: "cs" }) === 0, "no connections: live 0, send 0");
+
+  // a fake DataConnection, as PeerJS would hand one over
+  function fakeConn(peer) {
+    const h = {};
+    return { peer, open: true, sent: [],
+             send(o) { this.sent.push(o); },
+             on(ev, fn) { (h[ev] = h[ev] || []).push(fn); },
+             fire(ev, a) { (h[ev] || []).forEach(f => f(a)); } };
+  }
+  // caller side: relay registers peer.on("connection")
+  const fakePeer = (() => { const h = {};
+    return { id: null, on(ev, fn) { (h[ev] = h[ev] || []).push(fn); },
+             fire(ev, a) { (h[ev] || []).forEach(f => f(a)); } }; })();
+  r.window.eval("S.peer = null;");
+  r.window.S = r.window.S; // no-op, keep linters quiet
+  r.window.eval("void 0");
+  // hand the peer to relay.js via its 700 ms watcher
+  Object.assign(r.window, { __fp: fakePeer });
+  r.window.eval("S.peer = __fp;");
+  await new Promise(res => setTimeout(res, 900));
+
+  const c = fakeConn("caller-1");
+  fakePeer.fire("connection", c);
+  c.fire("open");
+  ok(rb.live() === 1, "a bound caller connection registers on the bus");
+  ok(c.sent.length === 1 && c.sent[0].k === "hello", "relay's own hello still sent");
+
+  let received = [];
+  rb.on(m => received.push(m));
+  ok(rb.send({ k: "cs", who: "adult" }) === 1, "bus sends over that connection");
+  ok(c.sent.length === 2 && c.sent[1].k === "cs", "the mirror payload went out");
+
+  c.fire("data", { k: "cs", who: "child" });
+  ok(received.length === 1 && received[0].who === "child", "incoming cs reaches subscribers");
+  c.fire("data", { k: "say", i: 2 });
+  ok(received.length === 2, "relay's own messages are also copied to the bus");
+  ok(r.window.eval("LOG.length") >= 0, "no throw handling a say message");
+
+  c.fire("close");
+  ok(rb.live() === 0, "closing the connection deregisters it");
 
   console.log("\n" + (fails ? fails + " FAILURES" : "all assertions passed"));
   process.exit(fails ? 1 : 0);

@@ -94,9 +94,9 @@
       "#ivl b{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;" +
       "letter-spacing:-.02em;color:var(--hair);flex:none}" +
       "#ivl.run b{color:var(--ink)}" +
-      "#ivl.warn{border-color:var(--amber,#B45309)}#ivl.warn b{color:var(--amber,#B45309)}" +
-      "#ivl.bad{border-color:var(--red,#B91C1C)}#ivl.bad b{color:var(--red,#B91C1C)}" +
-      "#ivl.done{border-color:var(--jade,#0F7B5A)}#ivl.done b{color:var(--jade,#0F7B5A)}";
+      "#ivl.warn{border-color:var(--amber,#C97A0B)}#ivl.warn b{color:var(--amber,#C97A0B)}" +
+      "#ivl.bad{border-color:var(--pulse,#E8412C)}#ivl.bad b{color:var(--pulse,#E8412C)}" +
+      "#ivl.done{border-color:var(--jade,#0E7C5E)}#ivl.done b{color:var(--jade,#0E7C5E)}";
     document.head.appendChild(s);
   }
 

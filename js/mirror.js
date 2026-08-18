@@ -260,8 +260,8 @@
       "font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;" +
       "color:var(--slate);margin-bottom:10px}" +
       "#mirror .dot{width:10px;height:10px;border-radius:50%;background:var(--hair);flex:none}" +
-      "#mirror.live .dot{background:var(--jade,#0F7B5A)}" +
-      "#mirror.stale .dot{background:var(--amber,#B45309)}" +
+      "#mirror.live .dot{background:var(--jade,#0E7C5E)}" +
+      "#mirror.stale .dot{background:var(--amber,#C97A0B)}" +
       "#mirror .rows{display:flex;flex-direction:column;gap:7px}" +
       "#mirror .r{display:flex;justify-content:space-between;align-items:baseline;gap:12px}" +
       "#mirror .r span{font-size:13px;font-weight:700;color:var(--slate)}" +

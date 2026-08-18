@@ -1,6 +1,6 @@
 # CPR Coach — Project Specification
 
-**Build of record: `2026-08-14i`** · Status: **beta, not clinically approved**
+**Build of record: `2026-08-18a`** · Status: **beta, not clinically approved**
 
 ---
 
@@ -76,13 +76,20 @@ wins.
 
 ```
 index.html              SERVED. App shell: meta/SEO, all CSS, the complete English
-                        language pack, and all application logic. Self-sufficient —
-                        runs alone, in English, with no other file present.
+                        language pack, the state machine, the flow, the audio and
+                        the console. Runs alone, in English, with every js/ module
+                        missing — degraded, but never broken (§4).
 sw.js                   SERVED. Must be at the ROOT. A self-uninstalling stub (§15).
 manifest.webmanifest    SERVED. PWA metadata; makes the app installable.
+js/speech.js            SERVED. The speech engine (§9).
+js/caselog.js           SERVED. Dispatcher case log (§7.8).
+js/video.js             SERVED. Video session: rooms, joining, playback (§12).
+js/relay.js             SERVED. Play-on-caller's-phone, and the shared channel (§12.1).
+js/mirror.js            SERVED. Caller state on the console (§7.6).
+js/interval.js          SERVED. Recognition → first compression (§7.7).
+js/haptic.js            SERVED. Optional vibration metronome (§8.1).
 lang/hi.js kn.js ta.js  SERVED. Additional language packs, loaded lazily on selection.
 lang/es.js ar.js
-lang/manifest.json      Informational only; not read at runtime.
 images/*                SERVED. Photographs and animations (§11).
 assets/icon-192.png     SERVED. PWA icons and the social share card.
 assets/icon-512.png
@@ -96,6 +103,10 @@ fetch-media.sh          NOT SERVED. Convenience script for local use only.
 `/cprcoach/sw.js` can only find its replacement at that exact path; in `lang/` it can
 never uninstall itself.
 
+**Load order in `index.html` is not free.** `js/video.js` must load before `js/relay.js`,
+which must load before `js/mirror.js`; `js/interval.js` and `js/haptic.js` may sit
+anywhere after the application script.
+
 ---
 
 ## 4. Architecture
@@ -106,7 +117,46 @@ Single page, no framework, no build step, no bundler. Three inline `<script>` bl
 1. **`SVG = {}`** — an empty map, retained as the fallback slot for imagery (§11).
 2. **The English language pack** — `registerLang("en", {...})`. Inline so the emergency
    path never waits on a fetch.
-3. **The application** — state, audio, speech, flow, dispatcher console, video.
+3. **The application** — state, flow, audio, imagery, dispatcher console.
+
+Seven further files in `js/` are fetched separately (§3).
+
+### One behaviour, one owner
+
+Every module here began as a fix for a defect in `index.html`, and each was added by
+overwriting the original — `js/speech.js` assigns `window.say`, `js/video.js` reassigns
+two click handlers. For a period **both implementations shipped**: the superseded code
+sat in `index.html`, unreachable but not harmless. The nine-second pause/resume speech
+watchdog was the clearest case. `js/speech.js` neutralised it on Android, where it had
+done its damage, and on every desktop it went on firing against that engine's own queue.
+
+The rule now: **when a module takes over a behaviour, the original is deleted, and a
+comment in its place names the owner.** `tests/check-spec.js` asserts the four removals
+stay removed.
+
+### What survives a missing module
+
+A separate file can fail to arrive. Design law 7 says a feature that is not working must
+say so, and a button that silently does nothing says nothing at all. So `index.html` ends
+with a **module check** that runs 1.5 s after load: any control whose owner is absent is
+withdrawn rather than left as a trap, and the names of the missing modules go to the
+console and to the `?debug=1` trace.
+
+| Missing | Consequence |
+|---|---|
+| `js/speech.js` | Falls back to a bare `say()` kept in `index.html` for this purpose only. Imperfect voice, no Android workarounds, but the app still speaks. |
+| `js/video.js` | 📹 Share my camera is hidden; the console's Open video is disabled. |
+| `js/caselog.js` | No dispatcher case log. The rescuer's handover record is unaffected. |
+| `js/relay.js` | Play plays on the console only. |
+| `js/mirror.js` | No caller-state card. |
+| `js/interval.js` | No recognition→first-compression readout. Both milestone buttons still work. |
+| `js/haptic.js` | No vibration toggle. Indistinguishable from a device without the Vibration API, and equally harmless. |
+
+**Speech is the only exception to "delete the original", and it is deliberate.** Speech is
+on the emergency path and the app is audio-first (law 4), so a rescuer hearing imperfect
+speech is better off than one hearing none. That fallback is a last resort, not an
+alternative implementation: it has no voice picker, no queue and no watchdog, and speech
+defects are fixed in `js/speech.js`.
 
 No persistence of any kind: no accounts, cookies, `localStorage`, `sessionStorage`, or
 analytics.
@@ -524,6 +574,83 @@ choosing a number is a decision the dispatcher does not need to make, and every 
 competes with the script. Change `BPM` in `index.html` if a reviewer wants a different
 value.
 
+### 7.6 Caller's app — what the caller's phone reports
+
+**Owner: `js/mirror.js`.** Sits between the milestones and the video.
+
+Before this, the console was blind unless the caller shared video. The caller's own handset
+already knew things the dispatcher did not: the patient's age band, how far through the six
+steps they were, whether compressions had started at all, and how long since the collapse
+was reported. That state now rides the data channel `js/relay.js` already opens (§12.1) —
+a second connection would have repeated the 900 ms negotiation delay that path needed on
+slow mobile networks.
+
+One object, at most once every **700 ms**, and only while a rescue is running on the
+caller's device:
+
+```
+{ k:"cs", who, scr, ph, cpr, br, el, tot }
+```
+
+Elapsed and total change every second by definition, so they are excluded from the change
+test and carried by a **5 s heartbeat** instead. Without that the channel would carry a
+message every 700 ms for the whole resuscitation.
+
+**The card says "reports", and the wording is load-bearing.** Every value is what the
+caller's *app* believes, because somebody tapped a button. It is not confirmation of
+anything at the patient's side, and a dispatcher must not read it as such. Every case-log
+entry it writes is prefixed `Caller app reports`.
+
+**A row is omitted rather than guessed.** `S.who` starts `null`, not `"adult"`. The patient
+row does not appear until the caller has answered `s-who`. Defaulting it meant the console
+displayed a patient type the caller had never stated — the same class of error as showing
+an emergency number that might be wrong (§20).
+
+Three failure states, never a blank card: **no link** says so in words; **stale** greys the
+dot and dims the values after **12 s**; and **relay not updated** names the file to fix,
+for the case where `window.relayBus` is missing.
+
+The rescuer's handover record gains exactly one line per session,
+`Status shared with control room` — not one per update, because the record paramedics read
+has to stay readable.
+
+### 7.7 Recognition → first compression
+
+**Owner: `js/interval.js`.** A slim readout directly beneath the two milestone buttons.
+
+The console captured both timestamps and never showed the thing they exist to measure. The
+readout is inert until recognition is marked, then counts up live, then stops and holds the
+interval when first compression is marked. A number appearing afterwards is an audit tool;
+a number climbing during the call is a prompt, and the prompt is the point.
+
+First compression marked *before* recognition is a data-entry error, not a negative
+interval: the readout shows `—:—` rather than something wrong.
+
+**The colour thresholds are placeholders and are not from any guideline.** `WARN_S = 60`
+and `BAD_S = 120` at the top of the file exist so the readout has some visible grammar
+rather than none. **They are the first thing a medical reviewer should replace or delete.**
+
+### 7.8 Case log
+
+**Owner: `js/caselog.js`.** A 📋 button beside Exit, opening an overlay with Copy and
+Share.
+
+The rescuer got a handover record; the dispatcher got nothing. Every fact on the console
+was displayed and then discarded — including the two milestone timestamps, which were
+written into a button label and nowhere else.
+
+Event labels are **English regardless of interface language**, matching the rescuer's log.
+A record read by quality assurance, a medical director or a court should not vary by who
+happened to take the call. Only seven chrome strings are localised.
+
+The record survives Exit, so a call-taker who exits before copying can still retrieve it. A
+new console session clears it. It lives in memory and dies with the tab; persisting it is a
+policy decision, not a coding one.
+
+A once-a-second watcher records three things not attached to any button: how many cameras
+are connected, the observed compression rate, and how long the chest was left alone —
+hands-off time being the quality measure that matters most after the two milestones.
+
 ---
 
 ## 8. Audio
@@ -559,15 +686,80 @@ running. Tapping it in that state retries the context rather than muting.
 
 **Caveat:** behaviour during a live phone call is unverified on low-end Android.
 
+### 8.1 Haptic metronome
+
+**Owner: `js/haptic.js`.** A 📴 / 📳 toggle in the header beside the sound control,
+**off by default**.
+
+Vibrates once per compression on the same beat as the click — **40 ms**, and **90 ms** on
+every tenth beat, mirroring the audio accent. It hangs off the existing `onBeat`, so it
+cannot drift away from the click, and it stops when the metronome stops. It fires only on
+`s-cpr` while `phase === "compress"`: the console metronome plays on the dispatcher's own
+speaker, and buzzing a call-taker's desk phone helps nobody.
+
+Three reasons it exists, in order of how likely they are to matter: the audio may not be
+reaching anyone (see the caveat above — a handset against an ear, on speaker, or on a call
+that has taken the audio session); a deaf or hard-of-hearing rescuer gets no rhythm cue at
+all beyond the flashing wash; and a rescuer who muted the sound deliberately still needs
+the tempo.
+
+**Nothing switches it on except a tap.** An earlier draft engaged it automatically when the
+app was muted or the audio context had failed. That was wrong, and the reasoning is worth
+keeping: a phone that starts vibrating in someone's hand during a resuscitation, for a
+reason they did not cause and cannot see, is frightening at the worst possible moment, and
+a rescuer startled into pausing compressions has been harmed by the feature meant to help
+them. Audio failure is already reported by the ⚠ on the sound control, which is the right
+place for it — it says what is wrong and leaves the response to the rescuer.
+
+**Platform.** `navigator.vibrate` is Android/Chromium only; iOS Safari has never
+implemented it. On a device without it the file adds no control at all, because a
+permanently dead toggle on every iPhone is noise.
+
+**Cost.** Around 110 pulses a minute drains the battery measurably and warms the phone over
+a ten-minute resuscitation. That is the correct trade at the moment it is needed, and one
+more reason the default is off.
+
 ---
 
 ## 9. Speech
 
-`SpeechSynthesisUtterance` at rate 0.97. Utterances are **queued, not cancelled** —
-cancelling mid-sentence was cutting words out of the rescue-breath instructions. A watchdog
-pauses and resumes the synthesiser every 9 s to work around a Chrome defect where speech
-dies silently after about 15 s. If no voice exists for the selected locale, it falls back
-to the default voice but keeps the native text.
+**Owner: `js/speech.js`.** It installs `window.say()` over the fallback in `index.html`
+and changes nothing else.
+
+Three Android Chrome defects produced the three symptoms that were reported, and each is
+answered separately:
+
+**Truncation mid-sentence.** Chrome abandons any single utterance running past roughly
+fifteen seconds. Text is split at sentence boundaries — including the Devanagari danda
+`।` and the Arabic full stop `۔` and question mark `؟` — so no utterance is ever long
+enough to trip it. Runs with no punctuation are hard-capped at **150 characters**;
+fragments under **14** are folded back into the previous piece so delivery is not chopped.
+
+**Overlapping sentences.** `speechSynthesis.cancel()` is asynchronous, and the old code
+called `speak()` on the next line, racing it. Exactly one utterance is now in flight at a
+time, driven by an internal queue, with a settling delay after every cancel — **220 ms**
+on Android, **140 ms** elsewhere — and a short gap between utterances, **110 ms** on
+Android, **45 ms** elsewhere.
+
+**Poor voice quality.** The old code took the first voice whose language tag matched, which
+on Android is often a low-fidelity fallback even when a better voice is installed. Voices
+are now scored: exact region match +40, a name matching the quality list +30, a name
+matching the novelty/low-fidelity list −70, Google TTS on Android +25.
+
+`onend` is not trusted on its own, because on Android it sometimes never fires. Two
+independent detectors close an utterance: a silence poll every **350 ms** after a 1200 ms
+grace period, and an absolute guard at `1500 ms + 160 ms per character`.
+
+Rate is **1.0 on Android** — its engines resample non-integer rates and the result is
+muddier — and **0.97 elsewhere**, which was chosen for clarity.
+
+**The nine-second pause/resume watchdog has been removed** from `index.html`. It existed
+for the fifteen-second defect that splitting now solves, and it fought this engine's queue
+on every platform where it was not disarmed. See §4 and §19.
+
+`speechReport()` in the browser console lists every voice the device offers and which one
+this app would choose. It is the only reliable way to tell a browser problem from a
+missing system voice, and it is what to ask for in a bug report.
 
 ---
 
@@ -686,6 +878,55 @@ code calls it. Multi-party by construction.
 deployment needs its own PeerServer or an SFU, plus TURN servers for callers behind carrier
 NAT.
 
+**Owner: `js/video.js`**, which replaced the room and joining handlers in `index.html`
+outright. Three defects it fixes:
+
+- **Any error tore down the stage.** The console's handler reacted to every PeerJS error
+  identically, by hiding the video stage. Most are not fatal: `peer-unavailable` means one
+  peer could not be reached while the room is still open and any connected camera is still
+  streaming. `js/relay.js` opens a second, data-only connection back to each camera, and
+  when that fails — common without TURN — it raises exactly this non-fatal error. The relay
+  did not break the video; it tripped a trapdoor that was already there. Only genuinely
+  fatal error types now end a session; the rest are logged as warnings.
+- **The room did not exist until the dispatcher pressed 📹.** A caller entering the code
+  first called a peer ID that had not been created, failed, and could not recover, because
+  the failed Peer was left in place and a retry stacked another on top. The room now opens
+  with the console (§14 discloses what that costs), and the caller cleans up and can retry.
+  If the room ID is already taken on the public broker, a new six-digit code is issued
+  rather than failing the call.
+- **The stage did not always start playing.** Assigning `srcObject` is not playing. Safari
+  will leave a muted autoplay element on its first black frame if it was hidden when the
+  stream arrived. `play()` is now called explicitly, three times over the first second.
+
+### 12.1 Instruction relay and the shared channel
+
+**Owner: `js/relay.js`.** The console's existing 🔊 Play button does one job in two places:
+it reads the current script line aloud on the console speaker as before, and — when the
+caller's camera is connected — the caller's own handset reads the same line aloud in the
+caller's own language at the same time.
+
+**One button, not two.** An earlier version added a separate "Speak on caller's phone".
+That asked the dispatcher to choose, mid-resuscitation, between two nearly identical
+controls — the sort of decision §2 exists to remove — and when no camera was connected it
+read "Caller's phone not connected", which is alarming to a dispatcher already talking to
+that caller by telephone. Nothing is wrong in that situation. The absence of a video link
+is never reported as a fault.
+
+**No text crosses the connection — only a step number, 0 to 5.** The caller's phone speaks
+the line from its own language pack. Three things follow, and they are the reason it is
+built this way rather than by sending words: the caller can only ever hear one of the six
+clinically reviewed lines, so a dispatcher cannot improvise a medical instruction through
+this channel by accident or otherwise; nothing needs translating in transit, so no
+mistranslation can reach a resuscitation; and a dispatcher who speaks no Tamil still
+delivers correct Tamil. The caller also announces its language, so the "Caller speaks"
+dropdown stops being a guess.
+
+**`window.relayBus`** lets a second module ride the same connection rather than opening
+another. It keeps its own connection map, copies every incoming message to subscribers, and
+lets subscribers send. Messages are namespaced by their `k` field and each handler ignores
+keys it does not own: `say`, `hello` and `said` belong to `js/relay.js`, `cs` belongs to
+`js/mirror.js` (§7.6).
+
 ---
 
 ## 13. URL parameters
@@ -702,9 +943,39 @@ NAT.
 ## 14. Privacy
 
 No accounts, cookies, storage or analytics. No third-party scripts on the emergency path.
-The handover log lives in memory and is destroyed on reset. Location is never requested.
-Camera is requested only when the rescuer explicitly enters a dispatcher code. PeerJS is
-fetched only when video is opened.
+Both logs — the rescuer's handover record and the dispatcher's case log — live in memory
+and die with the tab. **Location is never requested.**
+
+**The rescuer's side is unchanged and stays minimal.** The camera is requested only when
+the rescuer explicitly types a six-digit code and taps Connect. PeerJS is fetched only at
+that moment. Nothing on the CPR path touches the network.
+
+**The console's side is not minimal, and this is a deliberate trade.** Opening the
+dispatcher console now opens the video room immediately, rather than waiting for the
+📹 button. That means the console, on open:
+
+- fetches `peerjs@1.5.4` from `unpkg.com`, and
+- holds an open connection to the **public PeerJS broker** at `0.peerjs.com` for as long
+  as the console is on screen.
+
+The reason is a defect, not a feature: a caller who entered the code before the dispatcher
+had pressed 📹 called a room that did not yet exist, failed, and could not retry (§19).
+Opening the room with the console means the code is live from the moment it can be read
+aloud.
+
+**What that costs.** The broker sees a room identifier and the IP addresses of everyone in
+it. It is a third party, it is demo-grade infrastructure, and it is not covered by any
+agreement. No media and no application data pass through it — WebRTC is peer-to-peer once
+introduced — but the introduction itself is visible to it. A dispatch centre with a
+confidentiality obligation should read that sentence carefully and run its own PeerServer
+before deploying this (§12).
+
+**What crosses the peer connection.** Video, one way, camera to console. Then two small
+JSON channels and nothing else: a step number 0–5 with its acknowledgement (§12.1), and
+the caller state snapshot (§7.6). No free text can cross in either direction, by design.
+
+The console's video room can be closed at any time with the 📹 control, which tears down
+both the room and the broker connection.
 
 ---
 
@@ -816,6 +1087,12 @@ looks familiar.**
 | Dispatcher panels touching | An edit consumed `.d-say`'s closing `</div>`, nesting every panel inside it | `audit-flow.js` counts div balance |
 | 404 on a GIF | `MEDIA` referenced a file that was never downloaded | `audit-flow.js` asserts every `MEDIA` path exists |
 | Infants told to tilt the head back | Adult ventilation script applied to infants; over-extension occludes an infant airway | Separate `bi1`–`bi3` infant strings |
+| Speech paused and restarted itself on desktop | The 9 s pause/resume watchdog in `index.html` survived the move to `js/speech.js`, which disarmed it on Android only, and fought that engine's queue everywhere else | Watchdog deleted; `check-spec.js` asserts it cannot return |
+| Console reported a patient age nobody had given | `S.who` initialised to `"adult"`, so `js/mirror.js` mirrored it before `s-who` was ever answered | `S.who` starts `null`; the card omits the row until answered |
+| Hindi console showed an English script | `applyLang()` never called `dRender()`, so `?role=dispatcher&lang=hi` gave Hindi chrome over English script lines — the exact failure §7.2 exists to prevent | `applyLang()` ends with `dRender()` |
+| Screen stayed lit after the session ended | The wake lock was requested and never released | `letSleep()` on both exits from a session |
+| Clock timers multiplied | `beginCPR()` starts `tickClock()`, and every re-arrest left another chain running for the rest of the session | Single stored handle, cleared on entry; same for `dClock()` |
+| Over-time readout in an off-palette red | `js/interval.js` referenced `var(--red)`, which is not declared; the fallback hex was a red used nowhere else | Uses `var(--pulse)`, the app's own alarm colour |
 
 ---
 
@@ -844,6 +1121,15 @@ looks familiar.**
    audio may fall back to English.
 7. **Offline is currently disabled** (§15).
 8. **Images carry burnt-in English text** and one lacks recorded attribution (§11).
+9. **The dispatcher console holds an open connection to a public third-party broker**
+   for as long as it is on screen (§14). Acceptable for a demonstration; not acceptable
+   for a dispatch centre with a confidentiality obligation.
+10. **Seven separate `js/` requests.** Harmless on HTTP/2, which GitHub Pages serves —
+    they share one connection — but each is a file that can fail to arrive. §4 defines
+    what happens when one does.
+11. **The §7.7 colour thresholds are invented**, not drawn from any guideline.
+12. **`user-scalable=no`** blocks pinch zoom, which fails WCAG 1.4.4.
+13. **Images total roughly 980 KB**, heavy against the stated 2G target.
 
 ---
 
@@ -868,6 +1154,7 @@ Run through this for **every** change, however small.
 - [ ] `node tests/check-langs.js` passes — no empty or partial packs
 - [ ] `node tests/audit-flow.js` passes — no dead ends, all `MEDIA` paths exist
 - [ ] `node tests/test.js` passes (85 assertions)
+- [ ] `node tests/test-modules.js` passes (55 assertions)
 - [ ] `node tests/adversarial.js` passes (14 assertions)
 - [ ] `node tests/verify-flow.js` prints all six steps in order
 - [ ] Every new string added to all six language packs
@@ -877,4 +1164,8 @@ Run through this for **every** change, however small.
 - [ ] `BUILD` bumped in `index.html`
 - [ ] Emergency path still works with the network disabled
 - [ ] Tested in portrait, landscape and desktop
+- [ ] No behaviour now has two implementations — if a module took one over, the
+      original is deleted and a comment names the owner (§4)
+- [ ] Any new module is listed in §3, loaded in the right order, and covered by the
+      module check at the foot of `index.html`
 - [ ] This document updated in the same commit

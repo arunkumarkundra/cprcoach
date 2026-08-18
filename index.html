@@ -460,10 +460,10 @@ function langOrder(){
   return (ai<0?99:ai)-(bi<0?99:bi);});
 }
 
-const S={lang:"en",who:"adult",breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
+const S={lang:"en",who:null,breaths:false,t0:null,count:0,total:0,cycles:0,running:false,
  aedStep:0,log:[],cprStarted:false,dStep:0,dLang:"en",dT0:null,dCode:null,dLink:"",muted:false,
  vision:false,seenRate:null,stream:null,peer:null,feeds:{},sel:null,lastSwapPrompt:0};
-const BUILD="2026-08-14i";
+const BUILD="2026-08-18a";
 const BPM=110,PERIOD=60/BPM;
 const $=id=>document.getElementById(id);
 const t=()=>LANG_REGISTRY[S.lang]||LANG_REGISTRY.en;
@@ -542,7 +542,7 @@ function step(from,to,fn){
 }
 $("hdr-back").onclick=()=>{const b=BACK[current];if(b)show(b);};
 $("hdr-brand").onclick=()=>{if(phase==="idle"&&current!=="s-home")show("s-home");};
-$("hdr-exit").onclick=()=>{S.dT0=null;stopBeat();stopVideo();phase="idle";show("s-home");};
+$("hdr-exit").onclick=()=>{S.dT0=null;stopBeat();stopVideo();letSleep();phase="idle";show("s-home");};
 
 const loading={};
 function loadLang(code){
@@ -635,25 +635,39 @@ function startBeat(){if(S.running)return;S.running=true;beatNo=0;
  setTimeout(()=>{startKeepAlive();audioHealth();},600);}
 function stopBeat(){S.running=false;clearTimeout(timer);document.documentElement.style.setProperty("--wash",0);}
 
-let voices=[];
-function loadVoices(){voices=window.speechSynthesis?speechSynthesis.getVoices():[];}
-if(window.speechSynthesis){loadVoices();speechSynthesis.onvoiceschanged=loadVoices;
- setInterval(()=>{try{const ss=speechSynthesis;if(ss.speaking&&!ss.paused){ss.pause();ss.resume();}}catch(e){}},9000);}
+/* SPEECH LIVES IN js/speech.js. It installs the real say() over this one.
+
+   What used to be here — a voice list, a voice picker, and a nine-second
+   pause()/resume() watchdog — was a second, competing implementation.
+   speech.js disarmed the watchdog on Android only, so on every desktop it
+   went on firing every nine seconds against speech.js's own queue, pausing
+   and resuming utterances that engine was already managing.
+
+   What remains is a LAST RESORT, not an alternative. It exists so that a
+   failure to fetch js/speech.js degrades to imperfect speech rather than a
+   ReferenceError on the emergency path. It carries none of the Android
+   workarounds and is not the place to fix a speech bug — fix speech.js. */
 function say(text,opts){
  opts=opts||{};
  if(!window.speechSynthesis||!text||S.muted)return;
- const code=(LANG_REGISTRY[opts.lang||S.lang]||LANG_REGISTRY.en).code;
  const u=new SpeechSynthesisUtterance(text);
- const v=voices.find(x=>x.lang===code)||voices.find(x=>x.lang.startsWith(code.split("-")[0]));
- if(v){u.voice=v;u.lang=v.lang;}else{u.lang=code;}
- u.rate=0.97;u.volume=1;
- if(!opts.queue)speechSynthesis.cancel();
- try{speechSynthesis.resume();}catch(e){}
- speechSynthesis.speak(u);
+ u.lang=(LANG_REGISTRY[opts.lang||S.lang]||LANG_REGISTRY.en).code;
+ if(!opts.queue){try{speechSynthesis.cancel();}catch(e){}}
+ try{speechSynthesis.speak(u);}catch(e){}
 }
 
+/* The screen must stay lit for as long as someone is compressing, and no
+   longer. An unreleased lock survives the resuscitation and flattens the
+   battery of a phone that may still be needed. */
 let wakeLock=null;
-async function keepAwake(){try{if("wakeLock"in navigator)wakeLock=await navigator.wakeLock.request("screen");}catch(e){}}
+async function keepAwake(){
+ try{
+  if(!("wakeLock" in navigator)||wakeLock)return;
+  wakeLock=await navigator.wakeLock.request("screen");
+  wakeLock.addEventListener("release",()=>{wakeLock=null;});
+ }catch(e){wakeLock=null;}
+}
+function letSleep(){try{if(wakeLock)wakeLock.release();}catch(e){}wakeLock=null;}
 function mark(l){S.log.push({at:S.t0?Math.round((Date.now()-S.t0)/1000):0,ts:Date.now(),label:l});}
 function hhmmss(ms){const d=new Date(ms);
  return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");}
@@ -745,6 +759,10 @@ function applyLang(){
  a.s.forEach(([hd,bd])=>{const h3=document.createElement("h3");h3.textContent=hd;box.appendChild(h3);
   const p=document.createElement("p");p.textContent=bd;box.appendChild(p);});
  if(phase==="aed")renderAED();
+ /* The console script is part of the dispatcher's interface, so it must move
+    with the interface language. Leaving it out left an English script line
+    under Hindi chrome — the exact failure §7.2 exists to prevent. */
+ dRender();
 }
 /* A language name must be readable by the person choosing it. For the rescuer's own
    picker that means the native name; for the dispatcher it means the caller's language
@@ -811,6 +829,7 @@ function onBeat(n){
  const root=document.documentElement;
  root.style.setProperty("--wash",1);setTimeout(()=>root.style.setProperty("--wash",0),150);
  document.body.classList.add("beating");
+ setTimeout(()=>document.body.classList.remove("beating"),150);
  if(phase!=="compress")return;
  S.count++;S.total++;
  $("counter").textContent=S.count;$("ticker").style.width=((S.count%30)/30*100)+"%";
@@ -842,9 +861,14 @@ function doBreaths(){
   $("counter").classList.remove("small");$("tickwrap").classList.remove("breath");art("art-cpr",handArt());
   phase="compress";S.count=0;say(d.say.resume);startBeat();},10200));
 }
-function tickClock(){if(!S.t0)return;const s=Math.round((Date.now()-S.t0)/1000);
+/* One loop, however many times it is started. beginCPR() runs again on every
+   re-arrest, and each entry used to leave another timer chain running for the
+   rest of the session. */
+let clockT=null;
+function tickClock(){clearTimeout(clockT);if(!S.t0)return;
+ const s=Math.round((Date.now()-S.t0)/1000);
  if(HDR[current]==="clock")$("hdr-clock").textContent=mmss(s);
- setTimeout(tickClock,500);}
+ clockT=setTimeout(tickClock,500);}
 
 $("btn-sound").onclick=()=>{
  if(!S.muted&&ac&&ac.state!=="running"){          // warning state: retry, don't mute
@@ -894,7 +918,8 @@ $("btn-restart").onclick=()=>{
  if(S.cprStarted){mark("Re-arrest — compressions resumed");beginCPR();}
  else{mark("Deteriorated — arrest assumed");show("s-who");say(t().q3);}};
 $("btn-handover2").onclick=()=>{renderLog();show("s-hand");};
-$("btn-home").onclick=()=>{stopBeat();clearBreaths();stopVideo();phase="idle";S.t0=null;S.cprStarted=false;show("s-home");};
+$("btn-home").onclick=()=>{stopBeat();clearBreaths();stopVideo();letSleep();
+ phase="idle";S.t0=null;S.cprStarted=false;S.who=null;S.breaths=false;show("s-home");};
 function renderLog(){
  const ul=$("loglist");ul.innerHTML="";let day="";
  S.log.forEach(e=>{
@@ -956,20 +981,12 @@ $("btn-video").onclick=()=>{
  show("s-code");$("codeinput").value=S.lastCode||"";$("codeinput").focus();};
  
 $("btn-code-back").onclick=()=>show("s-cpr");
-$("btn-code-go").onclick=async()=>{
- const code=$("codeinput").value.trim(),d=t();
- if(!/^\d{6}$/.test(code)){$("t-code-note").textContent=d.ui.needSix;return;}
- $("btn-code-go").textContent="…";
- const lib=await loadPeerLib();
- if(!lib){$("t-code-note").textContent=d.ui.noNet;$("btn-code-go").textContent=d.codeGo;return;}
- try{S.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});}
- catch(e){$("t-code-note").textContent=d.ui.noCam;$("btn-code-go").textContent=d.codeGo;return;}
- S.peer=new Peer();
- S.peer.on("open",()=>{S.peer.call(ROOM(code),S.stream);S.lastCode=code;
-  mark("Video joined, code "+code);setVideoBtn(true);show("s-cpr");});
- 
- S.peer.on("error",()=>{$("t-code-note").textContent=d.ui.noReach;$("btn-code-go").textContent=d.codeGo;});
-};
+/* JOINING A ROOM LIVES IN js/video.js, which installs the handler for
+   btn-code-go. The version that used to sit here left a dead Peer and a live
+   camera behind after a failed attempt, so a second try could never succeed;
+   it also treated every PeerJS error as fatal. Both are fixed there. Nothing
+   here should reimplement it — see the module check at the foot of this file
+   for what happens if that file does not arrive. */
 function stopVideo(){S.vision=false;
  if(S.stream){S.stream.getTracks().forEach(x=>x.stop());S.stream=null;}
  if(S.peer){try{S.peer.destroy();}catch(e){}S.peer=null;}
@@ -1007,7 +1024,10 @@ $("btn-console").onclick=()=>{unlock();S.dT0=Date.now();S.dStep=0;
  $("d-code").textContent=S.dCode;
  S.dLink=location.origin+location.pathname+"?code="+S.dCode+"&lang="+S.dLang;
  dRender();buildDLangs();show("s-console");dClock();};
-function dClock(){if(!S.dT0)return;$("hdr-clock").textContent=mmss(Math.round((Date.now()-S.dT0)/1000));setTimeout(dClock,500);}
+let dClockT=null;
+function dClock(){clearTimeout(dClockT);if(!S.dT0)return;
+ $("hdr-clock").textContent=mmss(Math.round((Date.now()-S.dT0)/1000));
+ dClockT=setTimeout(dClock,500);}
 function dPack(){return LANG_REGISTRY[S.dLang]||LANG_REGISTRY.en;}
 function dRender(){
  /* The dispatcher reads the script in THEIR language; only the playback is in the
@@ -1051,20 +1071,11 @@ $("d-metro").onclick=e=>{unlock();
  else{startBeat();b.textContent="■ "+u.metronome+" · "+BPM+"/min";b.classList.remove("b-quiet");b.classList.add("b-amber");}};
 $("d-copylink").onclick=async()=>{try{await navigator.clipboard.writeText(S.dLink);
  $("d-copylink").textContent="✓ Copied";setTimeout(()=>$("d-copylink").innerHTML="🔗 <span id=\"d-linklbl\">"+t().ui.copyLink+"</span>",1800);}catch(e){}};
-$("d-startvid").onclick=async()=>{
- const u=t().ui;
- if(S.peer){stopVideo();$("d-vidlbl").textContent=u.openVideo;return;}
- $("d-vidlbl").textContent="…";
- const lib=await loadPeerLib();
- if(!lib){$("d-vidlbl").textContent=u.openVideo;return;}
- S.peer=new Peer(ROOM(S.dCode));
- $("stagewrap").hidden=false;
- S.peer.on("open",()=>{$("d-vidlbl").textContent=u.endVideo;$("stagehint").textContent=u.waiting;});
- S.peer.on("error",()=>{$("stagehint").textContent="⚠";
-  $("d-vidlbl").textContent=u.openVideo;$("stagewrap").hidden=true;});
- S.peer.on("call",c=>{c.answer();
-  c.on("stream",st=>addFeed(c.peer,st));c.on("close",()=>removeFeed(c.peer));});
-};
+/* OPENING THE ROOM LIVES IN js/video.js, which installs the handler for
+   d-startvid and also opens the room automatically when the console opens, so
+   the six-digit code is live from the moment it can be read aloud. The version
+   that used to sit here hid the whole video stage on ANY PeerJS error, which
+   blanked a perfectly good feed whenever an unrelated data channel failed. */
 function addFeed(id,stream){
  if(S.feeds[id])return;S.feeds[id]=stream;
  const n=Object.keys(S.feeds).length;
@@ -1099,6 +1110,32 @@ buildChips();buildDLangs();applyLang();setHeader("s-home");
 if(q.get("role")==="dispatcher")$("btn-console").click();
 if(ulang&&ulang!=="en"&&LANG_INDEX.some(l=>l.code===ulang))
  loadLang(ulang).then(ok=>{if(ok){S.lang=ulang;applyLang();buildChips();buildDLangs();}});
+/* MODULE CHECK. Behaviour now lives in one place per behaviour, which means
+   some of it lives in files that are fetched separately. Design law 7 says a
+   feature that is not working must say so, and a button that silently does
+   nothing says nothing at all. So each control whose owner failed to arrive is
+   withdrawn rather than left as a trap.
+
+   Speech is the deliberate exception: it falls back to the bare say() above,
+   because a rescuer hearing imperfect speech is better off than one hearing
+   none. Everything else here is optional and off the emergency path. */
+setTimeout(function(){
+ const gone=[];
+ if(!$("btn-code-go").onclick||!$("d-startvid").onclick){
+  gone.push("video");
+  $("btn-video").style.display="none";                 // do not offer what cannot work
+  $("d-startvid").disabled=true;$("d-startvid").style.opacity=".45";
+ }
+ if(!window.speechReport)gone.push("speech (using fallback voice)");
+ if(!window.caseLog)gone.push("caselog");
+ if(!window.relayBus)gone.push("relay");
+ if(!$("mirror"))gone.push("mirror");
+ if(!$("ivl"))gone.push("interval");
+ if(gone.length){
+  console.error("CPR Coach: module(s) did not load — "+gone.join(", "));
+  trace("MODULE MISSING: "+gone.join(", "));
+ }
+},1500);
 /* NO SERVICE WORKER. A cached worker could pin a stale copy of itself, so fixes
    never reached the device and the app appeared to lose steps at random. Until
    the UI settles, every load comes straight from the network. This block removes

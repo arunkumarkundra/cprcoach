@@ -13,19 +13,45 @@ Zero-install CPR guidance that works offline. Open a link, tap one button, follo
 ## Files
 
 ```
-index.html              the app. English is inline — the emergency path never waits on a fetch
+index.html              the app. English, the state machine, the flow and the audio are
+                        inline — the emergency path never waits on a fetch
+js/speech.js            the speech engine
+js/caselog.js           dispatcher case log
+js/video.js             video rooms, joining, playback
+js/relay.js             play the script line on the caller's phone; shared data channel
+js/mirror.js            the caller's app state, shown on the console
+js/interval.js          recognition → first compression, counting live
+js/haptic.js            optional vibration metronome
 lang/hi.js kn.js ta.js  other languages, loaded only when selected
 lang/es.js ar.js
-lang/manifest.json      optional list for tooling; the app uses LANG_INDEX in index.html
-sw.js                   service worker — caches everything for offline use
+sw.js                   service worker — a self-uninstalling stub; offline is off for now
 manifest.webmanifest    installable to the home screen
-fetch-media.sh          Downloads licensed photos/GIFs into assets/img/
-CREDITS.md              Media sources, authors and licences
-assets/img/             Photos and animations (optional; drawings are the fallback)
+fetch-media.sh          downloads licensed photos/GIFs into images/
+CREDITS.md              media sources, authors and licences
+images/                 photos and animations
 assets/icon-192.png     PWA icons
 assets/icon-512.png
 assets/og-image.png     link preview card for WhatsApp / social
 ```
+
+**One behaviour, one owner.** Each `js/` file exists because something in `index.html` was
+broken, and each took that behaviour over by overwriting it. For a while both versions
+shipped — the superseded code sat in `index.html`, unreachable but not harmless. The
+nine-second speech watchdog is the cautionary tale: `js/speech.js` disarmed it on Android,
+where it had done its damage, and on every desktop it went on fighting that engine's own
+queue.
+
+So: when a module takes over a behaviour, the original is **deleted**, and a comment in its
+place names the owner. `tests/check-spec.js` asserts the four removals stay removed.
+
+**Load order matters.** `video.js` before `relay.js` before `mirror.js`. The other three can
+sit anywhere after the application script.
+
+**If a module fails to arrive**, `index.html` withdraws the control it owns rather than
+leaving a button that silently does nothing, and names the missing file in the console and
+in the `?debug=1` trace. Speech is the one exception: it falls back to a bare `say()` kept
+in `index.html` for exactly this case, because a rescuer hearing imperfect speech is better
+off than one hearing none.
 
 ## Testing
 
@@ -85,7 +111,9 @@ index.html              served
 sw.js                   served — must be at the ROOT (a self-uninstalling stub;
                         keep it there so old registrations find it and remove themselves)
 manifest.webmanifest    served
+js/*.js                 served
 lang/*.js               served
+images/                 served
 assets/                 served
 tests/*.js              NOT served — Node scripts, run locally
 *.md                    NOT served — documentation
@@ -176,10 +204,13 @@ and cannot fail. Packs themselves load lazily — only English is ever parsed at
 
 - Deterministic state machine; no AI anywhere on the emergency path
 - Web Audio metronome with lookahead scheduling and drift recovery
-- Speech synthesis, queued so sentences are never cut off mid-word
-- Full offline operation after first visit
+- Speech synthesis, split at sentence boundaries and queued one utterance at a time, with
+  voice scoring so Android does not fall back to a low-fidelity voice
 - Multi-party video over PeerJS, loaded on demand only
 - Compression-rate estimate from frame differencing on the selected video feed
+- The caller's app state mirrored to the console over the same data channel
+- Recognition → first compression, counting up live on the console
+- Optional vibration metronome on Android
 
 ## What is stubbed or fragile
 
@@ -191,6 +222,20 @@ and cannot fail. Packs themselves load lazily — only English is ever parsed at
   Session API hold the audio focus, but the OS may still duck or suspend it. Test on the
   cheapest Android phones you can find before relying on it.
 - **Translations are unreviewed.** This is the highest-priority fix.
+- **Offline is off.** `sw.js` is a self-uninstalling stub and the page clears any worker
+  and cache on load. Two caching bugs each presented as the app randomly losing steps, the
+  second because a cached worker could serve a stale copy of *itself* — so published fixes
+  never reached the device and no fix could be verified. Offline returns once the UI
+  settles, built properly.
+- **The console holds an open connection to a public third-party broker** for as long as it
+  is on screen. Opening the console now opens the video room, so the six-digit code is live
+  from the moment it can be read aloud — that fixed a real defect, but it means the broker
+  sees a room identifier and the IP addresses of everyone in it. No media and no
+  application data pass through it. A dispatch centre with a confidentiality obligation
+  must run its own PeerServer first.
+- **The two colour thresholds on the recognition→compression readout are invented**, not
+  from any guideline. They are in `js/interval.js` as `WARN_S` and `BAD_S`, and a medical
+  reviewer should replace or delete them.
 
 ## Before this goes anywhere real
 
@@ -198,7 +243,12 @@ and cannot fail. Packs themselves load lazily — only English is ever parsed at
    Council guidance with a version number in the repo.
 2. Native-speaker review of every string, then clinical review of the back-translation.
 3. Field testing on low-end Android over 2G, in a stairwell, in daylight.
-4. Only then remove the beta badge and let search engines index the HowTo schema.
+4. Set `robots` to `noindex` and remove the `HowTo` schema **until 1 and 2 are done**. The
+   schema can surface unreviewed CPR steps as a rich result to someone who never opens the
+   page — no disclaimer, no beta badge, no context. Only then remove the beta badge and
+   allow indexing.
+5. Record the author of `Chest_compressions.gif`. It is CC BY 3.0 and the licence requires
+   a named author; see `CREDITS.md`.
 
 ---
 

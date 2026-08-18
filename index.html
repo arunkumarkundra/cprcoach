@@ -200,6 +200,11 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .tile video{width:100%;height:100%;object-fit:cover}
 .tile span{position:absolute;inset-inline-start:5px;bottom:4px;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 3px #000}
 
+@media(max-width:400px){
+ #appbar{gap:6px}#hdr-right{gap:5px}
+ .hsel{max-width:34vw;font-size:14px;padding:9px 10px}
+ .hbtn.icon{padding:9px 10px}#hdr-clock{font-size:20px}
+} 
 @media(min-width:700px){.screen,#appbar{max-width:760px;margin-inline:auto;width:100%}
  #s-console,#appbar.wide{max-width:760px}.b-huge{min-height:220px}}
 
@@ -484,7 +489,7 @@ function setHeader(id){
  $("hdr-back").style.display=(m==="back"&&BACK[id])?"flex":"none";
  const showClock=(m==="clock"||m==="exit");
  $("hdr-clock").style.display=showClock?"inline":"none";
- $("hdr-elapsed").style.display=showClock?"inline":"none";
+ $("hdr-elapsed").style.display="none";
  $("hdr-exit").style.display=(m==="exit")?"flex":"none";
  $("btn-sound").style.display=(id==="s-home")?"none":"flex";
  $("btn-console").style.display=(id==="s-home")?"inline":"none";

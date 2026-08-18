@@ -744,7 +744,8 @@ function applyLang(){
  $("btn-handover2").textContent=d.handH2;$("btn-aed-back").textContent=d.aedBack;
  if(typeof S.aedStep==="number")renderAED();
  const u=d.ui;
- $("hdr-elapsed").textContent=u.elapsed;$("hdr-exit").textContent=u.exit;
+  $("hdr-elapsed").textContent=u.elapsed;
+ $("hdr-exit").textContent="✕";$("hdr-exit").title=u.exit;$("hdr-exit").setAttribute("aria-label",u.exit);
  $("btn-console").textContent=u.dispatcher;
  $("btn-copy").textContent=u.copy;$("btn-home").textContent=u.startOver;
  $("btn-share").textContent=u.share;$("btn-medics").textContent=u.medics;

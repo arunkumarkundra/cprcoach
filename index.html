@@ -205,6 +205,10 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
  .hsel{max-width:34vw;font-size:14px;padding:9px 10px}
  .hbtn.icon{padding:9px 10px}#hdr-clock{font-size:20px}
 } 
+#memorial-foot{margin-top:26px;padding:18px 0 4px;border-top:1px solid var(--hair);
+ text-align:center;font-size:14px;font-weight:600;line-height:1.6;color:var(--slate)}
+#memorial-foot a{color:var(--ink);font-weight:800;text-decoration:underline;
+ text-underline-offset:4px;white-space:nowrap} 
 @media(min-width:700px){.screen,#appbar{max-width:760px;margin-inline:auto;width:100%}
  #s-console,#appbar.wide{max-width:760px}.b-huge{min-height:220px}}
 
@@ -244,7 +248,9 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
   <div class="foot stack">
     <button class="b-red b-huge" id="btn-start"><span id="t-start"></span><small id="t-start-sub"></small></button>
     <p class="disclaimer" id="t-disclaimer"></p>
-    <div class="article" id="article"></div>
+        <div class="article" id="article"></div>
+    <p id="memorial-foot">Created in loving memory of my daughter,
+      <a href="memorial.html">Prisha Kundra</a>.</p>
     
    
   </div>

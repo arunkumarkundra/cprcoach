@@ -13,10 +13,10 @@ All files live in `images/`.
 
 ### `Chest_compressions.gif` — adult and child compressions
 
-- **Source:** [File:Chest compressions.gif](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif), Wikimedia Commons, extracted from the video [การช่วยฟื้นคืนชีพ CPR](https://www.youtube.com/watch?v=pacoTshuOto) on YouTube
-- **Licence:** [CC BY 3.0 Unported](https://creativecommons.org/licenses/by/3.0)
-- **Author:** Video by Bangkok Hospital Phuket; segment extracted and converted to an animation by [Mikael Häggström](https://commons.wikimedia.org/wiki/User:Mikael_H%C3%A4ggstr%C3%B6m)
-- **Changes made:** none — the animation is used as published on Commons
+- **Source:** [File:Chest compressions.gif](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif), Wikimedia Commons, derived from the video [การช่วยฟื้นคืนชีพ CPR](https://www.youtube.com/watch?v=pacoTshuOto) on YouTube
+- **Licence:** [CC BY 3.0 Unported](https://creativecommons.org/licenses/by/3.0). The original video was published on YouTube under [YouTube's Creative Commons Attribution (CC BY) option](https://support.google.com/youtube/answer/2797468), which is CC BY 3.0 and [compatible with Wikimedia Commons](https://commons.wikimedia.org/wiki/Commons:YouTube_files); that is how the segment came to be hosted there.
+- **Author:** Original video by Bangkok Hospital Phuket; a segment was extracted and converted to an animated GIF by [Mikael Häggström](https://commons.wikimedia.org/wiki/User:Mikael_H%C3%A4ggstr%C3%B6m)
+- **Changes made:** Häggström extracted a short segment from the original video and converted it to a looping GIF. This app uses that GIF as published on Commons, without further modification.
 
 CC BY 3.0 requires three things, all of which are satisfied above:
 
@@ -26,9 +26,10 @@ CC BY 3.0 requires three things, all of which are satisfied above:
 
 The attribution line carried in `README.md` and the site's public description reads:
 
-> Chest compression animation by **Bangkok Hospital Phuket**, extracted and converted by
-> **Mikael Häggström**, via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif),
-> licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0). Unchanged.
+> Chest compression animation by **Bangkok Hospital Phuket**, segment extracted and
+> converted to a GIF by **Mikael Häggström**, via
+> [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif),
+> licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0).
 
 *Note:* the Commons description states the compressions are at **100 per minute**, while
 this app's metronome runs at 110. Both sit inside the 100–120 guideline window, so the

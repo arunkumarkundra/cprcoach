@@ -254,9 +254,9 @@ and cannot fail. Packs themselves load lazily — only English is ever parsed at
 
 ## Attribution
 
-Chest compression animation by **Bangkok Hospital Phuket**, extracted and converted by
-**[Mikael Häggström](https://commons.wikimedia.org/wiki/User:Mikael_H%C3%A4ggstr%C3%B6m)**,
+Chest compression animation by **Bangkok Hospital Phuket**, segment extracted and converted
+to a GIF by **[Mikael Häggström](https://commons.wikimedia.org/wiki/User:Mikael_H%C3%A4ggstr%C3%B6m)**,
 via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif),
-licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0). Unchanged.
+licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0).
 
 Infant illustrations generated at the maintainer's request; no third-party rights asserted.

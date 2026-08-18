@@ -149,12 +149,20 @@
     paint();
   }
 
-  function paint() {
+    function paint() {
     if (!btn) return;
     var sound = byId("btn-sound");
     /* Mirror the sound control's visibility rather than re-deriving which
        screens show header controls. One source of truth. */
     if (sound) btn.style.display = sound.style.display;
+
+    /* Except on the dispatcher console. buzz() only ever fires on the
+       rescuer's compression screen (see onRescuerBeat), so here the toggle
+       is a switch that does nothing, crowding a header that already
+       overflows on small phones. */
+    try {
+      if (typeof current !== "undefined" && current === "s-console") btn.style.display = "none";
+    } catch (e) {}
 
     btn.textContent = on ? "📳" : "📴";
     var label = on ? tx().on : tx().off;

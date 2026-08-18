@@ -21,36 +21,35 @@
    3. A rescuer who muted the sound deliberately — a quiet ward, a
       sleeping household — still needs the tempo.
 
-   THE AUTOMATIC PART
-   Design law 7 is "fail visibly, never silently". So the beat does not
-   stay silent on its own: when the app is muted, or when the
-   AudioContext is not running while the beat is meant to be playing,
-   vibration engages by itself. The toggle then shows that it did. The
-   rescuer can still switch it off, and an explicit off is respected —
-   an automatic fallback that cannot be refused is a different kind of
-   failure.
+   IT ONLY EVER DOES WHAT IT IS TOLD
+   Off until tapped, on until tapped again, and nothing else changes it.
+   An earlier draft switched itself on when the app was muted or the audio
+   context had failed. That was wrong. A phone that starts vibrating in
+   someone's hand during a resuscitation, for a reason they did not cause
+   and cannot see, is frightening at the worst possible moment, and a
+   rescuer startled into pausing compressions has been harmed by the
+   feature meant to help them. Audio failure is already reported by the ⚠
+   on the sound control, which is the right place for it: it says what is
+   wrong and leaves the response to the rescuer.
 
-   Three states, one button:
-     📴  off, and audio is fine
-     📳  on, because the rescuer asked
-     📳  on, because audio is not delivering (dimmed, and the tooltip says so)
+   Two states, one button:
+     📴  off
+     📳  on
 
    PLATFORM
    navigator.vibrate is Android/Chromium only. iOS Safari has never
    implemented it. On a device without it this file adds no control at
-   all — a permanently broken toggle on every iPhone would be noise, and
-   the missing feature is not a failure of this one. The ⚠ already on the
-   sound control covers audio failure on those devices.
+   all — a permanently dead toggle on every iPhone would be noise.
 
    COST
    Around 110 pulses a minute is not free. Expect measurably faster
    battery drain and a warm phone over a ten-minute resuscitation. That is
-   the correct trade at the moment it is needed and the reason the default
-   is off.
+   the correct trade at the moment it is needed, and one more reason the
+   default is off.
 
    Chromium also drops vibration when the tab is not visible and before
-   any user gesture. Both are moot here: the screen is held awake and the
-   app cannot reach the compression screen without several taps.
+   any user gesture. Both are moot here: the screen is held awake, and the
+   only way to switch this on is to tap it.
 
    WHAT IT DOES NOT DO
    It does not schedule anything. It hangs off the existing beat, so it
@@ -69,18 +68,12 @@
   var ACCENT = 90;
 
   var TX = {
-    en: { on: "Vibrate on each compression", off: "Vibration off",
-          auto: "Vibrating because the sound is not playing" },
-    hi: { on: "हर दबाव पर कंपन", off: "कंपन बंद",
-          auto: "ध्वनि नहीं चल रही, इसलिए कंपन चालू" },
-    kn: { on: "ಪ್ರತಿ ಒತ್ತುವಿಕೆಗೆ ಕಂಪನ", off: "ಕಂಪನ ಆಫ್",
-          auto: "ಧ್ವನಿ ಬರುತ್ತಿಲ್ಲ, ಆದ್ದರಿಂದ ಕಂಪನ" },
-    ta: { on: "ஒவ்வொரு அழுத்தத்திற்கும் அதிர்வு", off: "அதிர்வு நிறுத்தம்",
-          auto: "ஒலி இயங்கவில்லை, எனவே அதிர்வு" },
-    es: { on: "Vibrar en cada compresión", off: "Vibración desactivada",
-          auto: "Vibrando porque no suena el audio" },
-    ar: { on: "اهتزاز مع كل ضغطة", off: "الاهتزاز متوقف",
-          auto: "يهتز لأن الصوت لا يعمل" }
+    en: { on: "Vibrate on each compression", off: "Vibration off" },
+    hi: { on: "हर दबाव पर कंपन", off: "कंपन बंद" },
+    kn: { on: "ಪ್ರತಿ ಒತ್ತುವಿಕೆಗೆ ಕಂಪನ", off: "ಕಂಪನ ಆಫ್" },
+    ta: { on: "ஒவ்வொரு அழுத்தத்திற்கும் அதிர்வு", off: "அதிர்வு நிறுத்தம்" },
+    es: { on: "Vibrar en cada compresión", off: "Vibración desactivada" },
+    ar: { on: "اهتزاز مع كل ضغطة", off: "الاهتزاز متوقف" }
   };
   function tx() {
     var l = "en";
@@ -92,31 +85,9 @@
   try { supported = typeof navigator !== "undefined" && typeof navigator.vibrate === "function"; }
   catch (e) { supported = false; }
 
-  var wanted = false;        // the rescuer's explicit choice
-  var refused = false;       // they turned it off while it was auto-engaged
+  /* The whole of this module's state: one boolean the rescuer controls. */
+  var on = false;
   var btn = null;
-
-  /* =================================================================
-     Is the audio actually delivering?
-
-     Muted is the obvious case. The subtler one is a suspended or failed
-     AudioContext while the beat is supposed to be running — the same
-     condition the 🔊 control already shows as ⚠.
-  ================================================================= */
-  function audioFailing() {
-    var s = null;
-    try { s = (typeof S !== "undefined") ? S : null; } catch (e) {}
-    if (!s) return false;
-    if (s.muted) return true;
-    if (!s.running) return false;
-    try {
-      if (typeof ac !== "undefined" && ac && ac.state !== "running") return true;
-    } catch (e) {}
-    return false;
-  }
-
-  function auto() { return !refused && audioFailing(); }
-  function active() { return supported && (wanted || auto()); }
 
   /* Only the rescuer's compression screen. The console metronome plays on
      the dispatcher's own speaker to help them count aloud; buzzing a
@@ -128,7 +99,7 @@
   }
 
   function buzz(n) {
-    if (!active() || !onRescuerBeat()) return;
+    if (!on || !supported || !onRescuerBeat()) return;
     try { navigator.vibrate(n % 10 === 0 ? ACCENT : TAP); } catch (e) {}
   }
 
@@ -167,8 +138,11 @@
     btn.type = "button";
     btn.className = sound.className;        // inherit the header styling exactly
     btn.onclick = function () {
-      if (active()) { wanted = false; refused = true; }
-      else { wanted = true; refused = false; try { navigator.vibrate(ACCENT); } catch (e) {} }
+      on = !on;
+      /* One pulse on switching on, so the rescuer feels what they asked
+         for and knows the phone can do it. Nothing on switching off — a
+         buzz confirming silence is a contradiction. */
+      if (on) { try { navigator.vibrate(ACCENT); } catch (e) {} }
       paint();
     };
     sound.parentNode.insertBefore(btn, sound);
@@ -182,11 +156,8 @@
        screens show header controls. One source of truth. */
     if (sound) btn.style.display = sound.style.display;
 
-    var on = active(), byAuto = on && !wanted;
     btn.textContent = on ? "📳" : "📴";
-    btn.style.opacity = byAuto ? ".62" : "1";
-    var x = tx();
-    var label = !on ? x.off : (byAuto ? x.auto : x.on);
+    var label = on ? tx().on : tx().off;
     btn.title = label;
     btn.setAttribute("aria-label", label);
     btn.setAttribute("aria-pressed", on ? "true" : "false");

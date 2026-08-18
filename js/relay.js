@@ -30,6 +30,11 @@
    can only ever hear one of the six clinically reviewed lines, nothing
    needs translating in transit, and a dispatcher who speaks no Tamil still
    delivers correct Tamil.
+
+   SHARED CHANNEL
+   This file also exposes window.relayBus so js/mirror.js can ride the
+   same data connection instead of opening a second one. See the block
+   below. Nothing else in this file changed.
 */
 (function () {
   "use strict";
@@ -52,6 +57,52 @@
   function note(s) { try { if (window.caseLog) window.caseLog.add(s); } catch (e) {} }
 
   /* =================================================================
+     Shared channel bus.
+
+     Added so a second module (js/mirror.js) can ride this same data
+     channel without re-implementing peer discovery or opening a second
+     connection. A second connection would repeat the 900 ms negotiation
+     delay this file already had to introduce for slow mobile networks.
+
+     It keeps its OWN connection map, so nothing else in this file changes
+     behaviour: every incoming message is copied to subscribers, and
+     subscribers can send objects of their own. Messages are namespaced by
+     their "k" field and each handler ignores keys it does not own —
+     "say", "hello" and "said" belong to this file, "cs" belongs to
+     js/mirror.js.
+  ================================================================= */
+  var busConns = {}, busFns = [], busSeq = 0;
+
+  function busAdd(conn) {
+    if (!conn) return;
+    if (!conn.__busKey) conn.__busKey = "b" + (++busSeq);
+    busConns[conn.__busKey] = conn;
+  }
+  function busDrop(conn) {
+    if (!conn || !conn.__busKey) return;
+    delete busConns[conn.__busKey];
+  }
+  function bus(msg) {
+    for (var i = 0; i < busFns.length; i++) { try { busFns[i](msg); } catch (e) {} }
+  }
+  window.relayBus = {
+    on: function (fn) { if (typeof fn === "function") busFns.push(fn); },
+    send: function (obj) {
+      var n = 0;
+      for (var k in busConns) {
+        if (!busConns[k] || !busConns[k].open) continue;
+        try { busConns[k].send(obj); n++; } catch (e) {}
+      }
+      return n;
+    },
+    live: function () {
+      var n = 0;
+      for (var k in busConns) if (busConns[k] && busConns[k].open) n++;
+      return n;
+    }
+  };
+
+  /* =================================================================
      Finding the connection.
 
      index.html creates its Peer objects inside click handlers and never
@@ -65,11 +116,12 @@
     var p = null;
     try { p = (typeof S !== "undefined" && S) ? S.peer : null; } catch (e) { p = null; }
     if (p === hooked) {
-      if (!p && iAmDispatcher) { conns = {}; iAmDispatcher = false; }
+      if (!p && iAmDispatcher) { conns = {}; busConns = {}; iAmDispatcher = false; }
       return;
     }
     hooked = p;
     conns = {};
+    busConns = {};        /* a new peer means every old channel is dead */
     iAmDispatcher = false;
     if (p) hook(p);
   }
@@ -104,16 +156,14 @@
        now ignores those, which is what stopped it blanking the stage. */
     try { conn = peer.connect(remoteId, { reliable: true }); } catch (e) { return; }
     if (!conn) return;
-        conn.on("open", function () {
+    conn.on("open", function () {
       conns[remoteId] = conn;
       busAdd(conn);
-      logIt("Instruction channel open to caller's phone");
-      paint();
+      note("Instruction link to caller's phone open");
     });
     conn.on("data", function (msg) { fromCaller(msg); bus(msg); });
     conn.on("close", function () { busDrop(conn); drop(remoteId); });
     conn.on("error", function () { busDrop(conn); drop(remoteId); });
-     
   }
 
   function drop(remoteId) {
@@ -230,7 +280,7 @@
   /* =================================================================
      Caller side
   ================================================================= */
-    function bindCaller(conn) {
+  function bindCaller(conn) {
     try {
       conn.on("open", function () {
         busAdd(conn);

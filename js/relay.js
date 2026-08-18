@@ -104,13 +104,16 @@
        now ignores those, which is what stopped it blanking the stage. */
     try { conn = peer.connect(remoteId, { reliable: true }); } catch (e) { return; }
     if (!conn) return;
-    conn.on("open", function () {
+        conn.on("open", function () {
       conns[remoteId] = conn;
-      note("Instruction link to caller's phone open");
+      busAdd(conn);
+      logIt("Instruction channel open to caller's phone");
+      paint();
     });
-    conn.on("data", function (msg) { fromCaller(msg); });
-    conn.on("close", function () { drop(remoteId); });
-    conn.on("error", function () { drop(remoteId); });
+    conn.on("data", function (msg) { fromCaller(msg); bus(msg); });
+    conn.on("close", function () { busDrop(conn); drop(remoteId); });
+    conn.on("error", function () { busDrop(conn); drop(remoteId); });
+     
   }
 
   function drop(remoteId) {
@@ -227,14 +230,17 @@
   /* =================================================================
      Caller side
   ================================================================= */
-  function bindCaller(conn) {
+    function bindCaller(conn) {
     try {
       conn.on("open", function () {
+        busAdd(conn);
         var mine = "en";
         try { mine = S.lang || "en"; } catch (e) {}
         try { conn.send({ k: "hello", lang: mine }); } catch (e) {}
       });
-      conn.on("data", function (msg) { fromConsole(conn, msg); });
+      conn.on("data", function (msg) { fromConsole(conn, msg); bus(msg); });
+      conn.on("close", function () { busDrop(conn); });
+      conn.on("error", function () { busDrop(conn); });
     } catch (e) {}
   }
 

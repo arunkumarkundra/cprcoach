@@ -247,15 +247,16 @@ and cannot fail. Packs themselves load lazily — only English is ever parsed at
    schema can surface unreviewed CPR steps as a rich result to someone who never opens the
    page — no disclaimer, no beta badge, no context. Only then remove the beta badge and
    allow indexing.
-5. Record the author of `Chest_compressions.gif`. It is CC BY 3.0 and the licence requires
-   a named author; see `CREDITS.md`.
+5. Image attribution for `Chest_compressions.gif` is complete (`CREDITS.md`). Carry the
+   one-line credit in the site's public description too, wherever that is published.
 
 ---
 
 ## Attribution
 
-Chest compression animation from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif),
-licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0).
-**Author name still to be recorded — see `CREDITS.md`.**
+Chest compression animation by **Bangkok Hospital Phuket**, extracted and converted by
+**[Mikael Häggström](https://commons.wikimedia.org/wiki/User:Mikael_H%C3%A4ggstr%C3%B6m)**,
+via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif),
+licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0). Unchanged.
 
 Infant illustrations generated at the maintainer's request; no third-party rights asserted.

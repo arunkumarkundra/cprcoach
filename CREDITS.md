@@ -13,22 +13,22 @@ All files live in `images/`.
 
 ### `Chest_compressions.gif` — adult and child compressions
 
-- **Source:** [File:Chest compressions.gif](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif), Wikimedia Commons
+- **Source:** [File:Chest compressions.gif](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif), Wikimedia Commons, extracted from the video [การช่วยฟื้นคืนชีพ CPR](https://www.youtube.com/watch?v=pacoTshuOto) on YouTube
 - **Licence:** [CC BY 3.0 Unported](https://creativecommons.org/licenses/by/3.0)
-- **Author:** ⚠️ **TO DO — read the "Author" field on the file page and paste it here.**
-- **Changes made:** none (or note any cropping)
+- **Author:** Video by Bangkok Hospital Phuket; segment extracted and converted to an animation by [Mikael Häggström](https://commons.wikimedia.org/wiki/User:Mikael_H%C3%A4ggstr%C3%B6m)
+- **Changes made:** none — the animation is used as published on Commons
 
-CC BY 3.0 requires three things, all of which must be satisfied:
+CC BY 3.0 requires three things, all of which are satisfied above:
 
 1. Appropriate credit to the named author
 2. A link to the licence — https://creativecommons.org/licenses/by/3.0
 3. A statement of whether changes were made
 
-Once you have the author's name, add this line to the footer of `README.md` and to the
-site's public description:
+The attribution line carried in `README.md` and the site's public description reads:
 
-> Chest compression animation by **[AUTHOR]**, via Wikimedia Commons, licensed under
-> [CC BY 3.0](https://creativecommons.org/licenses/by/3.0). [Cropped / unchanged].
+> Chest compression animation by **Bangkok Hospital Phuket**, extracted and converted by
+> **Mikael Häggström**, via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Chest_compressions.gif),
+> licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0). Unchanged.
 
 *Note:* the Commons description states the compressions are at **100 per minute**, while
 this app's metronome runs at 110. Both sit inside the 100–120 guideline window, so the

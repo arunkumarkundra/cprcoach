@@ -862,9 +862,11 @@ disk, which prevents the 404 class of bug.
 Attribution lives in `CREDITS.md` and `README.md`, never on screen. `CREDITS.md` also lists
 the eight slots still worth filling, in priority order — `pads` and `recovery` first.
 
-**Outstanding:** `Chest_compressions.gif` is CC BY 3.0 and its author is not yet recorded.
-Both infant images carry burnt-in English text, which breaks the multilingual rule and
-should be cropped before release.
+`Chest_compressions.gif` is CC BY 3.0, credited to Bangkok Hospital Phuket with the segment
+extracted and converted by Mikael Häggström; see `CREDITS.md` for the full attribution.
+
+**Outstanding:** both infant images carry burnt-in English text, which breaks the
+multilingual rule and should be cropped before release.
 
 ---
 
@@ -1120,7 +1122,7 @@ looks familiar.**
 6. **Speech voices for Indian languages are absent on many devices**, so text is native but
    audio may fall back to English.
 7. **Offline is currently disabled** (§15).
-8. **Images carry burnt-in English text** and one lacks recorded attribution (§11).
+8. **Images carry burnt-in English text** (§11). Attribution is now fully recorded.
 9. **The dispatcher console holds an open connection to a public third-party broker**
    for as long as it is on screen (§14). Acceptable for a demonstration; not acceptable
    for a dispatch centre with a confidentiality obligation.
@@ -1140,7 +1142,7 @@ looks familiar.**
 2. Native-speaker review of every string, then clinical review of the back-translation.
 3. Field testing: low-end Android, 2G, a stairwell, direct sunlight, one-handed.
 4. Accessibility pass: screen reader, contrast, touch targets, reduced motion.
-5. Complete image attribution; crop burnt-in text; compress files.
+5. Crop burnt-in text and compress files. (Image attribution is complete — see `CREDITS.md`.)
 6. Rebuild offline support properly (§15).
 7. Only then remove the beta badge and allow indexing.
 
